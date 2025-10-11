@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { ArrowLeft, Download, Sparkles, ExternalLink } from "lucide-react";
 import EmailCard from "@/components/campaign/EmailCard";
+import { useUserPlan } from "@/hooks/useUserPlan";
 
 const CampaignView = () => {
   const { id } = useParams();
@@ -15,6 +16,7 @@ const CampaignView = () => {
   const [campaign, setCampaign] = useState<any>(null);
   const [emails, setEmails] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { isFree } = useUserPlan();
 
   useEffect(() => {
     const fetchCampaign = async () => {
@@ -71,6 +73,12 @@ const CampaignView = () => {
       htmlContent += `
 <!-- ${email.email_type.toUpperCase()} EMAIL (${email.sequence_number}) -->
 ${email.html_content}
+${isFree ? `
+<div style="text-align: center; padding: 20px; border-top: 1px solid #e5e7eb; margin-top: 20px; font-size: 12px; color: #6b7280;">
+  <span>Powered by </span>
+  <a href="https://vayno.ai" target="_blank" style="color: #8b5cf6; font-weight: 600; text-decoration: none;">Vayno</a>
+</div>
+` : ''}
 
 `;
     });

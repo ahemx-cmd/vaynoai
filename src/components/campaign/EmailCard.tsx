@@ -7,6 +7,8 @@ import { motion } from "framer-motion";
 import { Wand2, Check, X, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useUserPlan } from "@/hooks/useUserPlan";
+import VaynoWatermark from "./VaynoWatermark";
 
 interface EmailCardProps {
   email: any;
@@ -19,6 +21,7 @@ const EmailCard = ({ email, index, campaignId }: EmailCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(email.content);
   const [improving, setImproving] = useState(false);
+  const { isFree } = useUserPlan();
 
   const handleSave = async () => {
     const { error } = await supabase
@@ -151,6 +154,7 @@ const EmailCard = ({ email, index, campaignId }: EmailCardProps) => {
                       {content}
                     </pre>
                   </div>
+                  {isFree && <VaynoWatermark />}
                   <div className="flex gap-2 pt-4 border-t border-border/50">
                     <Button
                       onClick={handleImprove}

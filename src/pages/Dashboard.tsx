@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { Plus, Sparkles } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
+import MobileSidebar from "@/components/dashboard/MobileSidebar";
 import CampaignsList from "@/components/dashboard/CampaignsList";
 import UsageCard from "@/components/dashboard/UsageCard";
 
@@ -67,13 +68,16 @@ const Dashboard = () => {
         <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-lg border-b border-border">
           <div className="px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <h1 className="text-2xl font-bold tracking-tight">
-                  Good morning, {firstName} ✨
-                </h1>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Create and manage your email campaigns
-                </p>
+              <div className="flex items-center gap-4 flex-1">
+                <MobileSidebar />
+                <div className="flex-1">
+                  <h1 className="text-2xl font-bold tracking-tight">
+                    Good morning, {firstName} ✨
+                  </h1>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Create and manage your email campaigns
+                  </p>
+                </div>
               </div>
               <div className="flex items-center gap-3">
                 <Button onClick={() => navigate("/create-campaign")} className="btn-premium shadow-md hover-lift">
