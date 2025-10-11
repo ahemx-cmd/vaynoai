@@ -190,6 +190,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_user_generations: {
+        Args: { user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"
