@@ -3,7 +3,6 @@ import { ArrowRight, Sparkles, Zap, FileText, Download, Layout, CheckCircle2, St
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import PricingSection from "@/components/pricing/PricingSection";
-import HowItWorks from "@/components/landing/HowItWorks";
 import FeaturesGrid from "@/components/landing/FeaturesGrid";
 import Testimonials from "@/components/landing/Testimonials";
 
@@ -72,7 +71,7 @@ const Index = () => {
             </div>
 
             <p className="text-sm text-muted-foreground mt-6">
-              No credit card required • 5 free generations
+              No credit card required
             </p>
           </motion.div>
 
@@ -104,9 +103,6 @@ const Index = () => {
           </motion.div>
         </div>
       </section>
-
-      {/* How It Works */}
-      <HowItWorks />
 
       {/* Features Grid */}
       <FeaturesGrid />

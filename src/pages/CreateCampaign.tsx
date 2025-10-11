@@ -32,7 +32,6 @@ const dripDurations = [
   { value: "7-day", label: "7-Day Drip (3–5 emails)", description: "Quick sequence over one week" },
   { value: "14-day", label: "14-Day Drip (5–7 emails)", description: "Medium-paced sequence over two weeks" },
   { value: "30-day", label: "30-Day Drip (7–10 emails)", description: "Extended sequence over a month" },
-  { value: "custom", label: "Custom", description: "Define your own duration" },
 ];
 
 const urlSchema = z.string().url("Please enter a valid URL");
