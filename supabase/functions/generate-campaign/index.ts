@@ -109,8 +109,9 @@ serve(async (req) => {
         model: "google/gemini-2.5-flash",
         messages: [{
           role: "user",
-          content: `Analyze this URL: ${url} and create 4 email sequences (welcome, nurture, sales, re-engagement). Each 50-500 words, high-converting copy. Return JSON: {emails: [{type, subject, content, html}]}`
+          content: `Analyze this URL: ${url} and create 4 email sequences (welcome, nurture, sales, re-engagement). Each 50-500 words, high-converting copy with strong CTAs. Return ONLY valid JSON without markdown code blocks: {"emails": [{"type": "string", "subject": "string", "content": "string", "html": "string"}]}`
         }],
+        temperature: 0.7,
       }),
     });
 
@@ -127,7 +128,30 @@ serve(async (req) => {
       throw new Error("Invalid AI response format");
     }
 
-    const emailsData = JSON.parse(aiData.choices[0].message.content);
+    let contentText = aiData.choices[0].message.content.trim();
+    
+    // Remove markdown code blocks if present
+    if (contentText.startsWith("```json")) {
+      contentText = contentText.replace(/```json\n?/g, "").replace(/```\n?/g, "");
+    } else if (contentText.startsWith("```")) {
+      contentText = contentText.replace(/```\n?/g, "");
+    }
+    
+    console.log("Raw AI response:", contentText);
+    
+    let emailsData;
+    try {
+      emailsData = JSON.parse(contentText);
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError, "Content:", contentText);
+      throw new Error("Failed to parse AI response as JSON");
+    }
+    
+    if (!emailsData.emails || !Array.isArray(emailsData.emails)) {
+      console.error("Invalid emails structure:", emailsData);
+      throw new Error("AI response missing emails array");
+    }
+    
     console.log("Generated", emailsData.emails.length, "emails");
 
     // Save emails using service client (bypasses RLS for bulk insert)

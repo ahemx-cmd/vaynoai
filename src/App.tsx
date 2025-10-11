@@ -9,6 +9,11 @@ import Dashboard from "./pages/Dashboard";
 import CreateCampaign from "./pages/CreateCampaign";
 import AnalyzingCampaign from "./pages/AnalyzingCampaign";
 import CampaignView from "./pages/CampaignView";
+import Profile from "./pages/Profile";
+import Billing from "./pages/Billing";
+import Usage from "./pages/Usage";
+import Support from "./pages/Support";
+import Updates from "./pages/Updates";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +31,11 @@ const App = () => (
           <Route path="/create-campaign" element={<CreateCampaign />} />
           <Route path="/campaign/:id/analyzing" element={<AnalyzingCampaign />} />
           <Route path="/campaign/:id" element={<CampaignView />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/billing" element={<Billing />} />
+          <Route path="/usage" element={<Usage />} />
+          <Route path="/support" element={<Support />} />
+          <Route path="/updates" element={<Updates />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
