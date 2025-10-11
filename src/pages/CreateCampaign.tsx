@@ -5,10 +5,35 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { ArrowLeft, Sparkles, Loader2, Link as LinkIcon, FileText, Download, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2, Link as LinkIcon, FileText, Download } from "lucide-react";
 import { z } from "zod";
+
+const sequenceTypes = [
+  { value: "welcome", label: "Welcome Series 📝", description: "Introduce your brand, set the tone, and build trust with new subscribers or buyers." },
+  { value: "product-launch", label: "Product Launch 🚀", description: "Announce your new product or feature with excitement and storytelling that drives conversions." },
+  { value: "sales-promotion", label: "Sales / Promotion 💰", description: "Run limited-time discounts, flash sales, or special offers with urgency and clear CTAs." },
+  { value: "abandoned-cart", label: "Abandoned Cart 🛒", description: "Remind visitors what they left behind and gently nudge them to complete their purchase." },
+  { value: "re-engagement", label: "Re-engagement / Win-Back 🔄", description: "Bring inactive users or subscribers back with updates, offers, or fresh value." },
+  { value: "nurture", label: "Nurture / Educational 🎓", description: "Share helpful insights or tutorials to build authority and trust over time." },
+  { value: "onboarding", label: "Onboarding (SaaS) ⚙️", description: "Guide new users through setup, value discovery, and first success milestones." },
+  { value: "feature-announcement", label: "Feature Announcement / Update 🔔", description: "Highlight what's new — keep users engaged with updates and improvements." },
+  { value: "pre-launch", label: "Pre-Launch / Waitlist ⏳", description: "Build excitement before launch day. Perfect for early access or new releases." },
+  { value: "testimonial", label: "Customer Testimonial / Proof 🌟", description: "Leverage stories, reviews, or user wins to increase credibility and trust." },
+  { value: "newsletter", label: "Newsletter / Content Series 🗞️", description: "Share recurring updates, educational content, or brand stories that keep your audience warm." },
+  { value: "seasonal", label: "Seasonal / Holiday Campaign 🎉", description: "Engage your audience during key seasons — Black Friday, holidays, or special events." },
+  { value: "upsell", label: "Upsell / Cross-Sell Sequence 🔼", description: "Recommend complementary products or upgrades after purchase." },
+  { value: "event-followup", label: "Event Follow-up 🎤", description: "Send post-event recaps, replays, or offers to attendees." },
+];
+
+const dripDurations = [
+  { value: "7-day", label: "7-Day Drip (3–5 emails)", description: "Quick sequence over one week" },
+  { value: "14-day", label: "14-Day Drip (5–7 emails)", description: "Medium-paced sequence over two weeks" },
+  { value: "30-day", label: "30-Day Drip (7–10 emails)", description: "Extended sequence over a month" },
+  { value: "custom", label: "Custom", description: "Define your own duration" },
+];
 
 const urlSchema = z.string().url("Please enter a valid URL");
 const nameSchema = z.string().min(3, "Campaign name must be at least 3 characters");
@@ -19,6 +44,8 @@ const CreateCampaign = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [url, setUrl] = useState("");
   const [name, setName] = useState("");
+  const [sequenceType, setSequenceType] = useState("");
+  const [dripDuration, setDripDuration] = useState("");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -43,6 +70,18 @@ const CreateCampaign = () => {
     try {
       urlSchema.parse(url);
       nameSchema.parse(name);
+
+      if (!sequenceType) {
+        toast.error("Please select a sequence type");
+        setLoading(false);
+        return;
+      }
+
+      if (!dripDuration) {
+        toast.error("Please select a drip duration");
+        setLoading(false);
+        return;
+      }
 
       const { data: usageData, error: usageError } = await supabase
         .from("user_usage")
@@ -69,6 +108,8 @@ const CreateCampaign = () => {
           name,
           url,
           status: "analyzing",
+          sequence_type: sequenceType,
+          drip_duration: dripDuration,
         })
         .select()
         .single();
@@ -148,6 +189,50 @@ const CreateCampaign = () => {
                 />
                 <p className="text-sm text-muted-foreground mt-2">
                   The URL will be analyzed to extract product details and generate emails
+                </p>
+              </div>
+
+              <div>
+                <Label htmlFor="sequence-type" className="text-base">Sequence Type</Label>
+                <Select value={sequenceType} onValueChange={setSequenceType}>
+                  <SelectTrigger className="mt-2 h-12">
+                    <SelectValue placeholder="Choose your email sequence purpose" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    {sequenceTypes.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{type.label}</span>
+                          <span className="text-xs text-muted-foreground">{type.description}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Select the goal of your email sequence
+                </p>
+              </div>
+
+              <div>
+                <Label htmlFor="drip-duration" className="text-base">Drip Duration</Label>
+                <Select value={dripDuration} onValueChange={setDripDuration}>
+                  <SelectTrigger className="mt-2 h-12">
+                    <SelectValue placeholder="Choose sequence pacing" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {dripDurations.map((duration) => (
+                      <SelectItem key={duration.value} value={duration.value}>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{duration.label}</span>
+                          <span className="text-xs text-muted-foreground">{duration.description}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Define the pacing and length of your sequence
                 </p>
               </div>
 

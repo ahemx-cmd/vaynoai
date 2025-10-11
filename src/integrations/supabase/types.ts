@@ -18,8 +18,10 @@ export type Database = {
         Row: {
           analyzed_data: Json | null
           created_at: string
+          drip_duration: string | null
           id: string
           name: string
+          sequence_type: string | null
           status: string
           updated_at: string
           url: string
@@ -28,8 +30,10 @@ export type Database = {
         Insert: {
           analyzed_data?: Json | null
           created_at?: string
+          drip_duration?: string | null
           id?: string
           name: string
+          sequence_type?: string | null
           status?: string
           updated_at?: string
           url: string
@@ -38,8 +42,10 @@ export type Database = {
         Update: {
           analyzed_data?: Json | null
           created_at?: string
+          drip_duration?: string | null
           id?: string
           name?: string
+          sequence_type?: string | null
           status?: string
           updated_at?: string
           url?: string
