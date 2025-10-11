@@ -152,6 +152,7 @@ export type Database = {
           generations_limit: number
           generations_used: number
           id: string
+          lemonsqueezy_customer_id: string | null
           plan: string
           subscription_id: string | null
           subscription_status: string | null
@@ -164,6 +165,7 @@ export type Database = {
           generations_limit?: number
           generations_used?: number
           id?: string
+          lemonsqueezy_customer_id?: string | null
           plan?: string
           subscription_id?: string | null
           subscription_status?: string | null
@@ -176,6 +178,7 @@ export type Database = {
           generations_limit?: number
           generations_used?: number
           id?: string
+          lemonsqueezy_customer_id?: string | null
           plan?: string
           subscription_id?: string | null
           subscription_status?: string | null

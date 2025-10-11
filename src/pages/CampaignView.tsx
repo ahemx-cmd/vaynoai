@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Download, Sparkles, ExternalLink } from "lucide-react";
 import EmailCard from "@/components/campaign/EmailCard";
 import { useUserPlan } from "@/hooks/useUserPlan";
+import URLSummary from "@/components/campaign/URLSummary";
 
 const CampaignView = () => {
   const { id } = useParams();
@@ -114,15 +115,20 @@ ${isFree ? `
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
           <Button variant="ghost" onClick={() => navigate("/dashboard")}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
           </Button>
-          <Button onClick={handleExportHTML} className="glow">
-            <Download className="w-4 h-4 mr-2" />
-            Export HTML
-          </Button>
+          <div className="flex gap-2">
+            {campaign.analyzed_data && (
+              <URLSummary analyzedData={campaign.analyzed_data} url={campaign.url} />
+            )}
+            <Button onClick={handleExportHTML} className="glow">
+              <Download className="w-4 h-4 mr-2" />
+              Export HTML
+            </Button>
+          </div>
         </div>
 
         <motion.div

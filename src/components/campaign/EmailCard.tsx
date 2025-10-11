@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import VaynoWatermark from "./VaynoWatermark";
+import SmartPreview from "./SmartPreview";
+import AutoTranslate from "./AutoTranslate";
 
 interface EmailCardProps {
   email: any;
@@ -155,7 +157,16 @@ const EmailCard = ({ email, index, campaignId }: EmailCardProps) => {
                     </pre>
                   </div>
                   {isFree && <VaynoWatermark />}
-                  <div className="flex gap-2 pt-4 border-t border-border/50">
+                  <div className="flex flex-wrap gap-2 pt-4 border-t border-border/50">
+                    <SmartPreview 
+                      subject={email.subject}
+                      content={content}
+                      htmlContent={email.html_content}
+                    />
+                    <AutoTranslate 
+                      emailId={email.id}
+                      campaignId={campaignId}
+                    />
                     <Button
                       onClick={handleImprove}
                       variant="outline"

@@ -89,8 +89,43 @@ const Billing = () => {
     return "Free";
   };
 
+  const handleCheckout = (checkoutUrl: string) => {
+    if (user?.id) {
+      const urlWithUserId = `${checkoutUrl}&checkout[custom][user_id]=${user.id}`;
+      window.open(urlWithUserId, '_blank');
+    } else {
+      window.open(checkoutUrl, '_blank');
+    }
+  };
+
   const handleUpgrade = (planName: string) => {
-    toast.info("Payment integration coming soon! Contact support to upgrade.");
+    const checkoutUrls: { [key: string]: string } = {
+      'Starter': 'https://vayno.lemonsqueezy.com/buy/b8a3207d-80e9-4092-8cfc-5f15c00511b1?logo=0',
+      'Pro': 'https://vayno.lemonsqueezy.com/buy/b1c6e286-36a9-4b48-bc80-9b03182d3b83?logo=0'
+    };
+
+    const checkoutUrl = checkoutUrls[planName];
+    if (checkoutUrl) {
+      handleCheckout(checkoutUrl);
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    try {
+      const { data: usageData } = await supabase
+        .from('user_usage')
+        .select('lemonsqueezy_customer_id')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (usageData?.lemonsqueezy_customer_id) {
+        window.open(`https://app.lemonsqueezy.com/my-orders`, '_blank');
+      } else {
+        toast.error('No subscription found');
+      }
+    } catch (error) {
+      toast.error('Failed to open subscription management');
+    }
   };
 
   if (loading) {
@@ -142,12 +177,20 @@ const Billing = () => {
                     {isPro && "You're on the Pro plan with full access to all features."}
                   </p>
                 </div>
-                {!isPro && (
-                  <Button onClick={() => handleUpgrade(isStarter ? "Pro" : "Starter")}>
-                    <Crown className="w-4 h-4 mr-2" />
-                    Upgrade Now
-                  </Button>
-                )}
+                <div className="flex gap-2">
+                  {!isFree && (
+                    <Button variant="outline" onClick={handleManageSubscription}>
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      Manage Subscription
+                    </Button>
+                  )}
+                  {!isPro && (
+                    <Button onClick={() => handleUpgrade(isStarter ? "Pro" : "Starter")}>
+                      <Crown className="w-4 h-4 mr-2" />
+                      Upgrade Now
+                    </Button>
+                  )}
+                </div>
               </div>
 
               <Separator className="my-6" />
@@ -221,11 +264,14 @@ const Billing = () => {
                         <Button 
                           className="w-full mb-6" 
                           variant={isCurrentPlan ? "outline" : "default"}
-                          disabled={isCurrentPlan}
-                          onClick={() => handleUpgrade(planItem.name)}
+                          disabled={isCurrentPlan || planItem.name === "Free"}
+                          onClick={() => {
+                            if (planItem.name === "Free") return;
+                            handleUpgrade(planItem.name);
+                          }}
                         >
-                          {isCurrentPlan ? "Current Plan" : "Upgrade"}
-                          {!isCurrentPlan && <ChevronRight className="w-4 h-4 ml-2" />}
+                          {isCurrentPlan ? "Current Plan" : planItem.name === "Free" ? "Current Plan" : "Upgrade"}
+                          {!isCurrentPlan && planItem.name !== "Free" && <ChevronRight className="w-4 h-4 ml-2" />}
                         </Button>
 
                         <Separator className="mb-4" />

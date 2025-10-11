@@ -1,1 +1,10 @@
 project_id = "dwliuzujgjglbkezqsls"
+
+[functions.generate-campaign]
+verify_jwt = true
+
+[functions.improve-email]
+verify_jwt = true
+
+[functions.lemon-squeezy-webhook]
+verify_jwt = false
