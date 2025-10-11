@@ -8,7 +8,60 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Dark theme colors */
+    /* Premium light theme - Notion/Linear inspired */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Indigo to Violet gradient primary */
+    --primary: 238 77% 62%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 250 75% 70%;
+
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 250 75% 70%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 238 77% 62%;
+
+    --radius: 1rem;
+
+    /* Premium gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(238 77% 62%), hsl(250 75% 70%));
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(220 14% 98%));
+    --gradient-glow: linear-gradient(135deg, hsl(238 77% 62% / 0.1), hsl(250 75% 70% / 0.1));
+    
+    /* Glass morphism */
+    --glass-bg: hsl(0 0% 100% / 0.8);
+    --glass-border: hsl(220 13% 91% / 0.5);
+
+    /* Premium shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -2px hsl(0 0% 0% / 0.1);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -4px hsl(0 0% 0% / 0.1);
+    --shadow-glow: 0 0 30px hsl(238 77% 62% / 0.15);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  .dark {
     --background: 222 47% 5%;
     --foreground: 210 40% 98%;
 
@@ -18,10 +71,8 @@ All colors MUST be HSL.
     --popover: 222 40% 8%;
     --popover-foreground: 210 40% 98%;
 
-    /* Purple to blue gradient primary */
-    --primary: 258 90% 66%;
-    --primary-foreground: 210 40% 98%;
-    --primary-glow: 258 90% 76%;
+    --primary: 238 77% 62%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
@@ -29,7 +80,7 @@ All colors MUST be HSL.
     --muted: 217 33% 17%;
     --muted-foreground: 215 20% 65%;
 
-    --accent: 258 90% 66%;
+    --accent: 250 75% 70%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 84% 60%;
@@ -37,26 +88,10 @@ All colors MUST be HSL.
 
     --border: 217 33% 15%;
     --input: 217 33% 15%;
-    --ring: 258 90% 66%;
+    --ring: 238 77% 62%;
 
-    --radius: 0.75rem;
-
-    /* Premium gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(258 90% 66%), hsl(220 90% 66%));
-    --gradient-glow: linear-gradient(135deg, hsl(258 90% 66% / 0.2), hsl(220 90% 66% / 0.2));
-    --gradient-border: linear-gradient(135deg, hsl(258 90% 66% / 0.5), hsl(220 90% 66% / 0.5));
-    
-    /* Glass morphism */
-    --glass-bg: hsl(222 40% 8% / 0.6);
-    --glass-border: hsl(258 90% 66% / 0.2);
-
-    /* Shadows */
-    --shadow-glow: 0 0 40px hsl(258 90% 66% / 0.3);
-    --shadow-soft: 0 10px 30px -10px hsl(0 0% 0% / 0.5);
-
-    /* Animations */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --glass-bg: hsl(222 40% 8% / 0.8);
+    --glass-border: hsl(238 77% 62% / 0.2);
   }
 }
 
@@ -66,15 +101,19 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-[#f8f9fb] text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
     font-feature-settings: 'ss01' on, 'ss02' on, 'cv01' on, 'cv03' on;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Glass card effect */
+  /* Premium card effect */
   .glass-card {
     background: var(--glass-bg);
     backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-md);
   }
 
   /* Gradient text */
@@ -85,13 +124,42 @@ All colors MUST be HSL.
     background-clip: text;
   }
 
-  /* Glow effect */
+  /* Premium glow */
   .glow {
     box-shadow: var(--shadow-glow);
+  }
+
+  /* Hover lift effect */
+  .hover-lift {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
   }
 
   /* Smooth transitions */
   .transition-smooth {
     transition: var(--transition-smooth);
+  }
+
+  /* Premium button */
+  .btn-premium {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-premium::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent, hsl(0 0% 100% / 0.1));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .btn-premium:hover::before {
+    opacity: 1;
   }
 }

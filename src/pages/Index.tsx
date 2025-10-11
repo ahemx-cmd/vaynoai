@@ -1,149 +1,146 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Zap, Lock, TrendingUp } from "lucide-react";
+import { ArrowRight, Sparkles, Zap, FileText, Download, Layout, CheckCircle2, Star, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import PricingSection from "@/components/pricing/PricingSection";
+import HowItWorks from "@/components/landing/HowItWorks";
+import FeaturesGrid from "@/components/landing/FeaturesGrid";
+import Testimonials from "@/components/landing/Testimonials";
 
 const Index = () => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#f8f9fb]">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 glass-card border-b border-border/50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent glow" />
-            <span className="font-bold text-xl gradient-text">Vayno</span>
-          </Link>
-          <div className="flex gap-3">
-            <Button variant="ghost" asChild>
-              <Link to="/auth">Sign In</Link>
-            </Button>
-            <Button asChild className="glow">
-              <Link to="/auth">Get Started</Link>
-            </Button>
+      <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-lg border-b border-border/50">
+        <div className="container mx-auto px-4 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <Link to="/" className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <span className="font-bold text-xl tracking-tight">Vayno</span>
+            </Link>
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" asChild className="hidden sm:inline-flex">
+                <Link to="/auth">Sign In</Link>
+              </Button>
+              <Button asChild className="btn-premium">
+                <Link to="/auth">Try Free</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-background to-background" />
-        <div className="absolute top-20 left-1/4 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+        {/* Background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
+        <div className="absolute top-40 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
         
-        <div className="container mx-auto text-center relative z-10">
+        <div className="container mx-auto text-center relative z-10 max-w-5xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 bg-primary/10 mb-6 animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5 mb-6 animate-fade-in">
               <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm">AI-Powered Email Campaigns</span>
+              <span className="text-sm font-medium">AI-Powered Email Campaigns</span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 max-w-4xl mx-auto">
-              Turn Your Landing Page Into{" "}
-              <span className="gradient-text">Complete Email Campaigns</span>
+            
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight tracking-tight">
+              Turn your landing page into{" "}
+              <span className="gradient-text">ready-to-send</span>{" "}
+              email campaigns
             </h1>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Paste any product URL and get a full email sequence in seconds. Welcome series, nurture campaigns, sales emails — all ready to send.
+            
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
+              AI that builds high-converting sequences for you — no copywriting needed. Just paste your URL and get professional emails in minutes.
             </p>
-            <div className="flex gap-4 justify-center">
-              <Button size="lg" asChild className="glow">
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button size="lg" asChild className="btn-premium shadow-lg hover-lift">
                 <Link to="/auth" className="flex items-center gap-2">
-                  Start Free <ArrowRight className="w-4 h-4" />
+                  Try Free <ArrowRight className="w-4 h-4" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link to="#pricing">View Pricing</Link>
+              <Button size="lg" variant="outline" asChild className="hover-lift">
+                <Link to="#how-it-works">See How It Works</Link>
               </Button>
             </div>
+
+            <p className="text-sm text-muted-foreground mt-6">
+              No credit card required • 5 free generations
+            </p>
           </motion.div>
 
+          {/* Hero Visual */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="mt-16 relative"
+            className="mt-20"
           >
-            <div className="glass-card rounded-2xl p-8 max-w-4xl mx-auto border-2 border-primary/20 glow">
-              <div className="aspect-video bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg flex items-center justify-center">
-                <Sparkles className="w-20 h-20 text-primary animate-glow-pulse" />
+            <div className="glass-card rounded-2xl p-2 max-w-4xl mx-auto hover-lift">
+              <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-xl p-8 aspect-video flex flex-col items-center justify-center gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-white shadow-md flex items-center justify-center">
+                    <Mail className="w-6 h-6 text-primary" />
+                  </div>
+                  <ArrowRight className="w-6 h-6 text-muted-foreground" />
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent shadow-lg flex items-center justify-center">
+                    <Sparkles className="w-6 h-6 text-white animate-glow-pulse" />
+                  </div>
+                  <ArrowRight className="w-6 h-6 text-muted-foreground" />
+                  <div className="w-12 h-12 rounded-xl bg-white shadow-md flex items-center justify-center">
+                    <CheckCircle2 className="w-6 h-6 text-green-500" />
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground">Paste URL → AI Generates → Export & Send</p>
               </div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Why Founders Love Vayno</h2>
-            <p className="text-muted-foreground text-lg">Everything you need to launch email campaigns faster</p>
-          </div>
+      {/* How It Works */}
+      <HowItWorks />
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {[
-              {
-                icon: Zap,
-                title: "Lightning Fast",
-                description: "Generate complete email sequences in under 30 seconds. No more hours of copywriting."
-              },
-              {
-                icon: Lock,
-                title: "Brand-Matched Copy",
-                description: "AI analyzes your landing page to match your brand voice and product messaging perfectly."
-              },
-              {
-                icon: TrendingUp,
-                title: "High Converting",
-                description: "50-500 word emails with proven structures. Personalized CTAs that drive results."
-              }
-            ].map((feature, i) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                viewport={{ once: true }}
-                className="glass-card p-8 rounded-2xl hover:scale-105 transition-smooth hover:glow"
-              >
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-4 glow">
-                  <feature.icon className="w-6 h-6 text-primary-foreground" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-                <p className="text-muted-foreground">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Features Grid */}
+      <FeaturesGrid />
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-20 px-4">
+      <section id="pricing" className="py-20 px-4 bg-white">
         <PricingSection />
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto">
+      {/* Testimonials */}
+      <Testimonials />
+
+      {/* Final CTA Section */}
+      <section className="py-20 px-4 bg-gradient-to-b from-white to-primary/5">
+        <div className="container mx-auto max-w-4xl">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="glass-card rounded-3xl p-12 text-center max-w-4xl mx-auto border-2 border-primary/20 glow"
+            className="glass-card rounded-3xl p-12 text-center hover-lift"
           >
-            <h2 className="text-4xl font-bold mb-4">
-              Ready to Launch Your First Campaign?
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <Sparkles className="w-8 h-8 text-white" />
+            </div>
+            <h2 className="text-4xl font-bold mb-4 tracking-tight">
+              Start generating your first campaign today
             </h2>
-            <p className="text-xl text-muted-foreground mb-8">
-              Join hundreds of founders creating high-converting email campaigns
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Join hundreds of founders creating high-converting email campaigns in minutes, not hours
             </p>
-            <Button size="lg" asChild className="glow">
+            <Button size="lg" asChild className="btn-premium shadow-lg hover-lift">
               <Link to="/auth" className="flex items-center gap-2">
-                Start For Free <ArrowRight className="w-4 h-4" />
+                Try Free <ArrowRight className="w-4 h-4" />
               </Link>
             </Button>
           </motion.div>
@@ -151,9 +148,29 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/50 py-8">
-        <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p>&copy; 2025 Vayno. All rights reserved.</p>
+      <footer className="border-t border-border bg-white py-12">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-white" />
+              </div>
+              <span className="font-bold text-lg">Vayno</span>
+            </div>
+            
+            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
+              <a href="mailto:teamvaynosupport@gmail.com" className="hover:text-foreground transition-smooth">
+                Support
+              </a>
+              <a href="#" className="hover:text-foreground transition-smooth">Terms</a>
+              <a href="#" className="hover:text-foreground transition-smooth">Privacy</a>
+              <a href="#" className="hover:text-foreground transition-smooth">Refund Policy</a>
+            </div>
+            
+            <p className="text-sm text-muted-foreground">
+              &copy; 2025 Vayno. All rights reserved.
+            </p>
+          </div>
         </div>
       </footer>
     </div>

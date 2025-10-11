@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Check } from "lucide-react";
+import { Check, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 
 const PricingSection = () => {
@@ -13,9 +13,10 @@ const PricingSection = () => {
       name: "Free",
       price: "$0",
       period: "forever",
+      description: "Perfect for trying out Vayno",
       features: [
         "5 generations per month",
-        "Email sequences (3-5 emails)",
+        "3-5 email sequences",
         "HTML export",
         "Basic support"
       ],
@@ -26,21 +27,23 @@ const PricingSection = () => {
       name: "Starter",
       price: isLifetime ? "$79" : "$9",
       period: isLifetime ? "one-time" : "per month",
+      description: "For growing businesses",
       features: [
         "50 generations per month",
-        "Email sequences (3-5 emails)",
+        "3-5 email sequences",
         "HTML export",
         "One-click improvements",
         "Priority support"
       ],
       cta: "Get Started",
-      popular: !isLifetime,
+      popular: true,
       showToggle: true
     },
     {
       name: "Pro",
       price: "$19",
       period: "per month",
+      description: "For power users",
       features: [
         "500 generations per month",
         "Everything in Starter",
@@ -50,15 +53,24 @@ const PricingSection = () => {
         "Custom integrations"
       ],
       cta: "Go Pro",
-      popular: isLifetime
+      popular: false
     }
   ];
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto max-w-7xl">
       <div className="text-center mb-16">
-        <h2 className="text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
-        <p className="text-muted-foreground text-lg">Choose the plan that fits your needs</p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+        >
+          <h2 className="text-4xl font-bold mb-4 tracking-tight">Simple, transparent pricing</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Choose the plan that fits your needs. Upgrade or downgrade anytime.
+          </p>
+        </motion.div>
       </div>
 
       <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -73,40 +85,44 @@ const PricingSection = () => {
           >
             {plan.popular && (
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-                <span className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-4 py-1 rounded-full text-sm font-medium">
+                <span className="inline-flex items-center gap-1 bg-gradient-to-r from-primary to-accent text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-lg">
+                  <Sparkles className="w-3 h-3" />
                   Most Popular
                 </span>
               </div>
             )}
-            <Card className={`p-8 h-full glass-card transition-smooth hover:scale-105 ${plan.popular ? 'border-primary/50 glow' : ''}`}>
+            <Card className={`p-8 h-full glass-card hover-lift ${plan.popular ? 'border-primary shadow-lg ring-2 ring-primary/20' : ''}`}>
               <div className="mb-6">
                 <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                <p className="text-sm text-muted-foreground mb-4">{plan.description}</p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold gradient-text">{plan.price}</span>
+                  <span className="text-5xl font-bold">{plan.price}</span>
                   <span className="text-muted-foreground">/ {plan.period}</span>
                 </div>
               </div>
 
               {plan.showToggle && (
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 mb-6">
-                  <span className={!isLifetime ? 'font-medium' : 'text-muted-foreground'}>Monthly</span>
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50 mb-6">
+                  <span className={!isLifetime ? 'font-medium text-sm' : 'text-muted-foreground text-sm'}>Monthly</span>
                   <Switch checked={isLifetime} onCheckedChange={setIsLifetime} />
-                  <span className={isLifetime ? 'font-medium' : 'text-muted-foreground'}>Lifetime</span>
+                  <span className={isLifetime ? 'font-medium text-sm' : 'text-muted-foreground text-sm'}>Lifetime</span>
                 </div>
               )}
 
-              <Button className="w-full mb-6 glow" variant={plan.popular ? "default" : "outline"}>
+              <Button className={`w-full mb-6 ${plan.popular ? 'btn-premium shadow-lg' : ''}`} variant={plan.popular ? "default" : "outline"}>
                 {plan.cta}
               </Button>
 
-              <ul className="space-y-3">
+              <div className="space-y-3">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm">{feature}</span>
-                  </li>
+                  <div key={feature} className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                      <Check className="w-3 h-3 text-primary" />
+                    </div>
+                    <span className="text-sm leading-relaxed">{feature}</span>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </Card>
           </motion.div>
         ))}

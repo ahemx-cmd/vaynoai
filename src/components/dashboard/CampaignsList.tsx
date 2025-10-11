@@ -87,16 +87,16 @@ const CampaignsList = ({ userId }: CampaignsListProps) => {
 
   if (campaigns.length === 0) {
     return (
-      <Card className="glass-card p-12 text-center">
+      <Card className="glass-card p-12 text-center hover-lift">
         <div className="max-w-md mx-auto">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mx-auto mb-4">
             <ExternalLink className="w-8 h-8 text-primary" />
           </div>
-          <h3 className="text-xl font-semibold mb-2">No campaigns yet</h3>
-          <p className="text-muted-foreground mb-6">
-            Create your first campaign to get started with AI-powered email sequences
+          <h3 className="text-xl font-semibold mb-2">No campaigns yet ✨</h3>
+          <p className="text-muted-foreground mb-6 leading-relaxed">
+            Let's create your first magic — generate professional email campaigns in minutes
           </p>
-          <Button onClick={() => navigate("/create-campaign")} className="glow">
+          <Button onClick={() => navigate("/create-campaign")} className="btn-premium shadow-lg">
             Create First Campaign
           </Button>
         </div>
@@ -119,7 +119,7 @@ const CampaignsList = ({ userId }: CampaignsListProps) => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">Your Campaigns</h2>
+      <h2 className="text-2xl font-bold mb-6 tracking-tight">Your Campaigns</h2>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {campaigns.map((campaign, i) => (
           <motion.div
@@ -128,10 +128,10 @@ const CampaignsList = ({ userId }: CampaignsListProps) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: i * 0.1 }}
           >
-            <Card className="glass-card p-6 hover:scale-105 transition-smooth hover:glow">
+            <Card className="glass-card p-6 hover-lift h-full flex flex-col">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-1 truncate">
+                  <h3 className="font-semibold text-lg mb-2 truncate">
                     {campaign.name}
                   </h3>
                   <Badge className={getStatusColor(campaign.status)}>
@@ -140,7 +140,7 @@ const CampaignsList = ({ userId }: CampaignsListProps) => {
                 </div>
               </div>
 
-              <div className="space-y-2 mb-4">
+              <div className="space-y-2 mb-4 flex-1">
                 <p className="text-sm text-muted-foreground truncate">
                   {campaign.url}
                 </p>
@@ -153,7 +153,7 @@ const CampaignsList = ({ userId }: CampaignsListProps) => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex-1"
+                  className="flex-1 hover-lift"
                   onClick={() => navigate(`/campaign/${campaign.id}`)}
                   disabled={campaign.status !== "completed"}
                 >
@@ -164,6 +164,7 @@ const CampaignsList = ({ userId }: CampaignsListProps) => {
                   variant="ghost"
                   size="icon"
                   onClick={() => handleDelete(campaign.id)}
+                  className="hover:text-destructive"
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>

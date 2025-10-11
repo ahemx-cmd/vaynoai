@@ -8,7 +8,8 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Sparkles, Loader2, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 import { z } from "zod";
 
 const emailSchema = z.string().email("Invalid email address");
@@ -23,14 +24,12 @@ const Auth = () => {
   const [fullName, setFullName] = useState("");
 
   useEffect(() => {
-    // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         navigate("/dashboard");
       }
     });
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) {
         navigate("/dashboard");
@@ -45,7 +44,6 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      // Validate inputs
       emailSchema.parse(email);
       passwordSchema.parse(password);
       nameSchema.parse(fullName);
@@ -86,7 +84,6 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      // Validate inputs
       emailSchema.parse(email);
       passwordSchema.parse(password);
 
@@ -112,24 +109,30 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10" />
-      <div className="absolute top-20 left-1/4 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+    <div className="min-h-screen bg-[#f8f9fb] flex items-center justify-center p-4">
+      <div className="absolute top-4 left-4">
+        <Button variant="ghost" asChild>
+          <Link to="/" className="flex items-center gap-2">
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </Link>
+        </Button>
+      </div>
 
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md relative z-10"
+        className="w-full max-w-md"
       >
-        <Card className="glass-card p-8 border-primary/20">
+        <Card className="glass-card p-8">
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent glow" />
-              <span className="font-bold text-2xl gradient-text">Vayno</span>
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
+                <Sparkles className="w-6 h-6 text-white" />
+              </div>
             </div>
-            <h1 className="text-2xl font-bold mb-2">Welcome Back</h1>
+            <h1 className="text-3xl font-bold mb-2 tracking-tight">Welcome to Vayno</h1>
             <p className="text-muted-foreground">Create campaigns that convert</p>
           </div>
 
@@ -165,17 +168,14 @@ const Auth = () => {
                     className="mt-1.5"
                   />
                 </div>
-                <Button type="submit" className="w-full glow" disabled={loading}>
+                <Button type="submit" className="w-full btn-premium shadow-lg" disabled={loading}>
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       Signing in...
                     </>
                   ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Sign In
-                    </>
+                    "Sign In"
                   )}
                 </Button>
               </form>
@@ -220,23 +220,24 @@ const Auth = () => {
                   />
                   <p className="text-xs text-muted-foreground mt-1">At least 8 characters</p>
                 </div>
-                <Button type="submit" className="w-full glow" disabled={loading}>
+                <Button type="submit" className="w-full btn-premium shadow-lg" disabled={loading}>
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       Creating account...
                     </>
                   ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Create Account
-                    </>
+                    "Create Account"
                   )}
                 </Button>
               </form>
             </TabsContent>
           </Tabs>
         </Card>
+
+        <p className="text-center text-sm text-muted-foreground mt-6">
+          By continuing, you agree to our Terms and Privacy Policy
+        </p>
       </motion.div>
     </div>
   );

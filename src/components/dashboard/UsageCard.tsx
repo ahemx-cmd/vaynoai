@@ -86,7 +86,7 @@ const UsageCard = ({ userId }: UsageCardProps) => {
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="glass-card p-6 border-primary/20">
+      <Card className="glass-card p-6 hover-lift">
         <div className="flex items-start justify-between mb-4">
           <div>
             <h3 className="font-semibold text-lg mb-1">Generation Usage</h3>
@@ -94,8 +94,8 @@ const UsageCard = ({ userId }: UsageCardProps) => {
               {usage.plan} Plan
             </p>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center glow">
-            <Zap className="w-6 h-6 text-primary-foreground" />
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
+            <Zap className="w-6 h-6 text-primary" />
           </div>
         </div>
 
@@ -114,7 +114,7 @@ const UsageCard = ({ userId }: UsageCardProps) => {
         </div>
 
         {isNearLimit && (
-          <Button variant="outline" className="w-full mt-4" size="sm">
+          <Button variant="outline" className="w-full mt-4 hover-lift" size="sm">
             <TrendingUp className="w-4 h-4 mr-2" />
             Upgrade Plan
           </Button>
