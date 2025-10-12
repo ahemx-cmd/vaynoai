@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, XCircle } from "lucide-react";
+import vaynoIcon from "@/assets/vayno-icon.png";
 
 const AnalyzingCampaign = () => {
   const { id } = useParams();
@@ -145,7 +146,7 @@ const AnalyzingCampaign = () => {
             transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
             className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-6 glow"
           >
-            <Sparkles className="w-10 h-10 text-primary-foreground" />
+            <img src={vaynoIcon} alt="Vayno" className="w-12 h-12" />
           </motion.div>
 
           <h2 className="text-3xl font-bold mb-4">

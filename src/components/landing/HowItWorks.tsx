@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { Link, Sparkles, Download } from "lucide-react";
+import { Link, Download } from "lucide-react";
+import vaynoIcon from "@/assets/vayno-icon.png";
 
 const HowItWorks = () => {
   const steps = [
@@ -7,19 +8,22 @@ const HowItWorks = () => {
       icon: Link,
       number: "01",
       title: "Paste your landing page URL",
-      description: "Simply add the URL of your product page or website"
+      description: "Simply add the URL of your product page or website",
+      isCustomIcon: false
     },
     {
-      icon: Sparkles,
+      icon: null,
       number: "02",
       title: "AI analyzes & generates emails",
-      description: "Our AI extracts key info and creates a complete email sequence"
+      description: "Our AI extracts key info and creates a complete email sequence",
+      isCustomIcon: true
     },
     {
       icon: Download,
       number: "03",
       title: "Edit, improve, export, send",
-      description: "One-click improvements, then export as ready-to-upload HTML"
+      description: "One-click improvements, then export as ready-to-upload HTML",
+      isCustomIcon: false
     }
   ];
 
@@ -53,7 +57,11 @@ const HowItWorks = () => {
               <div className="glass-card p-8 rounded-2xl hover-lift h-full">
                 <div className="mb-6 relative">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mb-4">
-                    <step.icon className="w-8 h-8 text-primary" />
+                    {step.isCustomIcon ? (
+                      <img src={vaynoIcon} alt="AI" className="w-8 h-8" />
+                    ) : (
+                      step.icon && <step.icon className="w-8 h-8 text-primary" />
+                    )}
                   </div>
                   <span className="absolute top-0 right-0 text-6xl font-bold text-primary/10">
                     {step.number}

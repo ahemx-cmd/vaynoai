@@ -1,37 +1,44 @@
 import { motion } from "framer-motion";
-import { Sparkles, Wand2, FileText, Clock, LayoutDashboard, Zap } from "lucide-react";
+import { Wand2, FileText, Clock, LayoutDashboard, Zap } from "lucide-react";
+import vaynoIcon from "@/assets/vayno-icon.png";
 
 const FeaturesGrid = () => {
   const features = [
     {
-      icon: Sparkles,
+      icon: null,
       title: "AI Email Generator",
-      description: "Smart AI that understands your product and writes compelling copy that converts"
+      description: "Smart AI that understands your product and writes compelling copy that converts",
+      isCustomIcon: true
     },
     {
       icon: Wand2,
       title: "One-Click Improvements",
-      description: "Instantly enhance any email with AI-powered refinements and optimizations"
+      description: "Instantly enhance any email with AI-powered refinements and optimizations",
+      isCustomIcon: false
     },
     {
       icon: FileText,
       title: "Beautiful HTML Exports",
-      description: "Export production-ready HTML emails compatible with all major platforms"
+      description: "Export production-ready HTML emails compatible with all major platforms",
+      isCustomIcon: false
     },
     {
       icon: Clock,
       title: "Drip Sequences",
-      description: "Complete sequences including welcome, nurture, sales, and re-engagement emails"
+      description: "Complete sequences including welcome, nurture, sales, and re-engagement emails",
+      isCustomIcon: false
     },
     {
       icon: LayoutDashboard,
       title: "Clean Dashboard",
-      description: "Manage all your campaigns in one beautiful, intuitive interface"
+      description: "Manage all your campaigns in one beautiful, intuitive interface",
+      isCustomIcon: false
     },
     {
       icon: Zap,
       title: "Lightning Fast",
-      description: "Generate complete email sequences in under 30 seconds, ready to send"
+      description: "Generate complete email sequences in under 30 seconds, ready to send",
+      isCustomIcon: false
     }
   ];
 
@@ -63,7 +70,11 @@ const FeaturesGrid = () => {
               className="glass-card p-6 rounded-2xl hover-lift"
             >
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mb-4">
-                <feature.icon className="w-6 h-6 text-primary" />
+                {feature.isCustomIcon ? (
+                  <img src={vaynoIcon} alt="AI" className="w-6 h-6" />
+                ) : (
+                  feature.icon && <feature.icon className="w-6 h-6 text-primary" />
+                )}
               </div>
               <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>

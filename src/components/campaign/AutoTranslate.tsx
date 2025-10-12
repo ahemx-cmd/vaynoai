@@ -5,9 +5,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Globe, Lock, Crown } from "lucide-react";
 import { toast } from "sonner";
 import { useUserPlan } from "@/hooks/useUserPlan";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AutoTranslateProps {
-  emailId: string;
   campaignId: string;
 }
 
@@ -24,7 +24,7 @@ const languages = [
   { code: 'hi', name: 'Hindi', flag: '🇮🇳' },
 ];
 
-const AutoTranslate = ({ emailId, campaignId }: AutoTranslateProps) => {
+const AutoTranslate = ({ campaignId }: AutoTranslateProps) => {
   const [selectedLanguage, setSelectedLanguage] = useState<string>("");
   const [translating, setTranslating] = useState(false);
   const { isPro } = useUserPlan();
@@ -44,11 +44,29 @@ const AutoTranslate = ({ emailId, campaignId }: AutoTranslateProps) => {
     }
 
     setTranslating(true);
-    // Simulate translation
-    setTimeout(() => {
-      toast.success(`Email translated to ${languages.find(l => l.code === selectedLanguage)?.name}!`);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke("translate-campaign", {
+        body: {
+          campaignId,
+          targetLanguage: languages.find(l => l.code === selectedLanguage)?.name || selectedLanguage,
+        },
+      });
+
+      if (error) throw error;
+
+      toast.success(`Campaign translated to ${languages.find(l => l.code === selectedLanguage)?.name}! All emails have been updated.`);
+      
+      // Refresh the page to show translated content
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+    } catch (error: any) {
+      console.error("Translation error:", error);
+      toast.error("Failed to translate campaign. Please try again.");
+    } finally {
       setTranslating(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -66,7 +84,7 @@ const AutoTranslate = ({ emailId, campaignId }: AutoTranslateProps) => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Globe className="w-5 h-5" />
-            Auto-Translate Email
+            Auto-Translate Campaign
             {!isPro && <Crown className="w-5 h-5 text-amber-500" />}
           </DialogTitle>
         </DialogHeader>
@@ -109,7 +127,7 @@ const AutoTranslate = ({ emailId, campaignId }: AutoTranslateProps) => {
 
             <div className="bg-muted/30 rounded-lg p-4 text-sm">
               <p className="text-muted-foreground">
-                The AI will translate your email content while preserving formatting, 
+                The AI will translate all emails in your campaign while preserving formatting, 
                 tone, and brand voice. CTAs and links remain unchanged.
               </p>
             </div>
@@ -119,7 +137,7 @@ const AutoTranslate = ({ emailId, campaignId }: AutoTranslateProps) => {
               onClick={handleTranslate}
               disabled={translating || !selectedLanguage}
             >
-              {translating ? "Translating..." : "Translate Email"}
+              {translating ? "Translating Campaign..." : "Translate Entire Campaign"}
             </Button>
           </div>
         )}

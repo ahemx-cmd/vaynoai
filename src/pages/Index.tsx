@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import PricingSection from "@/components/pricing/PricingSection";
 import FeaturesGrid from "@/components/landing/FeaturesGrid";
 import Testimonials from "@/components/landing/Testimonials";
+import vaynoIcon from "@/assets/vayno-icon.png";
 
 const Index = () => {
   return (
@@ -15,7 +16,7 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
+                <img src={vaynoIcon} alt="Vayno" className="w-6 h-6" />
               </div>
               <span className="font-bold text-xl tracking-tight">Vayno</span>
             </Link>
@@ -90,7 +91,7 @@ const Index = () => {
                   </div>
                   <ArrowRight className="w-6 h-6 text-muted-foreground" />
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent shadow-lg flex items-center justify-center">
-                    <Sparkles className="w-6 h-6 text-white animate-glow-pulse" />
+                    <img src={vaynoIcon} alt="Vayno" className="w-7 h-7 animate-glow-pulse" />
                   </div>
                   <ArrowRight className="w-6 h-6 text-muted-foreground" />
                   <div className="w-12 h-12 rounded-xl bg-white shadow-md flex items-center justify-center">
@@ -126,7 +127,7 @@ const Index = () => {
             className="glass-card rounded-3xl p-12 text-center hover-lift"
           >
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-6 shadow-lg">
-              <Sparkles className="w-8 h-8 text-white" />
+              <img src={vaynoIcon} alt="Vayno" className="w-9 h-9" />
             </div>
             <h2 className="text-4xl font-bold mb-4 tracking-tight">
               Start generating your first campaign today
@@ -149,7 +150,7 @@ const Index = () => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-white" />
+                <img src={vaynoIcon} alt="Vayno" className="w-5 h-5" />
               </div>
               <span className="font-bold text-lg">Vayno</span>
             </div>

@@ -134,31 +134,38 @@ serve(async (req) => {
         model: "google/gemini-2.5-flash",
         messages: [{
           role: "user",
-          content: `You are an expert email marketer. Visit and thoroughly analyze this exact URL: ${url}
+          content: `You are an expert email marketer. You MUST analyze the EXACT URL provided: ${url}
 
-CRITICAL INSTRUCTIONS:
-1. Actually visit the URL provided and carefully read ALL content on that specific page
-2. Extract the EXACT product/service name, features, pricing, and unique selling propositions from THAT page
-3. Do NOT make assumptions or use generic information
-4. Match the brand voice and tone used on the actual landing page
-5. Reference specific details you found on the page in the emails
+CRITICAL REQUIREMENTS - FOLLOW EXACTLY:
+1. Visit and read ONLY the content at ${url} - DO NOT analyze any other website
+2. ALL emails MUST be written in ENGLISH only
+3. Extract the EXACT product/service information from THIS specific page
+4. Use the actual brand name, features, and pricing found on THIS page
+5. Match the exact tone and voice used on THIS landing page
+6. Reference specific details and claims from THIS URL
 
-Based on your analysis of ${url}, create ${numEmails} personalized email sequences for the campaign type (welcome, nurture, sales, re-engagement, etc.):
-- First email should be a welcome/introduction
-- Middle emails should provide value, education, or nurture
-- Later emails should include sales elements with clear CTAs
-- Final email should create urgency or be a re-engagement attempt
+Based ONLY on content from ${url}, create ${numEmails} email sequences in ENGLISH:
+- Email 1: Welcome/introduction (mention the actual product name from the page)
+- Middle emails: Value, education, or nurture (use real features from the page)
+- Later emails: Sales with CTAs (reference actual pricing/offers from the page)
+- Final email: Urgency or re-engagement
 
-Each email should be 50-500 words with high-converting copy.
+Each email should be 50-500 words with high-converting copy based on the ACTUAL content of ${url}.
+
+IMPORTANT: 
+- Write ALL emails in ENGLISH
+- Use the REAL product name and details from ${url}
+- DO NOT make up information
+- DO NOT write about different products
 
 Return ONLY valid JSON (no markdown, no code blocks):
 {
   "emails": [
     {
       "type": "welcome",
-      "subject": "string",
-      "content": "string (plain text version)",
-      "html": "string (HTML version with basic formatting)"
+      "subject": "string (in English)",
+      "content": "string (plain text in English)",
+      "html": "string (HTML in English)"
     }
   ]
 }`
