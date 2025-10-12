@@ -11,12 +11,15 @@ import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileSidebar from "@/components/dashboard/MobileSidebar";
 import CampaignsList from "@/components/dashboard/CampaignsList";
 import UsageCard from "@/components/dashboard/UsageCard";
+import LifetimeBanner from "@/components/dashboard/LifetimeBanner";
+import { useUserPlan } from "@/hooks/useUserPlan";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const { isFree } = useUserPlan();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -102,6 +105,7 @@ const Dashboard = () => {
             transition={{ duration: 0.5 }}
             className="space-y-8"
           >
+            {isFree && <LifetimeBanner userId={user.id} />}
             <UsageCard userId={user.id} />
             <CampaignsList userId={user.id} />
           </motion.div>

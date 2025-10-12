@@ -6,9 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { ArrowLeft, Sparkles, Loader2, Link as LinkIcon, FileText, Download } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2, Link as LinkIcon, FileText, Download, Info } from "lucide-react";
 import { z } from "zod";
 
 const sequenceTypes = [
@@ -40,6 +41,9 @@ const nameSchema = z.string().min(3, "Campaign name must be at least 3 character
 const CreateCampaign = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+  const [urlSummary, setUrlSummary] = useState<any>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [url, setUrl] = useState("");
   const [name, setName] = useState("");
@@ -55,6 +59,36 @@ const CreateCampaign = () => {
       }
     });
   }, [navigate]);
+
+  const handleAnalyzeUrl = async () => {
+    try {
+      urlSchema.parse(url);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        toast.error(err.errors[0].message);
+      }
+      return;
+    }
+
+    setAnalyzing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("analyze-url", {
+        body: { url },
+      });
+
+      if (error) throw error;
+
+      if (data?.analysis) {
+        setUrlSummary(data.analysis);
+        setShowSummary(true);
+      }
+    } catch (err) {
+      toast.error("Failed to analyze URL");
+      console.error(err);
+    } finally {
+      setAnalyzing(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -177,15 +211,36 @@ const CreateCampaign = () => {
 
               <div>
                 <Label htmlFor="url" className="text-base">Product Landing Page URL</Label>
-                <Input
-                  id="url"
-                  type="url"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="https://example.com/product"
-                  required
-                  className="mt-2 h-12"
-                />
+                <div className="flex gap-2 mt-2">
+                  <Input
+                    id="url"
+                    type="url"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="https://example.com/product"
+                    required
+                    className="h-12"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleAnalyzeUrl}
+                    disabled={analyzing || !url}
+                    className="shrink-0"
+                  >
+                    {analyzing ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Analyzing...
+                      </>
+                    ) : (
+                      <>
+                        <Info className="w-4 h-4 mr-2" />
+                        Preview Summary
+                      </>
+                    )}
+                  </Button>
+                </div>
                 <p className="text-sm text-muted-foreground mt-2">
                   The URL will be analyzed to extract product details and generate emails
                 </p>
@@ -279,6 +334,56 @@ const CreateCampaign = () => {
           </div>
         </motion.div>
       </div>
+
+      <Dialog open={showSummary} onOpenChange={setShowSummary}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Info className="w-5 h-5 text-primary" />
+              URL Analysis Summary
+            </DialogTitle>
+          </DialogHeader>
+          {urlSummary && (
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-semibold mb-1">Product/Service</h4>
+                <p className="text-sm text-muted-foreground">{urlSummary.title}</p>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-1">Description</h4>
+                <p className="text-sm text-muted-foreground">{urlSummary.description}</p>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-1">Key Features</h4>
+                <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                  {urlSummary.keyFeatures?.map((feature: string, i: number) => (
+                    <li key={i}>{feature}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h4 className="font-semibold mb-1">Target Audience</h4>
+                  <p className="text-sm text-muted-foreground">{urlSummary.targetAudience}</p>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-1">Price Range</h4>
+                  <p className="text-sm text-muted-foreground">{urlSummary.priceRange}</p>
+                </div>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-1">Brand Voice</h4>
+                <p className="text-sm text-muted-foreground">{urlSummary.brandVoice}</p>
+              </div>
+              <div className="pt-4 border-t">
+                <p className="text-xs text-muted-foreground">
+                  This analysis will help generate emails that match your brand and product perfectly.
+                </p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

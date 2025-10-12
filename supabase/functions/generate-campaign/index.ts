@@ -134,34 +134,47 @@ serve(async (req) => {
         model: "google/gemini-2.5-flash",
         messages: [{
           role: "user",
-          content: `You are an expert email marketer. Visit and thoroughly analyze this exact URL: ${url}
+          content: `You are an expert email marketing copywriter. 
 
-CRITICAL INSTRUCTIONS:
-1. Actually visit the URL provided and carefully read ALL content on that specific page
-2. Extract the EXACT product/service name, features, pricing, and unique selling propositions from THAT page
-3. Do NOT make assumptions or use generic information
-4. Match the brand voice and tone used on the actual landing page
-5. Reference specific details you found on the page in the emails
+CRITICAL INSTRUCTIONS - READ CAREFULLY:
+1. First, visit and scrape this EXACT URL: ${url}
+2. Read and analyze EVERY word, headline, feature, benefit, and call-to-action on that specific page
+3. Extract the EXACT product/service name, pricing details, key features, target audience, and unique value propositions
+4. Identify the brand voice, tone, and messaging style used on the landing page
+5. Note any specific claims, statistics, or proof elements mentioned
+6. **IMPORTANT**: You MUST write ALL emails in ENGLISH language ONLY. Do NOT use any other language.
+7. **CRITICAL**: Base your emails ONLY on the content found at ${url}. Do NOT make up information about other products or services.
 
-Based on your analysis of ${url}, create ${numEmails} personalized email sequences for the campaign type (welcome, nurture, sales, re-engagement, etc.):
-- First email should be a welcome/introduction
-- Middle emails should provide value, education, or nurture
-- Later emails should include sales elements with clear CTAs
-- Final email should create urgency or be a re-engagement attempt
+Now, based EXCLUSIVELY on what you found at ${url}, create ${numEmails} high-converting email sequences:
 
-Each email should be 50-500 words with high-converting copy.
+Email Structure Guidelines:
+- Email 1: Welcome/Introduction - introduce the product/service you found on the page
+- Middle emails: Provide value, highlight specific features/benefits from the landing page
+- Later emails: Include sales elements with clear CTAs matching the landing page offer
+- Final email: Create urgency or re-engagement using the actual product details
 
-Return ONLY valid JSON (no markdown, no code blocks):
+MANDATORY REQUIREMENTS:
+- Write in ENGLISH only
+- Each email: 50-500 words
+- Use specific details, features, and benefits from the landing page at ${url}
+- Match the brand voice and tone from the actual landing page
+- Include the exact product name and key selling points from ${url}
+- Reference real features, pricing, and benefits from the page
+
+OUTPUT FORMAT:
+Return ONLY valid JSON with NO markdown, NO code blocks, NO additional text:
 {
   "emails": [
     {
       "type": "welcome",
-      "subject": "string",
-      "content": "string (plain text version)",
-      "html": "string (HTML version with basic formatting)"
+      "subject": "string in English",
+      "content": "string in English (plain text version)",
+      "html": "string in English (HTML version with basic formatting)"
     }
   ]
-}`
+}
+
+Remember: Write EVERYTHING in ENGLISH and use ONLY information from ${url}.`
         }],
         temperature: 0.7,
       }),

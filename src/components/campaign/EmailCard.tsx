@@ -97,9 +97,15 @@ const EmailCard = ({ email, index, campaignId }: EmailCardProps) => {
                 </Badge>
               </div>
               <h3 className="text-xl font-semibold mb-1">{email.subject}</h3>
-              <p className="text-sm text-muted-foreground">
-                ~{email.content.split(" ").length} words
-              </p>
+              <div className="flex items-center gap-3">
+                <p className="text-sm text-muted-foreground">
+                  ~{email.content.split(" ").length} words
+                </p>
+                <AutoTranslate 
+                  emailId={email.id}
+                  campaignId={campaignId}
+                />
+              </div>
             </div>
             <Button variant="ghost" size="icon" onClick={(e) => {
               e.stopPropagation();
@@ -162,10 +168,6 @@ const EmailCard = ({ email, index, campaignId }: EmailCardProps) => {
                       subject={email.subject}
                       content={content}
                       htmlContent={email.html_content}
-                    />
-                    <AutoTranslate 
-                      emailId={email.id}
-                      campaignId={campaignId}
                     />
                     <Button
                       onClick={handleImprove}
