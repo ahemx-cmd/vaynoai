@@ -99,6 +99,31 @@ serve(async (req) => {
 
     // Generate emails using AI
     console.log("Calling AI API for URL:", url);
+    
+    // Determine number of emails based on drip duration from campaign
+    const { data: campaignDetails } = await serviceClient
+      .from("campaigns")
+      .select("drip_duration")
+      .eq("id", campaignId)
+      .single();
+    
+    let numEmails = 4; // default
+    if (campaignDetails?.drip_duration) {
+      switch (campaignDetails.drip_duration) {
+        case "7-day":
+          numEmails = 4;
+          break;
+        case "14-day":
+          numEmails = 7;
+          break;
+        case "30-day":
+          numEmails = 12;
+          break;
+      }
+    }
+    
+    console.log(`Generating ${numEmails} emails for ${campaignDetails?.drip_duration || 'default'} drip`);
+    
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -109,7 +134,34 @@ serve(async (req) => {
         model: "google/gemini-2.5-flash",
         messages: [{
           role: "user",
-          content: `Analyze this URL: ${url} and create 4 email sequences (welcome, nurture, sales, re-engagement). Each 50-500 words, high-converting copy with strong CTAs. Return ONLY valid JSON without markdown code blocks: {"emails": [{"type": "string", "subject": "string", "content": "string", "html": "string"}]}`
+          content: `You are an expert email marketer. Visit and thoroughly analyze this exact URL: ${url}
+
+CRITICAL INSTRUCTIONS:
+1. Actually visit the URL provided and carefully read ALL content on that specific page
+2. Extract the EXACT product/service name, features, pricing, and unique selling propositions from THAT page
+3. Do NOT make assumptions or use generic information
+4. Match the brand voice and tone used on the actual landing page
+5. Reference specific details you found on the page in the emails
+
+Based on your analysis of ${url}, create ${numEmails} personalized email sequences for the campaign type (welcome, nurture, sales, re-engagement, etc.):
+- First email should be a welcome/introduction
+- Middle emails should provide value, education, or nurture
+- Later emails should include sales elements with clear CTAs
+- Final email should create urgency or be a re-engagement attempt
+
+Each email should be 50-500 words with high-converting copy.
+
+Return ONLY valid JSON (no markdown, no code blocks):
+{
+  "emails": [
+    {
+      "type": "welcome",
+      "subject": "string",
+      "content": "string (plain text version)",
+      "html": "string (HTML version with basic formatting)"
+    }
+  ]
+}`
         }],
         temperature: 0.7,
       }),

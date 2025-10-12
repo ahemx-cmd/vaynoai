@@ -6,6 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Eye, Trash2, ExternalLink } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -160,14 +171,34 @@ const CampaignsList = ({ userId }: CampaignsListProps) => {
                   <Eye className="w-4 h-4 mr-2" />
                   View
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleDelete(campaign.id)}
-                  className="hover:text-destructive"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="hover:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>You sure you want to delete this precious campaign of yours?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        I don't think so. This campaign contains valuable email sequences you've generated. Once deleted, it's gone forever!
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Sure I'll just keep it</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDelete(campaign.id)}
+                        className="bg-destructive hover:bg-destructive/90"
+                      >
+                        Yes I do brah
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </Card>
           </motion.div>

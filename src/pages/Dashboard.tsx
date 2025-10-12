@@ -72,7 +72,7 @@ const Dashboard = () => {
                 <MobileSidebar />
                 <div className="flex-1">
                   <h1 className="text-2xl font-bold tracking-tight">
-                    Good morning, {firstName} ✨
+                    Hi, {firstName} ✨
                   </h1>
                   <p className="text-sm text-muted-foreground mt-1">
                     Create and manage your email campaigns

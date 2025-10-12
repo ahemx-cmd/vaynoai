@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { MessageCircle, Mail, Book, Video, HelpCircle, Send, ExternalLink } from "lucide-react";
+import { MessageCircle, Mail, Book, Video, HelpCircle, Send, ExternalLink, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileSidebar from "@/components/dashboard/MobileSidebar";
@@ -136,103 +136,56 @@ const Support = () => {
             animate={{ opacity: 1, y: 0 }}
             className="max-w-5xl mx-auto space-y-8"
           >
-            {/* Quick Help Cards */}
-            <div className="grid gap-4 md:grid-cols-3">
-              <Card className="glass-card p-6 border-primary/20">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-4">
-                  <Book className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-semibold mb-2">Documentation</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Comprehensive guides and tutorials to help you master Vayno.
-                </p>
-                <Button variant="outline" size="sm" className="w-full">
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  View Docs
-                </Button>
-              </Card>
 
-              <Card className="glass-card p-6 border-primary/20">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-4">
-                  <Video className="w-6 h-6 text-white" />
+            {/* Contact Support - Email Only */}
+            <Card className="glass-card p-8 border-primary/20 text-center">
+              <div className="max-w-2xl mx-auto">
+                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-4">
+                  <Mail className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="font-semibold mb-2">Video Tutorials</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Step-by-step video guides showing you how to use every feature.
+                <h2 className="text-2xl font-bold mb-3">Get in Touch</h2>
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  Have a question or need assistance? Our support team is here to help you get the most out of Vayno.
                 </p>
-                <Button variant="outline" size="sm" className="w-full">
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  Watch Videos
-                </Button>
-              </Card>
+                
+                <Card className="glass-card p-6 border-primary/20 inline-block">
+                  <div className="flex items-center gap-3">
+                    <Mail className="w-6 h-6 text-primary" />
+                    <div className="text-left">
+                      <p className="font-semibold mb-1">Email Support</p>
+                      <a 
+                        href="mailto:support@vayno.com" 
+                        className="text-primary hover:underline font-medium"
+                      >
+                        support@vayno.com
+                      </a>
+                      <p className="text-xs text-muted-foreground mt-1">We typically respond within 4-6 hours</p>
+                    </div>
+                  </div>
+                </Card>
 
-              <Card className="glass-card p-6 border-primary/20">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-4">
-                  <MessageCircle className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-semibold mb-2">Live Chat</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Get instant help from our support team during business hours.
-                </p>
-                <Button variant="outline" size="sm" className="w-full">
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  Start Chat
-                </Button>
-              </Card>
-            </div>
-
-            {/* Contact Support Form */}
-            <Card className="glass-card p-6 border-primary/20">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                  <Mail className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold">Contact Support</h2>
-                  <p className="text-sm text-muted-foreground">Submit a ticket and we'll respond within 24 hours</p>
+                <div className="mt-8 p-6 rounded-lg bg-muted/30 text-left">
+                  <h3 className="font-semibold mb-3">📧 What to Include in Your Email</h3>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">•</span>
+                      <span>A clear subject line describing your issue or question</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">•</span>
+                      <span>Detailed description of the problem or feedback</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">•</span>
+                      <span>Screenshots if relevant (helps us understand better)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">•</span>
+                      <span>Your account email or campaign ID if applicable</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
-
-              <form onSubmit={handleSubmitTicket} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Your Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={user?.email || ""}
-                    disabled
-                    className="bg-muted/50"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="subject">Subject</Label>
-                  <Input
-                    id="subject"
-                    value={subject}
-                    onChange={(e) => setSubject(e.target.value)}
-                    placeholder="Brief description of your issue"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="message">Message</Label>
-                  <Textarea
-                    id="message"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Please provide detailed information about your issue or question..."
-                    className="min-h-[150px]"
-                    required
-                  />
-                </div>
-
-                <Button type="submit" disabled={sending} className="w-full sm:w-auto">
-                  <Send className="w-4 h-4 mr-2" />
-                  {sending ? "Sending..." : "Submit Ticket"}
-                </Button>
-              </form>
             </Card>
 
             {/* FAQs */}
@@ -261,28 +214,88 @@ const Support = () => {
               </Accordion>
             </Card>
 
-            {/* Contact Information */}
+            {/* Additional Resources */}
             <Card className="glass-card p-6 border-primary/20">
-              <h2 className="text-xl font-semibold mb-4">Other Ways to Reach Us</h2>
+              <h2 className="text-xl font-semibold mb-4">Additional Resources</h2>
               <Separator className="mb-4" />
               
               <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <Mail className="w-5 h-5 text-primary mt-1" />
-                  <div>
-                    <p className="font-medium">Email Support</p>
-                    <p className="text-sm text-muted-foreground">support@vayno.com</p>
-                    <p className="text-xs text-muted-foreground mt-1">Average response time: 4-6 hours</p>
-                  </div>
+                <div className="p-4 rounded-lg bg-muted/30">
+                  <h3 className="font-semibold mb-2 flex items-center gap-2">
+                    <Book className="w-5 h-5 text-primary" />
+                    Getting Started Guide
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    New to Vayno? Learn how to create your first campaign, understand sequence types, and export your emails.
+                  </p>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">→</span>
+                      <span>Choose the right sequence type for your goal</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">→</span>
+                      <span>Select optimal drip duration for engagement</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">→</span>
+                      <span>Edit and customize generated content</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">→</span>
+                      <span>Export to your email service provider</span>
+                    </li>
+                  </ul>
                 </div>
 
-                <div className="flex items-start gap-3">
-                  <MessageCircle className="w-5 h-5 text-primary mt-1" />
-                  <div>
-                    <p className="font-medium">Live Chat</p>
-                    <p className="text-sm text-muted-foreground">Available Monday-Friday, 9 AM - 6 PM EST</p>
-                    <p className="text-xs text-muted-foreground mt-1">Instant responses during business hours</p>
-                  </div>
+                <div className="p-4 rounded-lg bg-muted/30">
+                  <h3 className="font-semibold mb-2 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    Tips for Better Results
+                  </h3>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">•</span>
+                      <span>Use clear, well-structured landing pages for better AI analysis</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">•</span>
+                      <span>Include product descriptions, pricing, and key benefits on your page</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">•</span>
+                      <span>Review and personalize the generated content before exporting</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">•</span>
+                      <span>Use Smart Preview to check email rendering across devices</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="p-4 rounded-lg bg-muted/30">
+                  <h3 className="font-semibold mb-2 flex items-center gap-2">
+                    <HelpCircle className="w-5 h-5 text-primary" />
+                    Common Issues & Solutions
+                  </h3>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">•</span>
+                      <span><strong>Generation failed:</strong> Ensure URL is accessible and includes product information</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">•</span>
+                      <span><strong>Reached limit:</strong> Check Usage & Limits page or upgrade your plan</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">•</span>
+                      <span><strong>Watermark removal:</strong> Upgrade to Starter or Pro plan</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">•</span>
+                      <span><strong>Export issues:</strong> Try different browsers or contact support</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </Card>
