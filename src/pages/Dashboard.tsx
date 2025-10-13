@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { User, Session } from "@supabase/supabase-js";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { Plus, Sparkles } from "lucide-react";
+import { Plus, Sparkles, Crown, X } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileSidebar from "@/components/dashboard/MobileSidebar";
@@ -18,6 +18,7 @@ const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showLifetimeBanner, setShowLifetimeBanner] = useState(true);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -104,6 +105,44 @@ const Dashboard = () => {
             transition={{ duration: 0.5 }}
             className="space-y-8"
           >
+            {showLifetimeBanner && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="relative bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 border border-amber-500/30 rounded-xl p-6 overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-orange-500/5 animate-pulse" />
+                <button
+                  onClick={() => setShowLifetimeBanner(false)}
+                  className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <div className="relative flex flex-col md:flex-row items-center gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
+                      <Crown className="w-8 h-8 text-white" />
+                    </div>
+                  </div>
+                  <div className="flex-1 text-center md:text-left">
+                    <h3 className="text-xl font-bold mb-1 flex items-center gap-2 justify-center md:justify-start">
+                      <Sparkles className="w-5 h-5 text-amber-500" />
+                      Limited Time: Lifetime Deal Available!
+                    </h3>
+                    <p className="text-muted-foreground">
+                      Get unlimited access to the Starter plan features forever. Pay once, use forever – no monthly fees!
+                    </p>
+                  </div>
+                  <Button 
+                    className="flex-shrink-0 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg hover-lift"
+                    onClick={() => navigate('/billing')}
+                  >
+                    <Crown className="w-4 h-4 mr-2" />
+                    View Lifetime Deal
+                  </Button>
+                </div>
+              </motion.div>
+            )}
             <UsageCard userId={user.id} />
             <CampaignsList userId={user.id} />
           </motion.div>

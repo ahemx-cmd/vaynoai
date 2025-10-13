@@ -10,6 +10,7 @@ import { ArrowLeft, Download, Sparkles, ExternalLink } from "lucide-react";
 import EmailCard from "@/components/campaign/EmailCard";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import URLSummary from "@/components/campaign/URLSummary";
+import AutoTranslate from "@/components/campaign/AutoTranslate";
 
 const CampaignView = () => {
   const { id } = useParams();
@@ -124,6 +125,7 @@ ${isFree ? `
             {campaign.analyzed_data && (
               <URLSummary analyzedData={campaign.analyzed_data} url={campaign.url} />
             )}
+            <AutoTranslate campaignId={id!} />
             <Button onClick={handleExportHTML} className="glow">
               <Download className="w-4 h-4 mr-2" />
               Export HTML

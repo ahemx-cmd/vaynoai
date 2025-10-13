@@ -98,7 +98,10 @@ const AutoTranslate = ({ campaignId }: AutoTranslateProps) => {
                 Auto-Translate helps you localize your campaigns instantly to reach global audiences.
                 Upgrade to Pro to unlock this feature!
               </p>
-              <Button className="btn-premium" onClick={() => window.location.href = '/billing'}>
+              <Button 
+                className="btn-premium" 
+                onClick={() => window.open('https://vaynoai.lemonsqueezy.com/buy/41de1603-c08e-47de-810f-e60e2eb91c5d', '_blank')}
+              >
                 <Crown className="w-4 h-4 mr-2" />
                 Upgrade to Pro
               </Button>

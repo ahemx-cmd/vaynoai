@@ -103,11 +103,15 @@ serve(async (req) => {
     // Determine number of emails based on drip duration from campaign
     const { data: campaignDetails } = await serviceClient
       .from("campaigns")
-      .select("drip_duration")
+      .select("drip_duration, words_per_email, include_cta, cta_link")
       .eq("id", campaignId)
       .single();
     
     let numEmails = 4; // default
+    const wordsPerEmail = campaignDetails?.words_per_email || 250;
+    const includeCTA = campaignDetails?.include_cta ?? true;
+    const ctaLink = campaignDetails?.cta_link || null;
+    
     if (campaignDetails?.drip_duration) {
       switch (campaignDetails.drip_duration) {
         case "7-day":
@@ -122,7 +126,13 @@ serve(async (req) => {
       }
     }
     
-    console.log(`Generating ${numEmails} emails for ${campaignDetails?.drip_duration || 'default'} drip`);
+    console.log(`Generating ${numEmails} emails for ${campaignDetails?.drip_duration || 'default'} drip with ${wordsPerEmail} words per email`);
+    
+    const ctaInstructions = includeCTA 
+      ? (ctaLink 
+          ? `- Include clear Call-to-Action buttons that link to: ${ctaLink}`
+          : `- Include Call-to-Action text (not as clickable buttons, just compelling text encouraging action)`)
+      : `- DO NOT include any Call-to-Action buttons or CTA text in the emails`;
     
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -143,6 +153,10 @@ CRITICAL REQUIREMENTS - FOLLOW EXACTLY:
 4. Use the actual brand name, features, and pricing found on THIS page
 5. Match the exact tone and voice used on THIS landing page
 6. Reference specific details and claims from THIS URL
+7. Each email should be approximately ${wordsPerEmail} words (between ${Math.max(50, wordsPerEmail - 50)} and ${Math.min(500, wordsPerEmail + 50)} words)
+
+CTA REQUIREMENTS:
+${ctaInstructions}
 
 Based ONLY on content from ${url}, create ${numEmails} email sequences in ENGLISH:
 - Email 1: Welcome/introduction (mention the actual product name from the page)
@@ -150,13 +164,14 @@ Based ONLY on content from ${url}, create ${numEmails} email sequences in ENGLIS
 - Later emails: Sales with CTAs (reference actual pricing/offers from the page)
 - Final email: Urgency or re-engagement
 
-Each email should be 50-500 words with high-converting copy based on the ACTUAL content of ${url}.
+Each email should be approximately ${wordsPerEmail} words with high-converting copy based on the ACTUAL content of ${url}.
 
 IMPORTANT: 
 - Write ALL emails in ENGLISH
 - Use the REAL product name and details from ${url}
 - DO NOT make up information
 - DO NOT write about different products
+- Target word count: ${wordsPerEmail} words per email
 
 Return ONLY valid JSON (no markdown, no code blocks):
 {
@@ -164,8 +179,8 @@ Return ONLY valid JSON (no markdown, no code blocks):
     {
       "type": "welcome",
       "subject": "string (in English)",
-      "content": "string (plain text in English)",
-      "html": "string (HTML in English)"
+      "content": "string (plain text in English, ~${wordsPerEmail} words)",
+      "html": "string (HTML in English, ~${wordsPerEmail} words)"
     }
   ]
 }`

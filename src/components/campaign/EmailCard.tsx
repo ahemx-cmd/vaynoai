@@ -10,7 +10,6 @@ import { toast } from "sonner";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import VaynoWatermark from "./VaynoWatermark";
 import SmartPreview from "./SmartPreview";
-import AutoTranslate from "./AutoTranslate";
 
 interface EmailCardProps {
   email: any;
@@ -97,14 +96,9 @@ const EmailCard = ({ email, index, campaignId }: EmailCardProps) => {
                 </Badge>
               </div>
               <h3 className="text-xl font-semibold mb-1">{email.subject}</h3>
-              <div className="flex items-center gap-2">
-                <p className="text-sm text-muted-foreground">
-                  ~{email.content.split(" ").length} words
-                </p>
-                <div onClick={(e) => e.stopPropagation()}>
-                  <AutoTranslate campaignId={campaignId} />
-                </div>
-              </div>
+              <p className="text-sm text-muted-foreground">
+                ~{email.content.split(" ").length} words
+              </p>
             </div>
             <Button variant="ghost" size="icon" onClick={(e) => {
               e.stopPropagation();

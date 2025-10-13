@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { ArrowLeft, Sparkles, Loader2, Link as LinkIcon, FileText, Download } from "lucide-react";
@@ -45,6 +46,9 @@ const CreateCampaign = () => {
   const [name, setName] = useState("");
   const [sequenceType, setSequenceType] = useState("");
   const [dripDuration, setDripDuration] = useState("");
+  const [wordsPerEmail, setWordsPerEmail] = useState("250");
+  const [includeCTA, setIncludeCTA] = useState(true);
+  const [ctaLink, setCtaLink] = useState("");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -82,6 +86,13 @@ const CreateCampaign = () => {
         return;
       }
 
+      const wordsNum = parseInt(wordsPerEmail);
+      if (isNaN(wordsNum) || wordsNum < 50 || wordsNum > 500) {
+        toast.error("Words per email must be between 50 and 500");
+        setLoading(false);
+        return;
+      }
+
       const { data: usageData, error: usageError } = await supabase
         .from("user_usage")
         .select("*")
@@ -109,6 +120,9 @@ const CreateCampaign = () => {
           status: "analyzing",
           sequence_type: sequenceType,
           drip_duration: dripDuration,
+          words_per_email: wordsNum,
+          include_cta: includeCTA,
+          cta_link: ctaLink || null,
         })
         .select()
         .single();
@@ -233,6 +247,54 @@ const CreateCampaign = () => {
                 <p className="text-sm text-muted-foreground mt-2">
                   Define the pacing and length of your sequence
                 </p>
+              </div>
+
+              <div>
+                <Label htmlFor="words-per-email" className="text-base">Words Per Email</Label>
+                <Input
+                  id="words-per-email"
+                  type="number"
+                  min="50"
+                  max="500"
+                  value={wordsPerEmail}
+                  onChange={(e) => setWordsPerEmail(e.target.value)}
+                  placeholder="250"
+                  required
+                  className="mt-2 h-12"
+                />
+                <p className="text-sm text-muted-foreground mt-2">
+                  Choose between 50-500 words per email
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="include-cta" 
+                    checked={includeCTA}
+                    onCheckedChange={(checked) => setIncludeCTA(checked as boolean)}
+                  />
+                  <Label htmlFor="include-cta" className="text-base cursor-pointer">
+                    Include Call-to-Action (CTA) in emails
+                  </Label>
+                </div>
+                
+                {includeCTA && (
+                  <div>
+                    <Label htmlFor="cta-link" className="text-base">CTA Link (Optional)</Label>
+                    <Input
+                      id="cta-link"
+                      type="url"
+                      value={ctaLink}
+                      onChange={(e) => setCtaLink(e.target.value)}
+                      placeholder="https://example.com/signup"
+                      className="mt-2 h-12"
+                    />
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {ctaLink ? "CTA will be a clickable button" : "Without a link, CTA will be text only"}
+                    </p>
+                  </div>
+                )}
               </div>
 
               <Button

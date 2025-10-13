@@ -18,38 +18,47 @@ export type Database = {
         Row: {
           analyzed_data: Json | null
           created_at: string
+          cta_link: string | null
           drip_duration: string | null
           id: string
+          include_cta: boolean | null
           name: string
           sequence_type: string | null
           status: string
           updated_at: string
           url: string
           user_id: string
+          words_per_email: number | null
         }
         Insert: {
           analyzed_data?: Json | null
           created_at?: string
+          cta_link?: string | null
           drip_duration?: string | null
           id?: string
+          include_cta?: boolean | null
           name: string
           sequence_type?: string | null
           status?: string
           updated_at?: string
           url: string
           user_id: string
+          words_per_email?: number | null
         }
         Update: {
           analyzed_data?: Json | null
           created_at?: string
+          cta_link?: string | null
           drip_duration?: string | null
           id?: string
+          include_cta?: boolean | null
           name?: string
           sequence_type?: string | null
           status?: string
           updated_at?: string
           url?: string
           user_id?: string
+          words_per_email?: number | null
         }
         Relationships: []
       }
