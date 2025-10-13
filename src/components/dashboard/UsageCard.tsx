@@ -5,12 +5,14 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Zap, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 interface UsageCardProps {
   userId: string;
 }
 
 const UsageCard = ({ userId }: UsageCardProps) => {
+  const navigate = useNavigate();
   const [usage, setUsage] = useState({
     used: 0,
     limit: 5,
@@ -114,7 +116,12 @@ const UsageCard = ({ userId }: UsageCardProps) => {
         </div>
 
         {isNearLimit && (
-          <Button variant="outline" className="w-full mt-4 hover-lift" size="sm">
+          <Button 
+            variant="outline" 
+            className="w-full mt-4 hover-lift" 
+            size="sm"
+            onClick={() => navigate('/billing')}
+          >
             <TrendingUp className="w-4 h-4 mr-2" />
             Upgrade Plan
           </Button>
