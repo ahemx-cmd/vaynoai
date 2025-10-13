@@ -11,6 +11,7 @@ import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileSidebar from "@/components/dashboard/MobileSidebar";
 import CampaignsList from "@/components/dashboard/CampaignsList";
 import UsageCard from "@/components/dashboard/UsageCard";
+import NewUserBonusDialog from "@/components/dashboard/NewUserBonusDialog";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -61,6 +62,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#f8f9fb] flex">
+      <NewUserBonusDialog />
       <DashboardSidebar />
       
       <div className="flex-1 lg:ml-64">
