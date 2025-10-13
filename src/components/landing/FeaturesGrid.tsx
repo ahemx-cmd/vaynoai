@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
-import { Wand2, FileText, Clock, LayoutDashboard, Zap } from "lucide-react";
-import vaynoIcon from "@/assets/vayno-icon.png";
+import { Wand2, FileText, Clock, LayoutDashboard, Zap, Sparkles } from "lucide-react";
 
 const FeaturesGrid = () => {
   const features = [
@@ -71,7 +70,7 @@ const FeaturesGrid = () => {
             >
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mb-4">
                 {feature.isCustomIcon ? (
-                  <img src={vaynoIcon} alt="AI" className="w-6 h-6" />
+                  <Sparkles className="w-6 h-6 text-primary" />
                 ) : (
                   feature.icon && <feature.icon className="w-6 h-6 text-primary" />
                 )}

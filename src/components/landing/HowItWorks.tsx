@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
-import { Link, Download } from "lucide-react";
-import vaynoIcon from "@/assets/vayno-icon.png";
+import { Link, Download, Sparkles } from "lucide-react";
 
 const HowItWorks = () => {
   const steps = [
@@ -58,7 +57,7 @@ const HowItWorks = () => {
                 <div className="mb-6 relative">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mb-4">
                     {step.isCustomIcon ? (
-                      <img src={vaynoIcon} alt="AI" className="w-8 h-8" />
+                      <Sparkles className="w-8 h-8 text-primary" />
                     ) : (
                       step.icon && <step.icon className="w-8 h-8 text-primary" />
                     )}
