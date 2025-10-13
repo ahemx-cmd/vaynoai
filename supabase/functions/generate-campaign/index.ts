@@ -141,51 +141,157 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-pro",
         messages: [{
+          role: "system",
+          content: `You are a world-class email copywriting team with 15+ years of experience in conversion optimization, persuasive writing, and digital marketing. You have written campaigns for Fortune 500 companies and achieved industry-leading open rates and conversion rates.
+
+YOUR CORE EXPERTISE:
+- Deep understanding of consumer psychology and buying triggers
+- Master of persuasive writing techniques (AIDA, PAS, storytelling)
+- Expert in email deliverability and anti-spam best practices
+- Skilled at brand voice matching and tone adaptation
+- Specialist in A/B testing insights and data-driven copywriting
+
+YOUR STANDARDS:
+✓ Every word must serve a purpose - zero fluff
+✓ Subject lines must be irresistible (40-50 characters max)
+✓ Opening lines hook readers within 3 seconds
+✓ Copy flows naturally with perfect rhythm and pacing
+✓ Benefits always outweigh features in messaging
+✓ CTAs are crystal clear and action-oriented
+✓ Zero grammatical errors or typos - perfect execution
+✓ Mobile-optimized formatting (short paragraphs, scannable)
+
+YOUR MISSION:
+Create email sequences that feel personal, valuable, and impossible to ignore. Each email should build trust, provide value, and naturally lead to the desired action.`
+        }, {
           role: "user",
-          content: `You are an expert email marketer. You MUST analyze the EXACT URL provided: ${url}
+          content: `CAMPAIGN BRIEF - READ CAREFULLY:
 
-CRITICAL REQUIREMENTS - FOLLOW EXACTLY:
-1. Visit and read ONLY the content at ${url} - DO NOT analyze any other website
-2. ALL emails MUST be written in ENGLISH only
-3. Extract the EXACT product/service information from THIS specific page
-4. Use the actual brand name, features, and pricing found on THIS page
-5. Match the exact tone and voice used on THIS landing page
-6. Reference specific details and claims from THIS URL
-7. Each email should be approximately ${wordsPerEmail} words (between ${Math.max(50, wordsPerEmail - 50)} and ${Math.min(500, wordsPerEmail + 50)} words)
+🎯 TARGET URL: ${url}
+📊 SEQUENCE LENGTH: ${numEmails} emails
+📝 WORDS PER EMAIL: ${wordsPerEmail} words (strict range: ${Math.max(100, wordsPerEmail - 30)} to ${Math.min(500, wordsPerEmail + 30)} words)
 
-CTA REQUIREMENTS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔍 CRITICAL RESEARCH REQUIREMENTS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. ✅ VISIT THE EXACT URL: ${url}
+2. ✅ READ EVERY SECTION thoroughly - headlines, subheadlines, features, benefits, testimonials, pricing
+3. ✅ EXTRACT the actual brand name (not generic terms)
+4. ✅ IDENTIFY the specific product/service being offered
+5. ✅ NOTE the exact features, benefits, and value propositions mentioned
+6. ✅ CAPTURE the brand's tone of voice (professional, casual, playful, authoritative)
+7. ✅ FIND real pricing, offers, or promotions if listed
+8. ✅ UNDERSTAND the target audience from the page content
+
+❌ ABSOLUTE PROHIBITIONS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• DO NOT make up product names or features
+• DO NOT analyze any other website
+• DO NOT write generic emails that could apply to any product
+• DO NOT ignore the actual content from ${url}
+• DO NOT exceed word count limits
+• DO NOT write in any language except ENGLISH
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✍️ EMAIL SEQUENCE STRUCTURE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Email 1 (WELCOME):
+• Hook them instantly with value
+• Introduce the actual brand/product from ${url}
+• Set expectations for the sequence
+• Make them excited for what's coming
+
+Middle Emails (VALUE & EDUCATION):
+• Deep dive into specific features from ${url}
+• Address pain points the product solves
+• Share social proof, case studies, or testimonials if on page
+• Educate without selling aggressively
+• Build trust and authority
+
+Later Emails (CONVERSION):
+• Present the offer with urgency
+• Use real pricing/promotions from ${url}
+• Overcome objections proactively
+• Create FOMO (fear of missing out)
+• Multiple CTAs for different buying stages
+
+Final Email (RE-ENGAGEMENT):
+• Last chance positioning
+• Remind of key benefits
+• Address "why haven't you acted yet?"
+• Strong, clear call-to-action
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎨 CALL-TO-ACTION REQUIREMENTS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${ctaInstructions}
 
-Based ONLY on content from ${url}, create ${numEmails} email sequences in ENGLISH:
-- Email 1: Welcome/introduction (mention the actual product name from the page)
-- Middle emails: Value, education, or nurture (use real features from the page)
-- Later emails: Sales with CTAs (reference actual pricing/offers from the page)
-- Final email: Urgency or re-engagement
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 FORMATTING REQUIREMENTS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Each email should be approximately ${wordsPerEmail} words with high-converting copy based on the ACTUAL content of ${url}.
+SUBJECT LINES:
+• 40-50 characters maximum
+• Create curiosity or urgency
+• Avoid spam trigger words
+• Personalized feel
 
-IMPORTANT: 
-- Write ALL emails in ENGLISH
-- Use the REAL product name and details from ${url}
-- DO NOT make up information
-- DO NOT write about different products
-- Target word count: ${wordsPerEmail} words per email
+EMAIL BODY (Plain Text):
+• Short paragraphs (2-3 lines max)
+• Use bullet points for scannability
+• Natural conversational tone
+• Clear hierarchy of information
+• Strong opening hook
+• Smooth transitions between ideas
+• Compelling close
 
-Return ONLY valid JSON (no markdown, no code blocks):
+EMAIL HTML:
+• Clean, professional design
+• Mobile-responsive layout
+• Proper heading hierarchy (h1, h2, p)
+• Sufficient white space
+• CTA buttons that stand out
+• Brand-consistent styling
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 QUALITY CHECKLIST (ALL MUST PASS):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Uses actual brand/product name from ${url}
+✅ References specific features from the landing page
+✅ Matches the tone of voice from ${url}
+✅ Word count within ${Math.max(100, wordsPerEmail - 30)}-${Math.min(500, wordsPerEmail + 30)} range
+✅ Zero spelling/grammar errors
+✅ Subject line under 50 characters
+✅ Clear, actionable CTA
+✅ Mobile-friendly formatting
+✅ Written in ENGLISH
+✅ Provides real value to readers
+✅ Builds logical progression through sequence
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 OUTPUT FORMAT (STRICT JSON):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Return ONLY valid JSON with NO markdown, NO code blocks, NO explanatory text:
+
 {
   "emails": [
     {
       "type": "welcome",
-      "subject": "string (in English)",
-      "content": "string (plain text in English, ~${wordsPerEmail} words)",
-      "html": "string (HTML in English, ~${wordsPerEmail} words)"
+      "subject": "Compelling subject line in English (40-50 chars)",
+      "content": "Plain text email body in English (~${wordsPerEmail} words, properly formatted with line breaks)",
+      "html": "HTML email with proper tags, styling, and structure in English (~${wordsPerEmail} words)"
     }
   ]
-}`
+}
+
+NOW CREATE THE EMAIL SEQUENCE BASED ON ${url} - MAKE IT EXCEPTIONAL! 🚀`
         }],
-        temperature: 0.7,
+        temperature: 0.8,
       }),
     });
 

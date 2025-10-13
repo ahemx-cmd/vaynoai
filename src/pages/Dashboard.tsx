@@ -138,7 +138,7 @@ const Dashboard = () => {
                     onClick={() => window.open('https://vayno.lemonsqueezy.com/buy/b9b0bdea-ddc5-42b8-8abc-aee080f88fae?logo=0', '_blank')}
                   >
                     <Crown className="w-4 h-4 mr-2" />
-                    Get Lifetime Deal ($69)
+                    Get Lifetime Deal ($89)
                   </Button>
                 </div>
               </motion.div>

@@ -52,13 +52,13 @@ const Billing = () => {
     },
     {
       name: "Starter",
-      price: 9,
+      price: 12,
       period: "month",
       icon: CreditCard,
       color: "from-primary to-accent",
       popular: true,
       showToggle: true,
-      lifetimePrice: 79,
+      lifetimePrice: 89,
       features: [
         "50 email generations / month",
         "Remove watermark",
@@ -70,7 +70,7 @@ const Billing = () => {
     },
     {
       name: "Pro",
-      price: 19,
+      price: 29,
       period: "month",
       icon: Crown,
       color: "from-accent to-primary",
