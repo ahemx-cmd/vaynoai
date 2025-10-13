@@ -130,15 +130,15 @@ const Dashboard = () => {
                       Limited Time: Lifetime Deal Available!
                     </h3>
                     <p className="text-muted-foreground">
-                      Get unlimited access to the Starter plan features forever. Pay once, use forever – no monthly fees!
+                      Get access to the Starter plan features forever. Pay once, use forever – no monthly fees!
                     </p>
                   </div>
                   <Button 
                     className="flex-shrink-0 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg hover-lift"
-                    onClick={() => navigate('/billing')}
+                    onClick={() => window.open('https://vayno.lemonsqueezy.com/buy/b9b0bdea-ddc5-42b8-8abc-aee080f88fae?logo=0', '_blank')}
                   >
                     <Crown className="w-4 h-4 mr-2" />
-                    View Lifetime Deal
+                    Get Lifetime Deal ($69)
                   </Button>
                 </div>
               </motion.div>

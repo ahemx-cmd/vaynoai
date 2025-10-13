@@ -43,7 +43,7 @@ const PricingSection = () => {
     },
     {
       name: "Starter",
-      price: isLifetime ? "$79" : "$9",
+      price: isLifetime ? "$69" : "$9",
       period: isLifetime ? "one-time" : "per month",
       description: "For growing businesses",
       features: [
