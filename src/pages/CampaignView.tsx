@@ -80,10 +80,6 @@ const CampaignView = () => {
         );
         
         zip.file(fileName, htmlContent);
-
-        // Also create a plain text version
-        const txtContent = `Subject: ${email.subject}\n\n${email.content}`;
-        zip.file(`${campaignSlug}_email${email.sequence_number}.txt`, txtContent);
       });
 
       // Generate ZIP file
