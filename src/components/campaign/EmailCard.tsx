@@ -4,20 +4,23 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
-import { Wand2, Check, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Wand2, Check, X, ChevronDown, ChevronUp, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import VaynoWatermark from "./VaynoWatermark";
 import SmartPreview from "./SmartPreview";
+import { calculateSendDay } from "@/lib/emailUtils";
 
 interface EmailCardProps {
   email: any;
   index: number;
   campaignId: string;
+  dripDuration?: string;
+  totalEmails: number;
 }
 
-const EmailCard = ({ email, index, campaignId }: EmailCardProps) => {
+const EmailCard = ({ email, index, campaignId, dripDuration, totalEmails }: EmailCardProps) => {
   const [isExpanded, setIsExpanded] = useState(index === 0);
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(email.content);
@@ -66,8 +69,10 @@ const EmailCard = ({ email, index, campaignId }: EmailCardProps) => {
       case "welcome":
         return "bg-blue-500/20 text-blue-400";
       case "nurture":
+      case "value":
         return "bg-green-500/20 text-green-400";
       case "sales":
+      case "conversion":
         return "bg-purple-500/20 text-purple-400";
       case "re-engagement":
         return "bg-orange-500/20 text-orange-400";
@@ -75,6 +80,10 @@ const EmailCard = ({ email, index, campaignId }: EmailCardProps) => {
         return "bg-muted text-muted-foreground";
     }
   };
+
+  const sendDay = dripDuration 
+    ? calculateSendDay(dripDuration, email.sequence_number, totalEmails)
+    : null;
 
   return (
     <motion.div
@@ -89,11 +98,17 @@ const EmailCard = ({ email, index, campaignId }: EmailCardProps) => {
         >
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
+              <div className="flex items-center gap-3 mb-2 flex-wrap">
                 <Badge variant="outline">Email {email.sequence_number}</Badge>
                 <Badge className={getTypeColor(email.email_type)}>
                   {email.email_type}
                 </Badge>
+                {sendDay && (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    Day {sendDay}
+                  </Badge>
+                )}
               </div>
               <h3 className="text-xl font-semibold mb-1">{email.subject}</h3>
               <p className="text-sm text-muted-foreground">

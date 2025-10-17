@@ -11,6 +11,8 @@ import EmailCard from "@/components/campaign/EmailCard";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import URLSummary from "@/components/campaign/URLSummary";
 import AutoTranslate from "@/components/campaign/AutoTranslate";
+import JSZip from "jszip";
+import { generateESPReadyHTML } from "@/lib/emailUtils";
 
 const CampaignView = () => {
   const { id } = useParams();
@@ -55,50 +57,53 @@ const CampaignView = () => {
     fetchCampaign();
   }, [id, navigate]);
 
-  const handleExportHTML = () => {
+  const handleExportHTML = async () => {
     if (emails.length === 0) {
       toast.error("No emails to export");
       return;
     }
 
-    let htmlContent = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${campaign?.name || 'Email Campaign'}</title>
-</head>
-<body>
-`;
+    try {
+      const zip = new JSZip();
+      const brandName = campaign?.analyzed_data?.title || campaign?.name || "Brand";
+      const campaignSlug = campaign?.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'campaign';
 
-    emails.forEach((email) => {
-      htmlContent += `
-<!-- ${email.email_type.toUpperCase()} EMAIL (${email.sequence_number}) -->
-${email.html_content}
-${isFree ? `
-<div style="text-align: center; padding: 20px; border-top: 1px solid #e5e7eb; margin-top: 20px; font-size: 12px; color: #6b7280;">
-  <span>Powered by </span>
-  <a href="https://vayno.ai" target="_blank" style="color: #8b5cf6; font-weight: 600; text-decoration: none;">Vayno</a>
-</div>
-` : ''}
+      // Generate ESP-ready HTML for each email
+      emails.forEach((email) => {
+        const fileName = `${campaignSlug}_email${email.sequence_number}.html`;
+        const htmlContent = generateESPReadyHTML(
+          email,
+          brandName,
+          campaign?.cta_link || null,
+          campaign?.include_cta ?? true,
+          isFree
+        );
+        
+        zip.file(fileName, htmlContent);
 
-`;
-    });
+        // Also create a plain text version
+        const txtContent = `Subject: ${email.subject}\n\n${email.content}`;
+        zip.file(`${campaignSlug}_email${email.sequence_number}.txt`, txtContent);
+      });
 
-    htmlContent += `</body>
-</html>`;
+      // Generate ZIP file
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+      
+      // Download ZIP
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${campaignSlug}_email_sequence.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
 
-    const blob = new Blob([htmlContent], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${campaign?.name || 'campaign'}-emails.html`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    toast.success("HTML exported successfully!");
+      toast.success("Email sequence exported successfully! Ready for ESP upload.");
+    } catch (error) {
+      console.error("Export error:", error);
+      toast.error("Failed to export emails");
+    }
   };
 
   if (loading) {
@@ -188,7 +193,14 @@ ${isFree ? `
             </div>
 
             {emails.map((email, i) => (
-              <EmailCard key={email.id} email={email} index={i} campaignId={id!} />
+              <EmailCard 
+                key={email.id} 
+                email={email} 
+                index={i} 
+                campaignId={id!}
+                dripDuration={campaign.drip_duration}
+                totalEmails={emails.length}
+              />
             ))}
           </div>
         </motion.div>

@@ -154,10 +154,10 @@ const Support = () => {
                     <div className="text-left">
                       <p className="font-semibold mb-1">Email Support</p>
                       <a 
-                        href="mailto:support@vayno.com" 
+                        href="mailto:teamvayno@gmail.com" 
                         className="text-primary hover:underline font-medium"
                       >
-                        support@vayno.com
+                        teamvayno@gmail.com
                       </a>
                       <p className="text-xs text-muted-foreground mt-1">We typically respond within 4-6 hours</p>
                     </div>
