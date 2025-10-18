@@ -66,7 +66,10 @@ const Auth = () => {
           toast.error(error.message);
         }
       } else {
-        toast.success("Account created! Redirecting...");
+        toast.success("Check your email to verify your account!", { 
+          duration: 6000,
+          description: "We've sent a verification link to your email address."
+        });
       }
     } catch (err) {
       if (err instanceof z.ZodError) {

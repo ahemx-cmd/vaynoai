@@ -256,6 +256,8 @@ EMAIL HTML:
 • Sufficient white space
 • CTA buttons that stand out
 • Brand-consistent styling
+• Use personalization tags: {{first_name}}, {{last_name}}, {{company_name}} where natural
+• Include engaging opening that uses {{first_name}}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🎯 QUALITY CHECKLIST (ALL MUST PASS):
