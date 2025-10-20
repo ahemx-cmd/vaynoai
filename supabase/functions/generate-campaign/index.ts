@@ -97,6 +97,36 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    // CRITICAL: Fetch the actual URL content first
+    console.log("Fetching URL content:", url);
+    let pageContent = "";
+    try {
+      const urlResponse = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+      });
+      
+      if (!urlResponse.ok) {
+        throw new Error(`Failed to fetch URL: ${urlResponse.status}`);
+      }
+      
+      const html = await urlResponse.text();
+      
+      // Extract text content from HTML (basic extraction)
+      pageContent = html
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove scripts
+        .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '') // Remove styles
+        .replace(/<[^>]+>/g, ' ') // Remove HTML tags
+        .replace(/\s+/g, ' ') // Normalize whitespace
+        .trim();
+      
+      console.log("Successfully fetched page content, length:", pageContent.length);
+    } catch (fetchError) {
+      console.error("Error fetching URL:", fetchError);
+      pageContent = "Unable to fetch page content. Please analyze based on the URL.";
+    }
+
     // Generate emails using AI
     console.log("Calling AI API for URL:", url);
     
@@ -174,26 +204,36 @@ Create email sequences that feel personal, valuable, and impossible to ignore. E
 📝 WORDS PER EMAIL: ${wordsPerEmail} words (strict range: ${Math.max(100, wordsPerEmail - 30)} to ${Math.min(500, wordsPerEmail + 30)} words)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 ACTUAL PAGE CONTENT FROM ${url}:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${pageContent.substring(0, 8000)}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔍 CRITICAL RESEARCH REQUIREMENTS:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. ✅ VISIT THE EXACT URL: ${url}
-2. ✅ READ EVERY SECTION thoroughly - headlines, subheadlines, features, benefits, testimonials, pricing
-3. ✅ EXTRACT the actual brand name (not generic terms)
-4. ✅ IDENTIFY the specific product/service being offered
-5. ✅ NOTE the exact features, benefits, and value propositions mentioned
-6. ✅ CAPTURE the brand's tone of voice (professional, casual, playful, authoritative)
-7. ✅ FIND real pricing, offers, or promotions if listed
-8. ✅ UNDERSTAND the target audience from the page content
+**IMPORTANT**: The page content above is THE ONLY SOURCE OF TRUTH. You MUST:
+
+1. ✅ ANALYZE THE ACTUAL PAGE CONTENT PROVIDED ABOVE
+2. ✅ EXTRACT the actual brand name from the content (not generic terms)
+3. ✅ IDENTIFY the specific product/service being offered FROM THE CONTENT
+4. ✅ NOTE the exact features, benefits, and value propositions FROM THE CONTENT
+5. ✅ CAPTURE the brand's tone of voice from the actual text
+6. ✅ FIND real pricing, offers, or promotions if mentioned in the content
+7. ✅ UNDERSTAND the target audience from the page content
 
 ❌ ABSOLUTE PROHIBITIONS:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-• DO NOT make up product names or features
-• DO NOT analyze any other website
+• DO NOT make up product names or features - USE ONLY WHAT'S IN THE PAGE CONTENT ABOVE
+• DO NOT use your training data or prior knowledge about this brand
 • DO NOT write generic emails that could apply to any product
-• DO NOT ignore the actual content from ${url}
+• DO NOT ignore the actual page content provided above
+• DO NOT hallucinate features not mentioned in the page content
 • DO NOT exceed word count limits
 • DO NOT write in any language except ENGLISH
+
+**VERIFICATION**: Before writing each email, verify that every claim comes directly from the page content provided above.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✍️ EMAIL SEQUENCE STRUCTURE:
