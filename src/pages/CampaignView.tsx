@@ -20,11 +20,15 @@ const CampaignView = () => {
   const [campaign, setCampaign] = useState<any>(null);
   const [emails, setEmails] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isGuest, setIsGuest] = useState(false);
   const { isFree } = useUserPlan();
 
   useEffect(() => {
     const fetchCampaign = async () => {
       if (!id) return;
+
+      // Check if user is authenticated
+      const { data: { session } } = await supabase.auth.getSession();
 
       const { data: campaignData, error: campaignError } = await supabase
         .from("campaigns")
@@ -34,8 +38,20 @@ const CampaignView = () => {
 
       if (campaignError || !campaignData) {
         toast.error("Campaign not found");
-        navigate("/dashboard");
+        
+        // Check if user is authenticated to decide where to redirect
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          navigate("/dashboard");
+        } else {
+          navigate("/");
+        }
         return;
+      }
+
+      // Check if this is a guest campaign (no user_id)
+      if (!campaignData.user_id) {
+        setIsGuest(true);
       }
 
       const { data: emailsData, error: emailsError } = await supabase
@@ -115,13 +131,55 @@ const CampaignView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      {/* Guest Blur Overlay */}
+      {isGuest && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-lg w-full mx-4"
+          >
+            <Card className="glass-card p-8 border-primary/30 text-center">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <Sparkles className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-3xl font-bold mb-3">Campaign Generated!</h2>
+              <p className="text-lg text-muted-foreground mb-6">
+                Your email sequence is ready. Sign in to view, edit, and export your campaign.
+              </p>
+              <div className="space-y-3">
+                <Button
+                  size="lg"
+                  onClick={() => navigate("/auth")}
+                  className="w-full btn-premium shadow-lg hover-lift"
+                >
+                  Sign In to Unlock
+                </Button>
+                <p className="text-sm text-muted-foreground">
+                  This generation will count toward your free plan (2 remaining after sign-up)
+                </p>
+              </div>
+            </Card>
+          </motion.div>
+        </div>
+      )}
+      
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-          <Button variant="ghost" onClick={() => navigate("/dashboard")}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
-          </Button>
+          {!isGuest && (
+            <Button variant="ghost" onClick={() => navigate("/dashboard")}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </Button>
+          )}
+          {isGuest && (
+            <Button variant="ghost" onClick={() => navigate("/")}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Home
+            </Button>
+          )}
           <div className="flex gap-2">
             {campaign.analyzed_data && (
               <URLSummary analyzedData={campaign.analyzed_data} url={campaign.url} />

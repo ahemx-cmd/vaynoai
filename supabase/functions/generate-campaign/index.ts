@@ -19,37 +19,28 @@ serve(async (req) => {
   }
 
   try {
-    // SECURITY FIX 1: Validate authentication
+    // Check for authentication (optional for guest campaigns)
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      console.error("Missing Authorization header");
-      return new Response(
-        JSON.stringify({ error: "Unauthorized - Missing authentication" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Create authenticated Supabase client
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    let user = null;
     
-    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
+    if (authHeader) {
+      // Create authenticated Supabase client
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+      
+      const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+        global: { headers: { Authorization: authHeader } },
+      });
 
-    // Verify user authentication
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
-    if (authError || !user) {
-      console.error("Authentication failed:", authError?.message);
-      return new Response(
-        JSON.stringify({ error: "Unauthorized - Invalid token" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      // Try to verify user authentication
+      const { data: { user: authUser }, error: authError } = await supabaseClient.auth.getUser();
+      if (!authError && authUser) {
+        user = authUser;
+        console.log("Authenticated user:", user.id);
+      }
     }
 
-    console.log("Authenticated user:", user.id);
-
-    // SECURITY FIX 2: Validate input data
+    // Validate input data
     const body = await req.json();
     const validationResult = requestSchema.safeParse(body);
     
@@ -66,8 +57,15 @@ serve(async (req) => {
 
     const { campaignId, url } = validationResult.data;
     
-    // SECURITY FIX 3: Verify campaign ownership
-    const { data: campaign, error: campaignError } = await supabaseClient
+    // Use service role for campaign operations
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceClient = createClient(
+      supabaseUrl,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+    
+    // Verify campaign exists and check ownership for authenticated users
+    const { data: campaign, error: campaignError } = await serviceClient
       .from("campaigns")
       .select("user_id")
       .eq("id", campaignId)
@@ -81,7 +79,8 @@ serve(async (req) => {
       );
     }
 
-    if (campaign.user_id !== user.id) {
+    // For authenticated users, verify ownership; for guest campaigns (user_id null), allow
+    if (user && campaign.user_id && campaign.user_id !== user.id) {
       console.error("Unauthorized access attempt - user does not own campaign");
       return new Response(
         JSON.stringify({ error: "Unauthorized - You don't own this campaign" }),
@@ -90,12 +89,6 @@ serve(async (req) => {
     }
 
     console.log("Starting campaign generation for:", campaignId);
-    
-    // Use service role only for the specific privileged operation (inserting emails)
-    const serviceClient = createClient(
-      supabaseUrl,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
 
     // CRITICAL: Fetch the actual URL content first
     console.log("Fetching URL content:", url);

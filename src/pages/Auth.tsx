@@ -26,18 +26,57 @@ const Auth = () => {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/dashboard");
+        claimGuestCampaign(session.user.id);
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) {
-        navigate("/dashboard");
+        claimGuestCampaign(session.user.id);
       }
     });
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  const claimGuestCampaign = async (userId: string) => {
+    const guestCampaignId = localStorage.getItem("guestCampaignId");
+    
+    if (guestCampaignId) {
+      try {
+        // Update campaign with user_id
+        const { error: updateError } = await supabase
+          .from("campaigns")
+          .update({ user_id: userId })
+          .eq("id", guestCampaignId)
+          .is("user_id", null);
+
+        if (!updateError) {
+          // Increment user generations
+          await supabase.rpc("increment_user_generations", {
+            user_id: userId,
+          });
+
+          // Clear guest campaign ID
+          localStorage.removeItem("guestCampaignId");
+          
+          toast.success("Your campaign has been unlocked!");
+          
+          // Navigate to the campaign
+          setTimeout(() => {
+            navigate(`/campaign/${guestCampaignId}`);
+          }, 1000);
+        } else {
+          navigate("/dashboard");
+        }
+      } catch (err) {
+        console.error("Error claiming guest campaign:", err);
+        navigate("/dashboard");
+      }
+    } else {
+      navigate("/dashboard");
+    }
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();

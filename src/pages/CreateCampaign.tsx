@@ -42,6 +42,7 @@ const CreateCampaign = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [isGuest, setIsGuest] = useState(true);
   const [url, setUrl] = useState("");
   const [name, setName] = useState("");
   const [sequenceType, setSequenceType] = useState("");
@@ -52,21 +53,17 @@ const CreateCampaign = () => {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        navigate("/auth");
-      } else {
+      if (session) {
         setUserId(session.user.id);
+        setIsGuest(false);
+      } else {
+        setIsGuest(true);
       }
     });
   }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!userId) {
-      toast.error("You must be logged in");
-      return;
-    }
 
     setLoading(true);
 
@@ -93,28 +90,40 @@ const CreateCampaign = () => {
         return;
       }
 
-      const { data: usageData, error: usageError } = await supabase
-        .from("user_usage")
-        .select("*")
-        .eq("user_id", userId)
-        .single();
+      // For authenticated users, check usage limits
+      if (userId) {
+        const { data: usageData, error: usageError } = await supabase
+          .from("user_usage")
+          .select("*")
+          .eq("user_id", userId)
+          .single();
 
-      if (usageError) {
-        toast.error("Failed to check usage");
-        setLoading(false);
-        return;
-      }
+        if (usageError) {
+          toast.error("Failed to check usage");
+          setLoading(false);
+          return;
+        }
 
-      if (usageData.generations_used >= usageData.generations_limit) {
-        toast.error("You've reached your generation limit. Please upgrade your plan.");
-        setLoading(false);
-        return;
+        if (usageData.generations_used >= usageData.generations_limit) {
+          toast.error("You've reached your generation limit. Please upgrade your plan.");
+          setLoading(false);
+          return;
+        }
+      } else {
+        // Check if guest has already used their free generation
+        const guestCampaignId = localStorage.getItem("guestCampaignId");
+        if (guestCampaignId) {
+          toast.error("You've already tried your free generation! Sign up to continue.");
+          setTimeout(() => navigate("/auth"), 2000);
+          setLoading(false);
+          return;
+        }
       }
 
       const { data: campaign, error: campaignError } = await supabase
         .from("campaigns")
         .insert({
-          user_id: userId,
+          user_id: userId, // null for guests
           name,
           url,
           status: "analyzing",
@@ -133,6 +142,11 @@ const CreateCampaign = () => {
         return;
       }
 
+      // Store guest campaign ID for later claiming
+      if (!userId) {
+        localStorage.setItem("guestCampaignId", campaign.id);
+      }
+
       navigate(`/campaign/${campaign.id}/analyzing`);
     } catch (err) {
       if (err instanceof z.ZodError) {
@@ -147,25 +161,55 @@ const CreateCampaign = () => {
   return (
     <div className="min-h-screen bg-[#f8f9fb]">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/dashboard")}
-          className="mb-6 hover-lift"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Dashboard
-        </Button>
+        {!isGuest && (
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/dashboard")}
+            className="mb-6 hover-lift"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Dashboard
+          </Button>
+        )}
+
+        {isGuest && (
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/")}
+            className="mb-6 hover-lift"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Home
+          </Button>
+        )}
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
+          {isGuest && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="mb-8 glass-card p-6 border-primary/30 rounded-2xl text-center"
+            >
+              <Sparkles className="w-8 h-8 text-primary mx-auto mb-3" />
+              <h2 className="text-2xl font-bold mb-2">Try Before You Sign Up!</h2>
+              <p className="text-muted-foreground">
+                Generate your first campaign for free — no account needed. Sign in after to unlock your results.
+              </p>
+            </motion.div>
+          )}
+          
           <div className="text-center mb-8">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-4 shadow-lg">
               <Sparkles className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-4xl font-bold mb-3 tracking-tight">Create New Campaign</h1>
+            <h1 className="text-4xl font-bold mb-3 tracking-tight">
+              {isGuest ? "Try Your First Campaign" : "Create New Campaign"}
+            </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               Enter your product URL and we'll analyze it to generate a complete email sequence
             </p>

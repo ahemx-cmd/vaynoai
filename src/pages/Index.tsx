@@ -24,7 +24,7 @@ const Index = () => {
                 <Link to="/auth">Sign In</Link>
               </Button>
               <Button asChild className="btn-premium">
-                <Link to="/auth">Try Free</Link>
+                <Link to="/create-campaign">Try Free</Link>
               </Button>
             </div>
           </div>
@@ -61,7 +61,7 @@ const Index = () => {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button size="lg" asChild className="btn-premium shadow-lg hover-lift">
-                <Link to="/auth" className="flex items-center gap-2">
+                <Link to="/create-campaign" className="flex items-center gap-2">
                   Try Free <ArrowRight className="w-4 h-4" />
                 </Link>
               </Button>
@@ -135,7 +135,7 @@ const Index = () => {
               Join hundreds of founders creating high-converting email campaigns in minutes, not hours
             </p>
             <Button size="lg" asChild className="btn-premium shadow-lg hover-lift">
-              <Link to="/auth" className="flex items-center gap-2">
+              <Link to="/create-campaign" className="flex items-center gap-2">
                 Try Free <ArrowRight className="w-4 h-4" />
               </Link>
             </Button>

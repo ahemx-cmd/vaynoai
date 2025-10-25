@@ -76,10 +76,12 @@ const AnalyzingCampaign = () => {
           throw error;
         }
 
-        // Update usage
-        await supabase.rpc("increment_user_generations", {
-          user_id: campaign.user_id,
-        });
+        // Update usage only if user is authenticated (not a guest)
+        if (campaign.user_id) {
+          await supabase.rpc("increment_user_generations", {
+            user_id: campaign.user_id,
+          });
+        }
 
         setProgress(100);
         setCurrentStep(steps.length - 1);
@@ -101,12 +103,24 @@ const AnalyzingCampaign = () => {
   const handleCancel = async () => {
     if (id) {
       await supabase.from("campaigns").delete().eq("id", id);
-      navigate("/dashboard");
+      
+      // Check if it's a guest campaign
+      const guestCampaignId = localStorage.getItem("guestCampaignId");
+      if (guestCampaignId === id) {
+        localStorage.removeItem("guestCampaignId");
+        navigate("/");
+      } else {
+        navigate("/dashboard");
+      }
+      
       toast.success("Campaign cancelled");
     }
   };
 
   if (error) {
+    const guestCampaignId = localStorage.getItem("guestCampaignId");
+    const isGuestError = guestCampaignId === id;
+    
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <motion.div
@@ -118,8 +132,11 @@ const AnalyzingCampaign = () => {
             <XCircle className="w-16 h-16 text-destructive mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-2">Analysis Failed</h2>
             <p className="text-muted-foreground mb-6">{error}</p>
-            <Button onClick={() => navigate("/dashboard")} variant="outline">
-              Return to Dashboard
+            <Button 
+              onClick={() => navigate(isGuestError ? "/" : "/dashboard")} 
+              variant="outline"
+            >
+              {isGuestError ? "Return to Home" : "Return to Dashboard"}
             </Button>
           </Card>
         </motion.div>
