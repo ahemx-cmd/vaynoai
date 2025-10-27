@@ -14,9 +14,9 @@ const Index = () => {
       <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-lg border-b border-border/50">
         <div className="container mx-auto px-4 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
-              <img src={vaynoIcon} alt="Vayno" className="w-9 h-9" />
-              <span className="font-bold text-xl tracking-tight">Vayno</span>
+            <Link to="/" className="flex items-center gap-3">
+              <img src={vaynoIcon} alt="Vayno" className="w-12 h-12" />
+              <span className="font-bold text-2xl tracking-tight">Vayno</span>
             </Link>
             <div className="flex items-center gap-3">
               <Button variant="ghost" asChild className="hidden sm:inline-flex">
@@ -43,9 +43,9 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5 mb-6 animate-fade-in">
-              <img src={vaynoIcon} alt="Vayno" className="w-4 h-4" />
-              <span className="text-sm font-medium">AI-Powered Email Campaigns</span>
+            <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-primary/20 bg-primary/5 mb-6 animate-fade-in">
+              <img src={vaynoIcon} alt="Vayno" className="w-6 h-6" />
+              <span className="text-base font-medium">AI-Powered Email Campaigns</span>
             </div>
             
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight tracking-tight">
@@ -124,7 +124,7 @@ const Index = () => {
             viewport={{ once: true }}
             className="glass-card rounded-3xl p-12 text-center hover-lift"
           >
-            <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mx-auto mb-6 shadow-lg p-3">
+            <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center mx-auto mb-6 shadow-lg p-4">
               <img src={vaynoIcon} alt="Vayno" className="w-full h-full" />
             </div>
             <h2 className="text-4xl font-bold mb-4 tracking-tight">
@@ -146,9 +146,9 @@ const Index = () => {
       <footer className="border-t border-border bg-white py-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-              <img src={vaynoIcon} alt="Vayno" className="w-8 h-8" />
-              <span className="font-bold text-lg">Vayno</span>
+            <div className="flex items-center gap-3">
+              <img src={vaynoIcon} alt="Vayno" className="w-10 h-10" />
+              <span className="font-bold text-xl">Vayno</span>
             </div>
             
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">

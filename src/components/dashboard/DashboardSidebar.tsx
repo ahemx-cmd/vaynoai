@@ -28,8 +28,8 @@ const DashboardSidebar = () => {
     <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
       <div className="flex flex-col flex-1 bg-white border-r border-border">
         {/* Logo */}
-        <div className="flex items-center gap-2 px-6 py-6 border-b border-border">
-          <img src={vaynoIcon} alt="Vayno" className="w-9 h-9" />
+        <div className="flex items-center gap-3 px-6 py-6 border-b border-border">
+          <img src={vaynoIcon} alt="Vayno" className="w-11 h-11" />
           <span className="font-bold text-xl tracking-tight">Vayno</span>
         </div>
 
