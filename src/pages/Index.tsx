@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Zap, FileText, Download, Layout, CheckCircle2, Star, Mail } from "lucide-react";
+import { ArrowRight, Zap, FileText, Download, Layout, CheckCircle2, Star, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import PricingSection from "@/components/pricing/PricingSection";
 import FeaturesGrid from "@/components/landing/FeaturesGrid";
 import Testimonials from "@/components/landing/Testimonials";
+import vaynoIcon from "@/assets/vayno-icon.png";
 
 const Index = () => {
   return (
@@ -14,9 +15,7 @@ const Index = () => {
         <div className="container mx-auto px-4 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
+              <img src={vaynoIcon} alt="Vayno" className="w-9 h-9" />
               <span className="font-bold text-xl tracking-tight">Vayno</span>
             </Link>
             <div className="flex items-center gap-3">
@@ -45,7 +44,7 @@ const Index = () => {
             transition={{ duration: 0.6 }}
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5 mb-6 animate-fade-in">
-              <Sparkles className="w-4 h-4 text-primary" />
+              <img src={vaynoIcon} alt="Vayno" className="w-4 h-4" />
               <span className="text-sm font-medium">AI-Powered Email Campaigns</span>
             </div>
             
@@ -89,8 +88,8 @@ const Index = () => {
                     <Mail className="w-6 h-6 text-primary" />
                   </div>
                   <ArrowRight className="w-6 h-6 text-muted-foreground" />
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent shadow-lg flex items-center justify-center">
-                    <Sparkles className="w-7 h-7 text-white animate-glow-pulse" />
+                  <div className="w-12 h-12 rounded-xl bg-white shadow-lg flex items-center justify-center p-2">
+                    <img src={vaynoIcon} alt="Vayno AI" className="w-full h-full" />
                   </div>
                   <ArrowRight className="w-6 h-6 text-muted-foreground" />
                   <div className="w-12 h-12 rounded-xl bg-white shadow-md flex items-center justify-center">
@@ -125,8 +124,8 @@ const Index = () => {
             viewport={{ once: true }}
             className="glass-card rounded-3xl p-12 text-center hover-lift"
           >
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-6 shadow-lg">
-              <Sparkles className="w-9 h-9 text-white" />
+            <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mx-auto mb-6 shadow-lg p-3">
+              <img src={vaynoIcon} alt="Vayno" className="w-full h-full" />
             </div>
             <h2 className="text-4xl font-bold mb-4 tracking-tight">
               Start generating your first campaign today
@@ -148,9 +147,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
+              <img src={vaynoIcon} alt="Vayno" className="w-8 h-8" />
               <span className="font-bold text-lg">Vayno</span>
             </div>
             

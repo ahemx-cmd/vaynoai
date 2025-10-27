@@ -2,8 +2,9 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { LayoutDashboard, FolderKanban, CreditCard, HelpCircle, User, LogOut, Sparkles } from "lucide-react";
+import { LayoutDashboard, FolderKanban, CreditCard, HelpCircle, User, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import vaynoIcon from "@/assets/vayno-icon.png";
 
 const DashboardSidebar = () => {
   const navigate = useNavigate();
@@ -28,9 +29,7 @@ const DashboardSidebar = () => {
       <div className="flex flex-col flex-1 bg-white border-r border-border">
         {/* Logo */}
         <div className="flex items-center gap-2 px-6 py-6 border-b border-border">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-md">
-            <Sparkles className="w-5 h-5 text-white" />
-          </div>
+          <img src={vaynoIcon} alt="Vayno" className="w-9 h-9" />
           <span className="font-bold text-xl tracking-tight">Vayno</span>
         </div>
 
