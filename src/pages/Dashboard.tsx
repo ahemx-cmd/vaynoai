@@ -11,6 +11,7 @@ import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileSidebar from "@/components/dashboard/MobileSidebar";
 import CampaignsList from "@/components/dashboard/CampaignsList";
 import UsageCard from "@/components/dashboard/UsageCard";
+import { useUserPlan } from "@/hooks/useUserPlan";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const Dashboard = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [showLifetimeBanner, setShowLifetimeBanner] = useState(true);
+  const { isFree } = useUserPlan();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -110,7 +112,7 @@ const Dashboard = () => {
             transition={{ duration: 0.5 }}
             className="space-y-6 sm:space-y-8"
           >
-            {showLifetimeBanner && (
+            {showLifetimeBanner && isFree && (
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -126,7 +128,7 @@ const Dashboard = () => {
                 <div className="relative flex flex-col sm:flex-row items-center gap-4 pr-8">
                   <div className="flex-shrink-0">
                     <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
-                      <Crown className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                      <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                     </div>
                   </div>
                   <div className="flex-1 text-center sm:text-left">
@@ -143,7 +145,7 @@ const Dashboard = () => {
                     size="sm"
                     onClick={() => window.open('https://vayno.lemonsqueezy.com/buy/b9b0bdea-ddc5-42b8-8abc-aee080f88fae?logo=0', '_blank')}
                   >
-                    <Crown className="w-4 h-4 mr-2" />
+                    <Sparkles className="w-4 h-4 mr-2" />
                     <span className="hidden sm:inline">Get Lifetime Deal ($89)</span>
                     <span className="sm:hidden">Get Deal ($89)</span>
                   </Button>

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Zap, FileText, Download, Layout, CheckCircle2, Star, Mail } from "lucide-react";
+import { ArrowRight, Zap, FileText, Download, Layout, CheckCircle2, Star, Mail, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import PricingSection from "@/components/pricing/PricingSection";
@@ -44,7 +44,7 @@ const Index = () => {
             transition={{ duration: 0.6 }}
           >
             <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-primary/20 bg-primary/5 mb-6 animate-fade-in">
-              <img src={vaynoIcon} alt="Vayno" className="w-6 h-6" />
+              <Sparkles className="w-6 h-6 text-primary" />
               <span className="text-base font-medium">AI-Powered Email Campaigns</span>
             </div>
             
