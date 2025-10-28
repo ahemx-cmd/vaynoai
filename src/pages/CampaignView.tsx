@@ -74,6 +74,13 @@ const CampaignView = () => {
   }, [id, navigate]);
 
   const handleExportHTML = async () => {
+    // Require sign-in for guests
+    if (isGuest) {
+      toast.error("Please sign in to export your campaign");
+      navigate("/auth");
+      return;
+    }
+
     if (emails.length === 0) {
       toast.error("No emails to export");
       return;
@@ -132,39 +139,6 @@ const CampaignView = () => {
 
   return (
     <div className="min-h-screen bg-background relative">
-      {/* Guest Blur Overlay */}
-      {isGuest && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="max-w-lg w-full mx-4"
-          >
-            <Card className="glass-card p-8 border-primary/30 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <Sparkles className="w-8 h-8 text-white" />
-              </div>
-              <h2 className="text-3xl font-bold mb-3">Campaign Generated!</h2>
-              <p className="text-lg text-muted-foreground mb-6">
-                Your email sequence is ready. Sign in to view, edit, and export your campaign.
-              </p>
-              <div className="space-y-3">
-                <Button
-                  size="lg"
-                  onClick={() => navigate("/auth")}
-                  className="w-full btn-premium shadow-lg hover-lift"
-                >
-                  Sign In to Unlock
-                </Button>
-                <p className="text-sm text-muted-foreground">
-                  This generation will count toward your free plan (2 remaining after sign-up)
-                </p>
-              </div>
-            </Card>
-          </motion.div>
-        </div>
-      )}
       
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
@@ -247,14 +221,33 @@ const CampaignView = () => {
             </div>
 
             {emails.map((email, i) => (
-              <EmailCard 
-                key={email.id} 
-                email={email} 
-                index={i} 
-                campaignId={id!}
-                dripDuration={campaign.drip_duration}
-                totalEmails={emails.length}
-              />
+              <div key={email.id} className="relative">
+                <EmailCard 
+                  email={email} 
+                  index={i} 
+                  campaignId={id!}
+                  dripDuration={campaign.drip_duration}
+                  totalEmails={emails.length}
+                />
+                {/* Blur overlay for emails 4+ for guests */}
+                {isGuest && i >= 3 && (
+                  <div className="absolute inset-0 bg-white/60 backdrop-blur-md rounded-lg flex items-center justify-center z-10">
+                    <Card className="glass-card p-6 max-w-sm mx-4 text-center shadow-xl">
+                      <Sparkles className="w-10 h-10 text-primary mx-auto mb-3" />
+                      <h3 className="font-bold text-lg mb-2">Sign in to view all emails</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Get access to the complete {emails.length}-email sequence
+                      </p>
+                      <Button
+                        onClick={() => navigate("/auth")}
+                        className="btn-premium w-full"
+                      >
+                        Sign In Now
+                      </Button>
+                    </Card>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </motion.div>

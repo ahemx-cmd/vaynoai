@@ -67,26 +67,33 @@ const Dashboard = () => {
       <div className="flex-1 lg:ml-64">
         {/* Top Bar */}
         <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-lg border-b border-border">
-          <div className="px-6 lg:px-8 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4 flex-1">
+          <div className="px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
                 <MobileSidebar />
-                <div className="flex-1">
-                  <h1 className="text-2xl font-bold tracking-tight">
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight truncate">
                     Hi, {firstName} ✨
                   </h1>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 hidden sm:block">
                     Create and manage your email campaigns
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <Button onClick={() => navigate("/create-campaign")} className="btn-premium shadow-md hover-lift">
-                  <Plus className="w-4 h-4 mr-2" />
-                  New Campaign
+              <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                <Button 
+                  onClick={() => navigate("/create-campaign")} 
+                  className="btn-premium shadow-md hover-lift"
+                  size="sm"
+                >
+                  <Plus className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">New Campaign</span>
                 </Button>
-                <Avatar className="cursor-pointer hover-lift">
-                  <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-semibold">
+                <Avatar 
+                  className="cursor-pointer hover-lift h-9 w-9 sm:h-10 sm:w-10"
+                  onClick={() => navigate("/profile")}
+                >
+                  <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-semibold text-sm">
                     {userInitials}
                   </AvatarFallback>
                 </Avatar>
@@ -96,47 +103,49 @@ const Dashboard = () => {
         </div>
 
         {/* Main Content */}
-        <div className="px-6 lg:px-8 py-8">
+        <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="space-y-8"
+            className="space-y-6 sm:space-y-8"
           >
             {showLifetimeBanner && (
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="relative bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 border border-amber-500/30 rounded-xl p-6 overflow-hidden"
+                className="relative bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 border border-amber-500/30 rounded-xl p-4 sm:p-6 overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-orange-500/5 animate-pulse" />
                 <button
                   onClick={() => setShowLifetimeBanner(false)}
-                  className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+                  className="absolute top-3 right-3 sm:top-4 sm:right-4 text-muted-foreground hover:text-foreground transition-colors z-10"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
-                <div className="relative flex flex-col md:flex-row items-center gap-4">
+                <div className="relative flex flex-col sm:flex-row items-center gap-4 pr-8">
                   <div className="flex-shrink-0">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
-                      <Crown className="w-8 h-8 text-white" />
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
+                      <Crown className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                     </div>
                   </div>
-                  <div className="flex-1 text-center md:text-left">
-                    <h3 className="text-xl font-bold mb-1 flex items-center gap-2 justify-center md:justify-start">
-                      <Sparkles className="w-5 h-5 text-amber-500" />
-                      Limited Time: Lifetime Deal Available!
+                  <div className="flex-1 text-center sm:text-left">
+                    <h3 className="text-base sm:text-xl font-bold mb-1 flex items-center gap-2 justify-center sm:justify-start flex-wrap">
+                      <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
+                      <span>Limited Time: Lifetime Deal Available!</span>
                     </h3>
-                    <p className="text-muted-foreground">
+                    <p className="text-sm sm:text-base text-muted-foreground">
                       Get access to the Starter plan features forever. Pay once, use forever – no monthly fees!
                     </p>
                   </div>
                   <Button 
-                    className="flex-shrink-0 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg hover-lift"
+                    className="flex-shrink-0 w-full sm:w-auto bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg hover-lift text-sm sm:text-base"
+                    size="sm"
                     onClick={() => window.open('https://vayno.lemonsqueezy.com/buy/b9b0bdea-ddc5-42b8-8abc-aee080f88fae?logo=0', '_blank')}
                   >
                     <Crown className="w-4 h-4 mr-2" />
-                    Get Lifetime Deal ($89)
+                    <span className="hidden sm:inline">Get Lifetime Deal ($89)</span>
+                    <span className="sm:hidden">Get Deal ($89)</span>
                   </Button>
                 </div>
               </motion.div>
