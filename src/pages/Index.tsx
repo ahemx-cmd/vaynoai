@@ -18,11 +18,11 @@ const Index = () => {
               <img src={vaynoIcon} alt="Vayno" className="w-12 h-12" />
               <span className="font-bold text-2xl tracking-tight">Vayno</span>
             </Link>
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" asChild className="hidden sm:inline-flex">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Button variant="ghost" asChild size="sm" className="text-sm">
                 <Link to="/auth">Sign In</Link>
               </Button>
-              <Button asChild className="btn-premium">
+              <Button asChild className="btn-premium" size="sm">
                 <Link to="/create-campaign">Try Free</Link>
               </Button>
             </div>
