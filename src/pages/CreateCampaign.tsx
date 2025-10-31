@@ -189,24 +189,15 @@ const CreateCampaign = () => {
           transition={{ duration: 0.5 }}
         >
           {isGuest && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="mb-8 glass-card p-6 border-primary/30 rounded-2xl text-center"
-            >
-              <Sparkles className="w-8 h-8 text-primary mx-auto mb-3" />
-              <h2 className="text-2xl font-bold mb-2">Create Your Account</h2>
-              <p className="text-muted-foreground mb-4">
-                Sign up now to generate powerful, high-converting email campaigns powered by AI.
-              </p>
+            <div className="mb-6 text-center">
               <Button
                 onClick={() => navigate("/auth")}
-                className="btn-premium"
+                variant="outline"
+                className="hover-lift"
               >
-                Sign Up to Get Started
+                Sign Up
               </Button>
-            </motion.div>
+            </div>
           )}
           
           <div className="text-center mb-8">
