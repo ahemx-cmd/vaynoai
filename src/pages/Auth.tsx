@@ -28,27 +28,44 @@ const Auth = () => {
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
   useEffect(() => {
-    // Check if this is a password reset callback
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('type') === 'recovery') {
+    // Detect password recovery from query OR hash params
+    const searchParams = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(window.location.hash.slice(1));
+    if (searchParams.get('type') === 'recovery' || hashParams.get('type') === 'recovery') {
       setIsUpdatingPassword(true);
-      return;
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        claimGuestCampaign(session.user.id);
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsUpdatingPassword(true);
+        return;
+      }
+      if (event === "SIGNED_IN" && session) {
+        // Avoid claiming during recovery flow
+        const hash = new URLSearchParams(window.location.hash.slice(1));
+        const isRecovery = hash.get('type') === 'recovery';
+        if (isRecovery || isUpdatingPassword) return;
+        // Defer any Supabase calls to prevent deadlocks
+        setTimeout(() => {
+          claimGuestCampaign(session.user.id);
+        }, 0);
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session) {
-        claimGuestCampaign(session.user.id);
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        const hash = new URLSearchParams(window.location.hash.slice(1));
+        const isRecovery = hash.get('type') === 'recovery';
+        if (!isRecovery && !isUpdatingPassword) {
+          claimGuestCampaign(session.user.id);
+        }
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, isUpdatingPassword]);
 
   const claimGuestCampaign = async (userId: string) => {
     const guestCampaignId = localStorage.getItem("guestCampaignId");
@@ -213,7 +230,8 @@ const Auth = () => {
         setIsUpdatingPassword(false);
         setNewPassword("");
         setConfirmPassword("");
-        // Redirect to auth page without query params
+        // Sign out to ensure the user returns to the sign-in screen
+        await supabase.auth.signOut();
         navigate("/auth", { replace: true });
       }
     } catch (err) {
