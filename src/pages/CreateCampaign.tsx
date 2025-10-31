@@ -196,10 +196,16 @@ const CreateCampaign = () => {
               className="mb-8 glass-card p-6 border-primary/30 rounded-2xl text-center"
             >
               <Sparkles className="w-8 h-8 text-primary mx-auto mb-3" />
-              <h2 className="text-2xl font-bold mb-2">Try Before You Sign Up!</h2>
-              <p className="text-muted-foreground">
-                Generate your first campaign for free — no account needed. Sign in after to unlock your results.
+              <h2 className="text-2xl font-bold mb-2">Create Your Account</h2>
+              <p className="text-muted-foreground mb-4">
+                Sign up now to generate powerful, high-converting email campaigns powered by AI.
               </p>
+              <Button
+                onClick={() => navigate("/auth")}
+                className="btn-premium"
+              >
+                Sign Up to Get Started
+              </Button>
             </motion.div>
           )}
           
