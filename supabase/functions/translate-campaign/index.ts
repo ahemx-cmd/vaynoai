@@ -77,14 +77,16 @@ serve(async (req) => {
     // Translate all emails using AI
     const translatedEmails = [];
     for (const email of emails) {
-      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${Deno.env.get("LOVABLE_API_KEY")}`,
+          "Authorization": `Bearer ${Deno.env.get("OPENROUTER_API_KEY")}`,
+          "HTTP-Referer": "https://vayno.app",
+          "X-Title": "Vayno Campaign Translator",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
+          model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
           messages: [{
             role: "user",
             content: `Translate the following email content to ${targetLanguage}. Preserve formatting, tone, and brand voice. Keep CTAs and links unchanged.

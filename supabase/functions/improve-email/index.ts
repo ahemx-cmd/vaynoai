@@ -66,14 +66,16 @@ serve(async (req) => {
     const { currentContent } = validationResult.data;
     console.log("Improving content of length:", currentContent.length);
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${Deno.env.get("LOVABLE_API_KEY")}`,
+        "Authorization": `Bearer ${Deno.env.get("OPENROUTER_API_KEY")}`,
+        "HTTP-Referer": "https://vayno.app",
+        "X-Title": "Vayno Email Improver",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
         messages: [{
           role: "user",
           content: `Improve this email to be more compelling and high-converting while keeping the same length and structure: ${currentContent}`
