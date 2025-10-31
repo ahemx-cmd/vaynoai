@@ -88,6 +88,15 @@ serve(async (req) => {
       );
     }
 
+    // If unauthenticated, only allow processing for guest campaigns (user_id must be null)
+    if (!user && campaign.user_id) {
+      console.error("Unauthorized access attempt - unauthenticated user tried to generate for owned campaign");
+      return new Response(
+        JSON.stringify({ error: "Unauthorized - Sign in required for this campaign" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     console.log("Starting campaign generation for:", campaignId);
 
     // CRITICAL: Fetch the actual URL content first

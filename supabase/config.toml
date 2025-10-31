@@ -1,7 +1,7 @@
 project_id = "dwliuzujgjglbkezqsls"
 
 [functions.generate-campaign]
-verify_jwt = true
+verify_jwt = false
 
 [functions.improve-email]
 verify_jwt = true
