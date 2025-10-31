@@ -73,6 +73,10 @@ const AnalyzingCampaign = () => {
         clearInterval(stepInterval);
 
         if (error) {
+          // Handle specific error types
+          if (error.message?.includes('402') || error.message?.includes('credits')) {
+            throw new Error("Insufficient AI credits. Please add credits to continue generating campaigns.");
+          }
           throw error;
         }
 
