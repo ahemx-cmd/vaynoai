@@ -333,6 +333,32 @@ NOW CREATE THE EMAIL SEQUENCE BASED ON ${url} - MAKE IT EXCEPTIONAL! 🚀`
     if (!response.ok) {
       const errorText = await response.text();
       console.error("AI API error:", response.status, errorText);
+      
+      // Handle specific error codes
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ 
+            error: "Insufficient AI credits. Please add credits to your Lovable workspace to continue." 
+          }),
+          { 
+            status: 402, 
+            headers: { ...corsHeaders, "Content-Type": "application/json" } 
+          }
+        );
+      }
+      
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ 
+            error: "Rate limit exceeded. Please try again in a few moments." 
+          }),
+          { 
+            status: 429, 
+            headers: { ...corsHeaders, "Content-Type": "application/json" } 
+          }
+        );
+      }
+      
       throw new Error(`AI API failed: ${response.status}`);
     }
 
