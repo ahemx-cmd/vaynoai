@@ -157,14 +157,14 @@ serve(async (req) => {
           : `- Include Call-to-Action text (not as clickable buttons, just compelling text encouraging action)`)
       : `- DO NOT include any Call-to-Action buttons or CTA text in the emails`;
     
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${Deno.env.get("OPENROUTER_API_KEY")}`,
+        "Authorization": `Bearer ${Deno.env.get("LOVABLE_API_KEY")}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "google/gemini-2.5-pro",
         messages: [{
           role: "system",
           content: `You are a world-class email copywriting team with 15+ years of experience in conversion optimization, persuasive writing, and digital marketing. You have written campaigns for Fortune 500 companies and achieved industry-leading open rates and conversion rates.
