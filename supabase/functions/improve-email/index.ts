@@ -66,20 +66,21 @@ serve(async (req) => {
     const { currentContent } = validationResult.data;
     console.log("Improving content of length:", currentContent.length);
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const prompt = `Improve this email to be more compelling and high-converting while keeping the same length and structure: ${currentContent}`;
+    
+    const response = await fetch("https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${Deno.env.get("OPENROUTER_API_KEY")}`,
-        "HTTP-Referer": "https://vayno.app",
-        "X-Title": "Vayno Email Improver",
+        "Authorization": `Bearer ${Deno.env.get("HUGGING_FACE_API_KEY")}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
-        messages: [{
-          role: "user",
-          content: `Improve this email to be more compelling and high-converting while keeping the same length and structure: ${currentContent}`
-        }],
+        inputs: prompt,
+        parameters: {
+          max_new_tokens: 1000,
+          temperature: 0.7,
+          return_full_text: false,
+        }
       }),
     });
 
@@ -91,12 +92,13 @@ serve(async (req) => {
 
     const aiData = await response.json();
     
-    if (!aiData.choices || !aiData.choices[0]?.message?.content) {
+    // Hugging Face returns array format
+    if (!Array.isArray(aiData) || !aiData[0]?.generated_text) {
       console.error("Invalid AI response format:", aiData);
       throw new Error("Invalid AI response format");
     }
 
-    const improvedContent = aiData.choices[0].message.content;
+    const improvedContent = aiData[0].generated_text.trim();
     console.log("Content improved successfully");
 
     return new Response(JSON.stringify({ improvedContent }), {

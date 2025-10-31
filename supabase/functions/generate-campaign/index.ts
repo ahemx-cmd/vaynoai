@@ -166,19 +166,7 @@ serve(async (req) => {
           : `- Include Call-to-Action text (not as clickable buttons, just compelling text encouraging action)`)
       : `- DO NOT include any Call-to-Action buttons or CTA text in the emails`;
     
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${Deno.env.get("OPENROUTER_API_KEY")}`,
-        "HTTP-Referer": "https://vayno.app",
-        "X-Title": "Vayno Email Campaign Generator",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
-        messages: [{
-          role: "system",
-          content: `You are a world-class email copywriting team with 15+ years of experience in conversion optimization, persuasive writing, and digital marketing. You have written campaigns for Fortune 500 companies and achieved industry-leading open rates and conversion rates.
+    const systemPrompt = `You are a world-class email copywriting team with 15+ years of experience in conversion optimization, persuasive writing, and digital marketing. You have written campaigns for Fortune 500 companies and achieved industry-leading open rates and conversion rates.
 
 YOUR CORE EXPERTISE:
 - Deep understanding of consumer psychology and buying triggers
@@ -198,10 +186,9 @@ YOUR STANDARDS:
 ✓ Mobile-optimized formatting (short paragraphs, scannable)
 
 YOUR MISSION:
-Create email sequences that feel personal, valuable, and impossible to ignore. Each email should build trust, provide value, and naturally lead to the desired action.`
-        }, {
-          role: "user",
-          content: `CAMPAIGN BRIEF - READ CAREFULLY:
+Create email sequences that feel personal, valuable, and impossible to ignore. Each email should build trust, provide value, and naturally lead to the desired action.`;
+
+    const userPrompt = `CAMPAIGN BRIEF - READ CAREFULLY:
 
 🎯 TARGET URL: ${url}
 📊 SEQUENCE LENGTH: ${numEmails} emails
@@ -335,9 +322,24 @@ Return ONLY valid JSON with NO markdown, NO code blocks, NO explanatory text:
   ]
 }
 
-NOW CREATE THE EMAIL SEQUENCE BASED ON ${url} - MAKE IT EXCEPTIONAL! 🚀`
-        }],
-        temperature: 0.8,
+NOW CREATE THE EMAIL SEQUENCE BASED ON ${url} - MAKE IT EXCEPTIONAL! 🚀`;
+
+    const fullPrompt = `${systemPrompt}\n\n${userPrompt}`;
+    
+    const response = await fetch("https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${Deno.env.get("HUGGING_FACE_API_KEY")}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inputs: fullPrompt,
+        parameters: {
+          max_new_tokens: 4000,
+          temperature: 0.8,
+          return_full_text: false,
+          top_p: 0.95,
+        }
       }),
     });
 
@@ -375,12 +377,13 @@ NOW CREATE THE EMAIL SEQUENCE BASED ON ${url} - MAKE IT EXCEPTIONAL! 🚀`
 
     const aiData = await response.json();
     
-    if (!aiData.choices || !aiData.choices[0]?.message?.content) {
+    // Hugging Face returns array format
+    if (!Array.isArray(aiData) || !aiData[0]?.generated_text) {
       console.error("Invalid AI response format:", aiData);
       throw new Error("Invalid AI response format");
     }
 
-    let contentText = aiData.choices[0].message.content.trim();
+    let contentText = aiData[0].generated_text.trim();
     
     // Remove markdown code blocks if present
     if (contentText.startsWith("```json")) {

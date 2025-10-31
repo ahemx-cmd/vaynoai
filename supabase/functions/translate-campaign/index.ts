@@ -77,19 +77,7 @@ serve(async (req) => {
     // Translate all emails using AI
     const translatedEmails = [];
     for (const email of emails) {
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${Deno.env.get("OPENROUTER_API_KEY")}`,
-          "HTTP-Referer": "https://vayno.app",
-          "X-Title": "Vayno Campaign Translator",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
-          messages: [{
-            role: "user",
-            content: `Translate the following email content to ${targetLanguage}. Preserve formatting, tone, and brand voice. Keep CTAs and links unchanged.
+      const prompt = `Translate the following email content to ${targetLanguage}. Preserve formatting, tone, and brand voice. Keep CTAs and links unchanged.
 
 Subject: ${email.subject}
 
@@ -104,9 +92,21 @@ Return ONLY valid JSON (no markdown, no code blocks):
   "subject": "translated subject",
   "content": "translated plain text content",
   "html": "translated HTML content"
-}`
-          }],
-          temperature: 0.3,
+}`;
+
+      const response = await fetch("https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${Deno.env.get("HUGGING_FACE_API_KEY")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          inputs: prompt,
+          parameters: {
+            max_new_tokens: 2000,
+            temperature: 0.3,
+            return_full_text: false,
+          }
         }),
       });
 
@@ -116,7 +116,13 @@ Return ONLY valid JSON (no markdown, no code blocks):
       }
 
       const aiData = await response.json();
-      let contentText = aiData.choices[0].message.content.trim();
+      
+      // Hugging Face returns array format
+      if (!Array.isArray(aiData) || !aiData[0]?.generated_text) {
+        throw new Error("Invalid AI response format");
+      }
+      
+      let contentText = aiData[0].generated_text.trim();
       
       // Remove markdown code blocks if present
       if (contentText.startsWith("```json")) {
