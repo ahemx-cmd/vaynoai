@@ -15,6 +15,7 @@ import Usage from "./pages/Usage";
 import Support from "./pages/Support";
 import Updates from "./pages/Updates";
 import NotFound from "./pages/NotFound";
+import RecoveryRedirect from "./components/auth/RecoveryRedirect";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <RecoveryRedirect />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
