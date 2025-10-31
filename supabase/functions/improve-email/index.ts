@@ -68,7 +68,7 @@ serve(async (req) => {
 
     const prompt = `Improve this email to be more compelling and high-converting while keeping the same length and structure: ${currentContent}`;
     
-    const response = await fetch("https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta", {
+    const response = await fetch("https://router.huggingface.co/hf-inference/models/HuggingFaceH4/zephyr-7b-beta", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${Deno.env.get("HUGGING_FACE_API_KEY")}`,
