@@ -335,7 +335,7 @@ NOW CREATE THE EMAIL SEQUENCE BASED ON ${url} - MAKE IT EXCEPTIONAL! 🚀`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
+        model: "deepseek/deepseek-chat",
         messages: [
           {
             role: "user",
@@ -343,7 +343,7 @@ NOW CREATE THE EMAIL SEQUENCE BASED ON ${url} - MAKE IT EXCEPTIONAL! 🚀`;
           }
         ],
         temperature: 0.8,
-        max_tokens: 4000,
+        max_tokens: 8000,
       }),
     });
 
@@ -402,8 +402,20 @@ NOW CREATE THE EMAIL SEQUENCE BASED ON ${url} - MAKE IT EXCEPTIONAL! 🚀`;
     try {
       emailsData = JSON.parse(contentText);
     } catch (parseError) {
-      console.error("JSON parse error:", parseError, "Content:", contentText);
-      throw new Error("Failed to parse AI response as JSON");
+      console.error("JSON parse error:", parseError);
+      console.error("Content length:", contentText.length);
+      console.error("Content preview:", contentText.substring(0, 500));
+      console.error("Content end:", contentText.substring(contentText.length - 500));
+      
+      return new Response(
+        JSON.stringify({ 
+          error: "The AI model returned an incomplete response. The free DeepSeek model has limitations. Please use a paid model like 'deepseek/deepseek-chat' or 'openai/gpt-4o-mini' for reliable results." 
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
+      );
     }
     
     if (!emailsData.emails || !Array.isArray(emailsData.emails)) {

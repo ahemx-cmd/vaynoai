@@ -103,7 +103,7 @@ Return ONLY valid JSON (no markdown, no code blocks):
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
+          model: "deepseek/deepseek-chat",
           messages: [
             {
               role: "user",
@@ -111,7 +111,7 @@ Return ONLY valid JSON (no markdown, no code blocks):
             }
           ],
           temperature: 0.3,
-          max_tokens: 2000,
+          max_tokens: 4000,
         }),
       });
 
