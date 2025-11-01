@@ -23,6 +23,8 @@ serve(async (req) => {
     const authHeader = req.headers.get("Authorization");
     let user = null;
     
+    console.log("Request received, auth header present:", !!authHeader);
+    
     if (authHeader) {
       // Create authenticated Supabase client
       const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -37,7 +39,11 @@ serve(async (req) => {
       if (!authError && authUser) {
         user = authUser;
         console.log("Authenticated user:", user.id);
+      } else {
+        console.log("Auth header present but user verification failed:", authError?.message);
       }
+    } else {
+      console.log("No auth header - processing as guest campaign");
     }
 
     // Validate input data
@@ -65,6 +71,7 @@ serve(async (req) => {
     );
     
     // Verify campaign exists and check ownership for authenticated users
+    console.log("Fetching campaign:", campaignId);
     const { data: campaign, error: campaignError } = await serviceClient
       .from("campaigns")
       .select("user_id")
@@ -78,6 +85,8 @@ serve(async (req) => {
         { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    console.log("Campaign found, user_id:", campaign.user_id, "is_guest_campaign:", campaign.user_id === null);
 
     // For authenticated users, verify ownership; for guest campaigns (user_id null), allow
     if (user && campaign.user_id && campaign.user_id !== user.id) {
@@ -96,6 +105,8 @@ serve(async (req) => {
         { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+    
+    console.log("Authorization check passed - proceeding with generation");
 
     console.log("Starting campaign generation for:", campaignId);
 

@@ -61,23 +61,51 @@ const AnalyzingCampaign = () => {
           });
         }, 3000);
 
+        // Get auth header for the request (works for both authenticated and guest users)
+        const { data: { session } } = await supabase.auth.getSession();
+        const authHeader = session?.access_token ? `Bearer ${session.access_token}` : '';
+        
         // Call edge function to analyze and generate
         const { data, error } = await supabase.functions.invoke("generate-campaign", {
           body: {
             campaignId: id,
             url: campaign.url,
           },
+          headers: authHeader ? {
+            Authorization: authHeader
+          } : {}
         });
 
         clearInterval(progressInterval);
         clearInterval(stepInterval);
 
         if (error) {
+          console.error("Edge function error:", error);
+          
+          // Try to parse error message from the response
+          let errorMessage = "Failed to generate campaign";
+          
+          if (error.message) {
+            errorMessage = error.message;
+          } else if (error.context?.body) {
+            try {
+              const errorBody = JSON.parse(error.context.body);
+              errorMessage = errorBody.error || errorMessage;
+            } catch {
+              errorMessage = error.context.body;
+            }
+          }
+          
           // Handle specific error types
-          if (error.message?.includes('402') || error.message?.includes('credits')) {
+          if (errorMessage.includes('402') || errorMessage.includes('credits') || errorMessage.includes('Payment required')) {
             throw new Error("Insufficient AI credits. Please add credits to continue generating campaigns.");
           }
-          throw error;
+          
+          throw new Error(errorMessage);
+        }
+        
+        if (!data || !data.success) {
+          throw new Error(data?.error || "Failed to generate campaign");
         }
 
         // Update usage only if user is authenticated (not a guest)

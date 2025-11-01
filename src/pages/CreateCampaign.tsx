@@ -138,7 +138,15 @@ const CreateCampaign = () => {
         .single();
 
       if (campaignError) {
-        toast.error("Failed to create campaign");
+        console.error("Campaign creation error:", campaignError);
+        toast.error(`Failed to create campaign: ${campaignError.message || 'Unknown error'}`);
+        setLoading(false);
+        return;
+      }
+      
+      if (!campaign) {
+        console.error("No campaign data returned");
+        toast.error("Failed to create campaign: No data returned");
         setLoading(false);
         return;
       }
