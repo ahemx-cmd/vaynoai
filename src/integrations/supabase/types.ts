@@ -27,7 +27,7 @@ export type Database = {
           status: string
           updated_at: string
           url: string
-          user_id: string
+          user_id: string | null
           words_per_email: number | null
         }
         Insert: {
@@ -42,7 +42,7 @@ export type Database = {
           status?: string
           updated_at?: string
           url: string
-          user_id: string
+          user_id?: string | null
           words_per_email?: number | null
         }
         Update: {
@@ -57,7 +57,7 @@ export type Database = {
           status?: string
           updated_at?: string
           url?: string
-          user_id?: string
+          user_id?: string | null
           words_per_email?: number | null
         }
         Relationships: []
