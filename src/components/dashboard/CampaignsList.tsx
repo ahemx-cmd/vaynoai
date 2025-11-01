@@ -183,18 +183,18 @@ const CampaignsList = ({ userId }: CampaignsListProps) => {
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>You sure you want to delete this precious campaign of yours?</AlertDialogTitle>
+                      <AlertDialogTitle>Delete this masterpiece? Really?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        I don't think so. This campaign contains valuable email sequences you've generated. Once deleted, it's gone forever!
+                        This campaign is about to go *poof* 💨 Like, forever gone. No ctrl+Z, no "just kidding", no digital afterlife. Are you absolutely, positively, 100% sure about this?
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Sure I'll just keep it</AlertDialogCancel>
+                      <AlertDialogCancel>Nah, I'll keep it</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={() => handleDelete(campaign.id)}
                         className="bg-destructive hover:bg-destructive/90"
                       >
-                        Yes I do brah
+                        Yes, delete
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
