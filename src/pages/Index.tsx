@@ -6,6 +6,7 @@ import PricingSection from "@/components/pricing/PricingSection";
 import FeaturesGrid from "@/components/landing/FeaturesGrid";
 import Testimonials from "@/components/landing/Testimonials";
 import vaynoIcon from "@/assets/vayno-icon.png";
+import { trackButtonClick } from "@/lib/analytics";
 
 const Index = () => {
   return (
@@ -19,10 +20,21 @@ const Index = () => {
               <span className="font-bold text-2xl tracking-tight">Vayno</span>
             </Link>
             <div className="flex items-center gap-2 sm:gap-3">
-              <Button variant="ghost" asChild size="sm" className="text-sm">
+              <Button 
+                variant="ghost" 
+                asChild 
+                size="sm" 
+                className="text-sm"
+                onClick={() => trackButtonClick('Sign In', 'nav-bar')}
+              >
                 <Link to="/auth">Sign In</Link>
               </Button>
-              <Button asChild className="btn-premium" size="sm">
+              <Button 
+                asChild 
+                className="btn-premium" 
+                size="sm"
+                onClick={() => trackButtonClick('Try Free', 'nav-bar')}
+              >
                 <Link to="/create-campaign">Try Free</Link>
               </Button>
             </div>
@@ -59,12 +71,23 @@ const Index = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button size="lg" asChild className="btn-premium shadow-lg hover-lift">
+              <Button 
+                size="lg" 
+                asChild 
+                className="btn-premium shadow-lg hover-lift"
+                onClick={() => trackButtonClick('Try Free', 'hero-section')}
+              >
                 <Link to="/create-campaign" className="flex items-center gap-2">
                   Try Free <ArrowRight className="w-4 h-4" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="hover-lift">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                asChild 
+                className="hover-lift"
+                onClick={() => trackButtonClick('See How It Works', 'hero-section')}
+              >
                 <Link to="#how-it-works">See How It Works</Link>
               </Button>
             </div>
@@ -133,7 +156,12 @@ const Index = () => {
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
               Join hundreds of founders creating high-converting email campaigns in minutes, not hours
             </p>
-            <Button size="lg" asChild className="btn-premium shadow-lg hover-lift">
+            <Button 
+              size="lg" 
+              asChild 
+              className="btn-premium shadow-lg hover-lift"
+              onClick={() => trackButtonClick('Try Free', 'final-cta')}
+            >
               <Link to="/create-campaign" className="flex items-center gap-2">
                 Try Free <ArrowRight className="w-4 h-4" />
               </Link>

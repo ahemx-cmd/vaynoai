@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { ArrowLeft, Sparkles, Loader2, Link as LinkIcon, FileText, Download } from "lucide-react";
 import { z } from "zod";
+import { trackButtonClick, trackFunnelStep } from "@/lib/analytics";
 
 const sequenceTypes = [
   { value: "welcome", label: "Welcome Series 📝", description: "Introduce your brand, set the tone, and build trust with new subscribers or buyers." },
@@ -146,6 +147,12 @@ const CreateCampaign = () => {
       if (!userId) {
         localStorage.setItem("guestCampaignId", campaign.id);
       }
+
+      // Track funnel step
+      trackFunnelStep('generate', {
+        sequence_type: sequenceType,
+        campaign_id: campaign.id,
+      });
 
       navigate(`/campaign/${campaign.id}/analyzing`);
     } catch (err) {
@@ -351,6 +358,7 @@ const CreateCampaign = () => {
                 type="submit"
                 className="w-full btn-premium shadow-lg hover-lift h-12 text-base"
                 disabled={loading}
+                onClick={() => trackButtonClick('Generate Campaign', '/create-campaign')}
               >
                 {loading ? (
                   <>

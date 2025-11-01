@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 import { Sparkles, Loader2, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
+import { trackFormSubmission, trackFunnelStep, trackConversion } from "@/lib/analytics";
 
 const emailSchema = z.string().email("Invalid email address");
 const passwordSchema = z.string().min(8, "Password must be at least 8 characters");
@@ -132,11 +133,15 @@ const Auth = () => {
         } else {
           toast.error(error.message);
         }
+        trackFormSubmission('signup', false);
       } else {
         toast.success("Check your email to verify your account!", { 
           duration: 6000,
           description: "We've sent a verification link to your email address."
         });
+        trackFormSubmission('signup', true);
+        trackFunnelStep('signup');
+        trackConversion('signup');
       }
     } catch (err) {
       if (err instanceof z.ZodError) {
@@ -164,8 +169,10 @@ const Auth = () => {
 
       if (error) {
         toast.error(error.message);
+        trackFormSubmission('signin', false);
       } else {
         toast.success("Signed in successfully!");
+        trackFormSubmission('signin', true);
       }
     } catch (err) {
       if (err instanceof z.ZodError) {

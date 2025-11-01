@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileSidebar from "@/components/dashboard/MobileSidebar";
 import { useUserPlan } from "@/hooks/useUserPlan";
+import { trackPlanUpgrade, trackButtonClick } from "@/lib/analytics";
 
 const Billing = () => {
   const navigate = useNavigate();
@@ -110,6 +111,8 @@ const Billing = () => {
 
     const checkoutUrl = checkoutUrls[planName];
     if (checkoutUrl) {
+      const price = planName === 'Starter' ? (isLifetime ? 89 : 12) : 29;
+      trackPlanUpgrade(planName, price);
       handleCheckout(checkoutUrl);
     }
   };

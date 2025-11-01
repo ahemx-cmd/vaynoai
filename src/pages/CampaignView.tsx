@@ -13,6 +13,7 @@ import URLSummary from "@/components/campaign/URLSummary";
 import AutoTranslate from "@/components/campaign/AutoTranslate";
 import JSZip from "jszip";
 import { generateESPReadyHTML } from "@/lib/emailUtils";
+import { trackExport, trackFunnelStep, trackCampaignGeneration } from "@/lib/analytics";
 
 const CampaignView = () => {
   const { id } = useParams();
@@ -68,6 +69,11 @@ const CampaignView = () => {
 
       setCampaign(campaignData);
       setLoading(false);
+      
+      // Track successful campaign generation when viewing completed campaign
+      if (campaignData.status === 'completed' && emailsData && emailsData.length > 0) {
+        trackCampaignGeneration(campaignData.id, campaignData.sequence_type);
+      }
     };
 
     fetchCampaign();
@@ -117,6 +123,10 @@ const CampaignView = () => {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+
+      // Track export event
+      trackExport('zip', id!);
+      trackFunnelStep('export', { campaign_id: id });
 
       toast.success("Email sequence exported successfully! Ready for ESP upload.");
     } catch (error) {

@@ -6,6 +6,7 @@ import { Check, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { trackPlanUpgrade, trackButtonClick } from "@/lib/analytics";
 
 const PricingSection = () => {
   const [isLifetime, setIsLifetime] = useState(false);
@@ -17,7 +18,9 @@ const PricingSection = () => {
     });
   }, []);
 
-  const handleCheckout = (checkoutUrl: string) => {
+  const handleCheckout = (checkoutUrl: string, planName: string, price: number) => {
+    trackPlanUpgrade(planName, price);
+    
     if (userId) {
       const urlWithUserId = `${checkoutUrl}&checkout[custom][user_id]=${userId}`;
       window.open(urlWithUserId, '_blank');
@@ -133,8 +136,10 @@ const PricingSection = () => {
                 variant={plan.popular ? "default" : "outline"}
                 onClick={() => {
                   if (plan.checkoutUrl) {
-                    handleCheckout(plan.checkoutUrl);
+                    const price = plan.name === "Starter" ? (isLifetime ? 89 : 12) : 29;
+                    handleCheckout(plan.checkoutUrl, plan.name, price);
                   } else {
+                    trackButtonClick('Sign Up', 'pricing-section');
                     window.location.href = '/auth';
                   }
                 }}
