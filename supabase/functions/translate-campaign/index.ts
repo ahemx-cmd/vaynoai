@@ -94,19 +94,24 @@ Return ONLY valid JSON (no markdown, no code blocks):
   "html": "translated HTML content"
 }`;
 
-      const response = await fetch("https://router.huggingface.co/hf-inference/models/HuggingFaceH4/zephyr-7b-beta", {
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${Deno.env.get("HUGGING_FACE_API_KEY")}`,
+          "Authorization": `Bearer ${Deno.env.get("OPENROUTER_API_KEY")}`,
+          "HTTP-Referer": "https://vayno.app",
+          "X-Title": "Vayno",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          inputs: prompt,
-          parameters: {
-            max_new_tokens: 2000,
-            temperature: 0.3,
-            return_full_text: false,
-          }
+          model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
+          messages: [
+            {
+              role: "user",
+              content: prompt
+            }
+          ],
+          temperature: 0.3,
+          max_tokens: 2000,
         }),
       });
 
@@ -117,12 +122,12 @@ Return ONLY valid JSON (no markdown, no code blocks):
 
       const aiData = await response.json();
       
-      // Hugging Face returns array format
-      if (!Array.isArray(aiData) || !aiData[0]?.generated_text) {
+      // OpenRouter returns OpenAI-compatible format
+      if (!aiData.choices?.[0]?.message?.content) {
         throw new Error("Invalid AI response format");
       }
       
-      let contentText = aiData[0].generated_text.trim();
+      let contentText = aiData.choices[0].message.content.trim();
       
       // Remove markdown code blocks if present
       if (contentText.startsWith("```json")) {

@@ -68,19 +68,24 @@ serve(async (req) => {
 
     const prompt = `Improve this email to be more compelling and high-converting while keeping the same length and structure: ${currentContent}`;
     
-    const response = await fetch("https://router.huggingface.co/hf-inference/models/HuggingFaceH4/zephyr-7b-beta", {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${Deno.env.get("HUGGING_FACE_API_KEY")}`,
+        "Authorization": `Bearer ${Deno.env.get("OPENROUTER_API_KEY")}`,
+        "HTTP-Referer": "https://vayno.app",
+        "X-Title": "Vayno",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        inputs: prompt,
-        parameters: {
-          max_new_tokens: 1000,
-          temperature: 0.7,
-          return_full_text: false,
-        }
+        model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 1000,
       }),
     });
 
@@ -92,13 +97,13 @@ serve(async (req) => {
 
     const aiData = await response.json();
     
-    // Hugging Face returns array format
-    if (!Array.isArray(aiData) || !aiData[0]?.generated_text) {
+    // OpenRouter returns OpenAI-compatible format
+    if (!aiData.choices?.[0]?.message?.content) {
       console.error("Invalid AI response format:", aiData);
       throw new Error("Invalid AI response format");
     }
 
-    const improvedContent = aiData[0].generated_text.trim();
+    const improvedContent = aiData.choices[0].message.content.trim();
     console.log("Content improved successfully");
 
     return new Response(JSON.stringify({ improvedContent }), {

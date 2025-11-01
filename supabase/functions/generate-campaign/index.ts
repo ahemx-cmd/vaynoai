@@ -326,20 +326,24 @@ NOW CREATE THE EMAIL SEQUENCE BASED ON ${url} - MAKE IT EXCEPTIONAL! 🚀`;
 
     const fullPrompt = `${systemPrompt}\n\n${userPrompt}`;
     
-    const response = await fetch("https://router.huggingface.co/hf-inference/models/HuggingFaceH4/zephyr-7b-beta", {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${Deno.env.get("HUGGING_FACE_API_KEY")}`,
+        "Authorization": `Bearer ${Deno.env.get("OPENROUTER_API_KEY")}`,
+        "HTTP-Referer": "https://vayno.app",
+        "X-Title": "Vayno",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        inputs: fullPrompt,
-        parameters: {
-          max_new_tokens: 4000,
-          temperature: 0.8,
-          return_full_text: false,
-          top_p: 0.95,
-        }
+        model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
+        messages: [
+          {
+            role: "user",
+            content: fullPrompt
+          }
+        ],
+        temperature: 0.8,
+        max_tokens: 4000,
       }),
     });
 
@@ -377,13 +381,13 @@ NOW CREATE THE EMAIL SEQUENCE BASED ON ${url} - MAKE IT EXCEPTIONAL! 🚀`;
 
     const aiData = await response.json();
     
-    // Hugging Face returns array format
-    if (!Array.isArray(aiData) || !aiData[0]?.generated_text) {
+    // OpenRouter returns OpenAI-compatible format
+    if (!aiData.choices?.[0]?.message?.content) {
       console.error("Invalid AI response format:", aiData);
       throw new Error("Invalid AI response format");
     }
 
-    let contentText = aiData[0].generated_text.trim();
+    let contentText = aiData.choices[0].message.content.trim();
     
     // Remove markdown code blocks if present
     if (contentText.startsWith("```json")) {
