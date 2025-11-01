@@ -51,9 +51,9 @@ export const generateESPReadyHTML = (
   const watermarkHTML = includeWatermark 
     ? `
     <tr>
-      <td style="padding: 20px 30px; border-top: 1px solid #e5e7eb; text-align: center; background-color: #f9fafb;">
-        <p style="font-size: 12px; color: #9ca3af; margin: 0; line-height: 1.5;">
-          Powered by <a href="https://vaynoai.lovable.app" target="_blank" style="color: #6366f1; text-decoration: none; font-weight: 600;">Vayno</a> — AI Campaign Builder
+      <td style="padding: 16px 30px; border-top: 1px solid #e5e7eb; text-align: center; background-color: #fafafa;">
+        <p style="font-size: 11px; color: #9ca3af; margin: 0; line-height: 1.5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;">
+          Made with <span style="color: #ef4444;">❤️</span> <a href="https://vaynoai.lovable.app" target="_blank" style="color: #6366f1; text-decoration: none; font-weight: 600;">Vayno</a>
         </p>
       </td>
     </tr>
