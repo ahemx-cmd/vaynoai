@@ -71,12 +71,23 @@ const CampaignsList = ({ userId }: CampaignsListProps) => {
   }, [userId]);
 
   const handleDelete = async (id: string) => {
+    // Optimistically remove from UI immediately
+    setCampaigns(prev => prev.filter(c => c.id !== id));
+    toast.success("Campaign deleted");
+
+    // Perform actual deletion in background
     const { error } = await supabase.from("campaigns").delete().eq("id", id);
 
     if (error) {
+      // If deletion fails, refetch to restore
+      const { data } = await supabase
+        .from("campaigns")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+      
+      setCampaigns(data || []);
       toast.error("Failed to delete campaign");
-    } else {
-      toast.success("Campaign deleted successfully");
     }
   };
 
