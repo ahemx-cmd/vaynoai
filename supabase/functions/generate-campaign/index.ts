@@ -346,7 +346,7 @@ NOW CREATE THE EMAIL SEQUENCE BASED ON ${url} - MAKE IT EXCEPTIONAL! 🚀`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "deepseek/deepseek-chat",
+        model: "google/gemini-2.5-pro-exp-03-25:free", // FREE MODEL - Most powerful on OpenRouter
         messages: [
           {
             role: "user",
