@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { ArrowLeft, Download, Sparkles, ExternalLink } from "lucide-react";
+import { ArrowLeft, Download, Sparkles, ExternalLink, Copy, Check } from "lucide-react";
 import EmailCard from "@/components/campaign/EmailCard";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import URLSummary from "@/components/campaign/URLSummary";
@@ -23,6 +23,8 @@ const CampaignView = () => {
   const [emails, setEmails] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isGuest, setIsGuest] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [copyingLink, setCopyingLink] = useState(false);
   const { isFree } = useUserPlan();
 
   useEffect(() => {
@@ -79,6 +81,55 @@ const CampaignView = () => {
 
     fetchCampaign();
   }, [id, navigate]);
+
+  const handleCopyShareLink = async () => {
+    if (isGuest) {
+      toast.error("Please sign in to share your campaign");
+      navigate("/auth");
+      return;
+    }
+
+    setCopyingLink(true);
+    try {
+      // Check if a share link already exists
+      const { data: existingShare } = await supabase
+        .from('campaign_shares')
+        .select('share_token')
+        .eq('campaign_id', id!)
+        .single();
+
+      let shareToken = existingShare?.share_token;
+
+      // If no share link exists, create one
+      if (!shareToken) {
+        shareToken = crypto.randomUUID();
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        const { error } = await supabase
+          .from('campaign_shares')
+          .insert({
+            campaign_id: id!,
+            share_token: shareToken,
+            allow_export: false,
+            created_by: user?.id
+          });
+
+        if (error) throw error;
+      }
+
+      // Copy to clipboard
+      const shareUrl = `${window.location.origin}/shared/${shareToken}`;
+      await navigator.clipboard.writeText(shareUrl);
+      setCopiedLink(true);
+      toast.success("Share link copied to clipboard!");
+      setTimeout(() => setCopiedLink(false), 2000);
+    } catch (error) {
+      console.error("Error copying share link:", error);
+      toast.error("Failed to copy share link");
+    } finally {
+      setCopyingLink(false);
+    }
+  };
 
   const handleExportHTML = async () => {
     // Require sign-in for guests
@@ -170,6 +221,20 @@ const CampaignView = () => {
               <URLSummary analyzedData={campaign.analyzed_data} url={campaign.url} />
             )}
             <AutoTranslate campaignId={id!} />
+            {!isGuest && (
+              <Button 
+                variant="outline" 
+                onClick={handleCopyShareLink}
+                disabled={copyingLink}
+              >
+                {copiedLink ? (
+                  <Check className="w-4 h-4 mr-2 text-green-500" />
+                ) : (
+                  <Copy className="w-4 h-4 mr-2" />
+                )}
+                {copyingLink ? "Copying..." : copiedLink ? "Copied!" : "Copy Link"}
+              </Button>
+            )}
             <ShareCampaignDialog campaignId={id!} />
             <Button onClick={handleExportHTML} className="glow">
               <Download className="w-4 h-4 mr-2" />
