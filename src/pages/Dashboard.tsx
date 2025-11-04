@@ -146,8 +146,8 @@ const Dashboard = () => {
                     onClick={() => window.open('https://vayno.lemonsqueezy.com/buy/b9b0bdea-ddc5-42b8-8abc-aee080f88fae?logo=0', '_blank')}
                   >
                     <Sparkles className="w-4 h-4 mr-2" />
-                    <span className="hidden sm:inline">Get Lifetime Deal ($89)</span>
-                    <span className="sm:hidden">Get Deal ($89)</span>
+                    <span className="hidden sm:inline">Get Lifetime Deal ($69)</span>
+                    <span className="sm:hidden">Get Deal ($69)</span>
                   </Button>
                 </div>
               </motion.div>
