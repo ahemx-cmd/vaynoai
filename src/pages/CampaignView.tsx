@@ -23,8 +23,7 @@ const CampaignView = () => {
   const [emails, setEmails] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isGuest, setIsGuest] = useState(false);
-  const [copiedLink, setCopiedLink] = useState(false);
-  const [copyingLink, setCopyingLink] = useState(false);
+  const [copiedAll, setCopiedAll] = useState(false);
   const { isFree } = useUserPlan();
 
   useEffect(() => {
@@ -82,52 +81,30 @@ const CampaignView = () => {
     fetchCampaign();
   }, [id, navigate]);
 
-  const handleCopyShareLink = async () => {
-    if (isGuest) {
-      toast.error("Please sign in to share your campaign");
-      navigate("/auth");
+  const handleCopyAllEmails = async () => {
+    if (emails.length === 0) {
+      toast.error("No emails to copy");
       return;
     }
 
-    setCopyingLink(true);
     try {
-      // Check if a share link already exists
-      const { data: existingShare } = await supabase
-        .from('campaign_shares')
-        .select('share_token')
-        .eq('campaign_id', id!)
-        .single();
+      // Format all emails as text
+      const emailsText = emails.map((email, index) => {
+        return `EMAIL ${index + 1} - ${email.email_type.toUpperCase()}\n` +
+               `Subject: ${email.subject}\n` +
+               `\n${email.content}\n` +
+               `\n${'='.repeat(80)}\n`;
+      }).join('\n');
 
-      let shareToken = existingShare?.share_token;
+      const fullText = `${campaign.name}\n${campaign.url}\n\n${'='.repeat(80)}\n\n${emailsText}`;
 
-      // If no share link exists, create one
-      if (!shareToken) {
-        shareToken = crypto.randomUUID();
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        const { error } = await supabase
-          .from('campaign_shares')
-          .insert({
-            campaign_id: id!,
-            share_token: shareToken,
-            allow_export: false,
-            created_by: user?.id
-          });
-
-        if (error) throw error;
-      }
-
-      // Copy to clipboard
-      const shareUrl = `${window.location.origin}/shared/${shareToken}`;
-      await navigator.clipboard.writeText(shareUrl);
-      setCopiedLink(true);
-      toast.success("Share link copied to clipboard!");
-      setTimeout(() => setCopiedLink(false), 2000);
+      await navigator.clipboard.writeText(fullText);
+      setCopiedAll(true);
+      toast.success("All emails copied to clipboard!");
+      setTimeout(() => setCopiedAll(false), 2000);
     } catch (error) {
-      console.error("Error copying share link:", error);
-      toast.error("Failed to copy share link");
-    } finally {
-      setCopyingLink(false);
+      console.error("Error copying emails:", error);
+      toast.error("Failed to copy emails");
     }
   };
 
@@ -221,20 +198,17 @@ const CampaignView = () => {
               <URLSummary analyzedData={campaign.analyzed_data} url={campaign.url} />
             )}
             <AutoTranslate campaignId={id!} />
-            {!isGuest && (
-              <Button 
-                variant="outline" 
-                onClick={handleCopyShareLink}
-                disabled={copyingLink}
-              >
-                {copiedLink ? (
-                  <Check className="w-4 h-4 mr-2 text-green-500" />
-                ) : (
-                  <Copy className="w-4 h-4 mr-2" />
-                )}
-                {copyingLink ? "Copying..." : copiedLink ? "Copied!" : "Copy Link"}
-              </Button>
-            )}
+            <Button 
+              variant="outline" 
+              onClick={handleCopyAllEmails}
+            >
+              {copiedAll ? (
+                <Check className="w-4 h-4 mr-2 text-green-500" />
+              ) : (
+                <Copy className="w-4 h-4 mr-2" />
+              )}
+              {copiedAll ? "Copied!" : "Copy All"}
+            </Button>
             <ShareCampaignDialog campaignId={id!} />
             <Button onClick={handleExportHTML} className="glow">
               <Download className="w-4 h-4 mr-2" />
