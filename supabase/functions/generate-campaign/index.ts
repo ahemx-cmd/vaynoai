@@ -373,16 +373,14 @@ NOW CREATE THE EMAIL SEQUENCE BASED ON ${url} - MAKE IT EXCEPTIONAL! 🚀`;
 
     const fullPrompt = `${systemPrompt}\n\n${userPrompt}`;
     
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${Deno.env.get("OPENROUTER_API_KEY")}`,
-        "HTTP-Referer": "https://vayno.app",
-        "X-Title": "Vayno",
+        "Authorization": `Bearer ${Deno.env.get("LOVABLE_API_KEY")}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro-exp-03-25:free", // FREE MODEL - Most powerful on OpenRouter
+        model: "google/gemini-2.5-flash",
         messages: [
           {
             role: "user",
