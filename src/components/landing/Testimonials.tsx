@@ -6,19 +6,16 @@ const Testimonials = () => {
   const testimonials = [
     {
       name: "Sarah Chen",
-      role: "Founder, TechFlow SaaS",
       content: "Generated 7 emails that actually made sales! Vayno saved me hours of copywriting and the results speak for themselves.",
       rating: 5
     },
     {
       name: "Marcus Rodriguez",
-      role: "Marketing Lead, GrowthKit",
       content: "The AI understands our brand voice perfectly. We've cut our email campaign creation time from days to minutes.",
       rating: 5
     },
     {
       name: "Emily Watson",
-      role: "Solo Founder, DesignHub",
       content: "As a non-marketer, this tool is a lifesaver. Professional emails without hiring a copywriter. Absolutely worth it.",
       rating: 5
     }
@@ -59,7 +56,6 @@ const Testimonials = () => {
                 <p className="text-foreground mb-6 leading-relaxed">"{testimonial.content}"</p>
                 <div>
                   <p className="font-semibold">{testimonial.name}</p>
-                  <p className="text-sm text-muted-foreground">{testimonial.role}</p>
                 </div>
               </Card>
             </motion.div>
