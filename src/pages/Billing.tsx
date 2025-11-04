@@ -59,7 +59,7 @@ const Billing = () => {
       color: "from-primary to-accent",
       popular: true,
       showToggle: true,
-      lifetimePrice: 89,
+      lifetimePrice: 69,
       features: [
         "50 email generations / month",
         "Remove watermark",
@@ -111,7 +111,7 @@ const Billing = () => {
 
     const checkoutUrl = checkoutUrls[planName];
     if (checkoutUrl) {
-      const price = planName === 'Starter' ? (isLifetime ? 89 : 12) : 29;
+      const price = planName === 'Starter' ? (isLifetime ? 69 : 12) : 29;
       trackPlanUpgrade(planName, price);
       handleCheckout(checkoutUrl);
     }

@@ -46,7 +46,7 @@ const PricingSection = () => {
     },
     {
       name: "Starter",
-      price: isLifetime ? "$89" : "$12",
+      price: isLifetime ? "$69" : "$12",
       period: isLifetime ? "one-time" : "per month",
       description: "For growing businesses",
       features: [
@@ -136,7 +136,7 @@ const PricingSection = () => {
                 variant={plan.popular ? "default" : "outline"}
                 onClick={() => {
                   if (plan.checkoutUrl) {
-                    const price = plan.name === "Starter" ? (isLifetime ? 89 : 12) : 29;
+                    const price = plan.name === "Starter" ? (isLifetime ? 69 : 12) : 29;
                     handleCheckout(plan.checkoutUrl, plan.name, price);
                   } else {
                     trackButtonClick('Sign Up', 'pricing-section');

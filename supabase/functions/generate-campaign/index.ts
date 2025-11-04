@@ -137,7 +137,18 @@ serve(async (req) => {
       console.log("Successfully fetched page content, length:", pageContent.length);
     } catch (fetchError) {
       console.error("Error fetching URL:", fetchError);
-      pageContent = "Unable to fetch page content. Please analyze based on the URL.";
+      
+      // Return detailed error to user instead of generating random emails
+      return new Response(
+        JSON.stringify({ 
+          error: "Unable to access the website", 
+          details: `We couldn't access ${url}. This might be due to security restrictions, firewalls, or the website blocking automated requests. Please try a different URL or contact support.` 
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
+      );
     }
 
     // Generate emails using AI

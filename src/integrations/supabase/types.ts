@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      campaign_shares: {
+        Row: {
+          allow_export: boolean
+          campaign_id: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          share_token: string
+        }
+        Insert: {
+          allow_export?: boolean
+          campaign_id: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          share_token: string
+        }
+        Update: {
+          allow_export?: boolean
+          campaign_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          share_token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_shares_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campaigns: {
         Row: {
           analyzed_data: Json | null

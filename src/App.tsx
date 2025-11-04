@@ -18,6 +18,7 @@ import Updates from "./pages/Updates";
 import NotFound from "./pages/NotFound";
 import RecoveryRedirect from "./components/auth/RecoveryRedirect";
 import ChoosePlan from "./pages/ChoosePlan";
+import SharedCampaignView from "./pages/SharedCampaignView";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const AppRoutes = () => {
       <Route path="/create-campaign" element={<CreateCampaign />} />
       <Route path="/campaign/:id/analyzing" element={<AnalyzingCampaign />} />
       <Route path="/campaign/:id" element={<CampaignView />} />
+      <Route path="/shared/:shareToken" element={<SharedCampaignView />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/billing" element={<Billing />} />
       <Route path="/usage" element={<Usage />} />

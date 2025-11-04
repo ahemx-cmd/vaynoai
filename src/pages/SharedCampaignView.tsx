@@ -8,83 +8,79 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { ArrowLeft, Download, Sparkles, ExternalLink } from "lucide-react";
 import EmailCard from "@/components/campaign/EmailCard";
-import { useUserPlan } from "@/hooks/useUserPlan";
-import URLSummary from "@/components/campaign/URLSummary";
-import AutoTranslate from "@/components/campaign/AutoTranslate";
-import ShareCampaignDialog from "@/components/campaign/ShareCampaignDialog";
 import JSZip from "jszip";
 import { generateESPReadyHTML } from "@/lib/emailUtils";
-import { trackExport, trackFunnelStep, trackCampaignGeneration } from "@/lib/analytics";
 
-const CampaignView = () => {
-  const { id } = useParams();
+const SharedCampaignView = () => {
+  const { shareToken } = useParams();
   const navigate = useNavigate();
   const [campaign, setCampaign] = useState<any>(null);
   const [emails, setEmails] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isGuest, setIsGuest] = useState(false);
-  const { isFree } = useUserPlan();
+  const [allowExport, setAllowExport] = useState(false);
 
   useEffect(() => {
-    const fetchCampaign = async () => {
-      if (!id) return;
+    const fetchSharedCampaign = async () => {
+      if (!shareToken) return;
 
-      // Check if user is authenticated
-      const { data: { session } } = await supabase.auth.getSession();
+      try {
+        // Fetch share details
+        const { data: shareData, error: shareError } = await supabase
+          .from("campaign_shares")
+          .select("campaign_id, allow_export")
+          .eq("share_token", shareToken)
+          .single();
 
-      const { data: campaignData, error: campaignError } = await supabase
-        .from("campaigns")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-      if (campaignError || !campaignData) {
-        toast.error("Campaign not found");
-        
-        // Check if user is authenticated to decide where to redirect
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          navigate("/dashboard");
-        } else {
+        if (shareError || !shareData) {
+          toast.error("Invalid or expired share link");
           navigate("/");
+          return;
         }
-        return;
-      }
 
-      // Check if this is a guest campaign (no user_id)
-      if (!campaignData.user_id) {
-        setIsGuest(true);
-      }
+        setAllowExport(shareData.allow_export);
 
-      const { data: emailsData, error: emailsError } = await supabase
-        .from("email_sequences")
-        .select("*")
-        .eq("campaign_id", id)
-        .order("sequence_number", { ascending: true });
+        // Fetch campaign
+        const { data: campaignData, error: campaignError } = await supabase
+          .from("campaigns")
+          .select("*")
+          .eq("id", shareData.campaign_id)
+          .single();
 
-      if (emailsError) {
-        toast.error("Failed to load emails");
-      } else {
-        setEmails(emailsData || []);
-      }
+        if (campaignError || !campaignData) {
+          toast.error("Campaign not found");
+          navigate("/");
+          return;
+        }
 
-      setCampaign(campaignData);
-      setLoading(false);
-      
-      // Track successful campaign generation when viewing completed campaign
-      if (campaignData.status === 'completed' && emailsData && emailsData.length > 0) {
-        trackCampaignGeneration(campaignData.id, campaignData.sequence_type);
+        // Fetch emails
+        const { data: emailsData, error: emailsError } = await supabase
+          .from("email_sequences")
+          .select("*")
+          .eq("campaign_id", shareData.campaign_id)
+          .order("sequence_number", { ascending: true });
+
+        if (emailsError) {
+          toast.error("Failed to load emails");
+        } else {
+          setEmails(emailsData || []);
+        }
+
+        setCampaign(campaignData);
+      } catch (error) {
+        console.error("Error fetching shared campaign:", error);
+        toast.error("Failed to load campaign");
+        navigate("/");
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchCampaign();
-  }, [id, navigate]);
+    fetchSharedCampaign();
+  }, [shareToken, navigate]);
 
   const handleExportHTML = async () => {
-    // Require sign-in for guests
-    if (isGuest) {
-      toast.error("Please sign in to export your campaign");
-      navigate("/auth");
+    if (!allowExport) {
+      toast.error("Export is not allowed for this shared campaign");
       return;
     }
 
@@ -98,7 +94,7 @@ const CampaignView = () => {
       const brandName = campaign?.analyzed_data?.title || campaign?.name || "Brand";
       const campaignSlug = campaign?.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'campaign';
 
-      // Generate ESP-ready HTML for each email
+      // Generate ESP-ready HTML for each email (always with watermark for shared)
       emails.forEach((email) => {
         const fileName = `${campaignSlug}_email${email.sequence_number}.html`;
         const htmlContent = generateESPReadyHTML(
@@ -106,7 +102,7 @@ const CampaignView = () => {
           brandName,
           campaign?.cta_link || null,
           campaign?.include_cta ?? true,
-          isFree
+          true // Always include watermark for shared campaigns
         );
         
         zip.file(fileName, htmlContent);
@@ -125,11 +121,7 @@ const CampaignView = () => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      // Track export event
-      trackExport('zip', id!);
-      trackFunnelStep('export', { campaign_id: id });
-
-      toast.success("Email sequence exported successfully! Ready for ESP upload.");
+      toast.success("Email sequence exported successfully!");
     } catch (error) {
       console.error("Export error:", error);
       toast.error("Failed to export emails");
@@ -150,31 +142,19 @@ const CampaignView = () => {
 
   return (
     <div className="min-h-screen bg-background relative">
-      
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-          {!isGuest && (
-            <Button variant="ghost" onClick={() => navigate("/dashboard")}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Button>
-          )}
-          {isGuest && (
-            <Button variant="ghost" onClick={() => navigate("/")}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
-            </Button>
-          )}
+          <Button variant="ghost" onClick={() => navigate("/")}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Home
+          </Button>
           <div className="flex gap-2">
-            {campaign.analyzed_data && (
-              <URLSummary analyzedData={campaign.analyzed_data} url={campaign.url} />
+            {allowExport && (
+              <Button onClick={handleExportHTML} className="glow">
+                <Download className="w-4 h-4 mr-2" />
+                Export HTML
+              </Button>
             )}
-            <AutoTranslate campaignId={id!} />
-            <ShareCampaignDialog campaignId={id!} />
-            <Button onClick={handleExportHTML} className="glow">
-              <Download className="w-4 h-4 mr-2" />
-              Export HTML
-            </Button>
           </div>
         </div>
 
@@ -183,6 +163,14 @@ const CampaignView = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
+          {/* Shared Badge */}
+          <Card className="glass-card p-4 mb-4 bg-primary/5 border-primary/20">
+            <div className="flex items-center gap-2 text-sm">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span>This campaign was shared with you (read-only mode)</span>
+            </div>
+          </Card>
+
           <Card className="glass-card p-8 mb-8 border-primary/20">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
@@ -233,39 +221,36 @@ const CampaignView = () => {
             </div>
 
             {emails.map((email, i) => (
-              <div key={email.id} className="relative">
-                <EmailCard 
-                  email={email} 
-                  index={i} 
-                  campaignId={id!}
-                  dripDuration={campaign.drip_duration}
-                  totalEmails={emails.length}
-                />
-                {/* Blur overlay for emails 4+ for guests */}
-                {isGuest && i >= 3 && (
-                  <div className="absolute inset-0 bg-white/60 backdrop-blur-md rounded-lg flex items-center justify-center z-10">
-                    <Card className="glass-card p-6 max-w-sm mx-4 text-center shadow-xl">
-                      <Sparkles className="w-10 h-10 text-primary mx-auto mb-3" />
-                      <h3 className="font-bold text-lg mb-2">Sign in to view all emails</h3>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Get access to the complete {emails.length}-email sequence
-                      </p>
-                      <Button
-                        onClick={() => navigate("/auth")}
-                        className="btn-premium w-full"
-                      >
-                        Sign In Now
-                      </Button>
-                    </Card>
-                  </div>
-                )}
-              </div>
+              <EmailCard 
+                key={email.id}
+                email={email} 
+                index={i} 
+                campaignId={campaign.id}
+                dripDuration={campaign.drip_duration}
+                totalEmails={emails.length}
+              />
             ))}
           </div>
+
+          {/* Vayno CTA at bottom */}
+          <Card className="glass-card p-8 mt-12 text-center border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
+            <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
+            <h3 className="text-2xl font-bold mb-2">Create Your Own Email Campaigns</h3>
+            <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
+              Generate high-converting email sequences for your products in minutes with AI-powered Vayno
+            </p>
+            <Button 
+              size="lg" 
+              className="btn-premium"
+              onClick={() => window.location.href = '/'}
+            >
+              Try Vayno Free
+            </Button>
+          </Card>
         </motion.div>
       </div>
     </div>
   );
 };
 
-export default CampaignView;
+export default SharedCampaignView;

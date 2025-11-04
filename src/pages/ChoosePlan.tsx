@@ -51,7 +51,7 @@ const ChoosePlan = () => {
   const plans = [
     {
       name: "Starter",
-      price: isLifetime ? "$89" : "$12",
+      price: isLifetime ? "$69" : "$12",
       period: isLifetime ? "one-time" : "per month",
       description: "For growing businesses",
       features: [
@@ -192,7 +192,7 @@ const ChoosePlan = () => {
                   className={`w-full mb-6 ${(plan.popular || (isLifetime && plan.name === "Starter")) ? 'btn-premium shadow-lg' : ''}`} 
                   variant={(plan.popular || (isLifetime && plan.name === "Starter")) ? "default" : "outline"}
                   onClick={() => {
-                    const price = plan.name === "Starter" ? (isLifetime ? 89 : 12) : 29;
+                    const price = plan.name === "Starter" ? (isLifetime ? 69 : 12) : 29;
                     handleCheckout(plan.checkoutUrl, plan.name, price);
                   }}
                 >
