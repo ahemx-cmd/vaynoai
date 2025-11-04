@@ -91,19 +91,20 @@ const Auth = () => {
           
           toast.success("Your campaign has been unlocked!");
           
-          // Navigate to the campaign
+          // Navigate to the campaign after plan selection
+          localStorage.setItem("pendingCampaignId", guestCampaignId);
           setTimeout(() => {
-            navigate(`/campaign/${guestCampaignId}`);
+            navigate("/choose-plan");
           }, 1000);
         } else {
-          navigate("/dashboard");
+          navigate("/choose-plan");
         }
       } catch (err) {
         console.error("Error claiming guest campaign:", err);
-        navigate("/dashboard");
+        navigate("/choose-plan");
       }
     } else {
-      navigate("/dashboard");
+      navigate("/choose-plan");
     }
   };
 

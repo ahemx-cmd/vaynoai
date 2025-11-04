@@ -17,6 +17,7 @@ import Support from "./pages/Support";
 import Updates from "./pages/Updates";
 import NotFound from "./pages/NotFound";
 import RecoveryRedirect from "./components/auth/RecoveryRedirect";
+import ChoosePlan from "./pages/ChoosePlan";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={<Index />} />
       <Route path="/auth" element={<Auth />} />
+      <Route path="/choose-plan" element={<ChoosePlan />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/create-campaign" element={<CreateCampaign />} />
       <Route path="/campaign/:id/analyzing" element={<AnalyzingCampaign />} />

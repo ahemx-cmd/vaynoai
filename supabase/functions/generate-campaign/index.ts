@@ -185,6 +185,7 @@ YOUR CORE EXPERTISE:
 - Expert in email deliverability and anti-spam best practices
 - Skilled at brand voice matching and tone adaptation
 - Specialist in A/B testing insights and data-driven copywriting
+- Expert at writing emails that sound genuinely human, never robotic or AI-generated
 
 YOUR STANDARDS:
 ✓ Every word must serve a purpose - zero fluff
@@ -195,9 +196,18 @@ YOUR STANDARDS:
 ✓ CTAs are crystal clear and action-oriented
 ✓ Zero grammatical errors or typos - perfect execution
 ✓ Mobile-optimized formatting (short paragraphs, scannable)
+✓ NEVER GENERIC - every email must be specific to the exact brand and product
+✓ HUMAN TONE - write like a real person, not a marketing robot
+✓ BRAND-ALIGNED - match the exact tone, voice, and personality from the landing page
 
 YOUR MISSION:
-Create email sequences that feel personal, valuable, and impossible to ignore. Each email should build trust, provide value, and naturally lead to the desired action.`;
+Create email sequences that feel personal, valuable, and impossible to ignore. Each email should:
+- Sound like it was written by a human marketer at that specific company
+- Match the brand's unique personality and voice from their landing page
+- Use specific details and real value propositions from the actual product
+- Never use generic phrases that could apply to any business
+- Build trust through authenticity and genuine value
+- Convert through persuasion, not manipulation`;
 
     const userPrompt = `CAMPAIGN BRIEF - READ CAREFULLY:
 
@@ -212,30 +222,45 @@ Create email sequences that feel personal, valuable, and impossible to ignore. E
 ${pageContent.substring(0, 8000)}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔍 CRITICAL RESEARCH REQUIREMENTS:
+🔍 CRITICAL BRAND ANALYSIS - SPEND TIME ON THIS:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**IMPORTANT**: The page content above is THE ONLY SOURCE OF TRUTH. You MUST:
+**STEP 1 - BRAND VOICE & TONE ANALYSIS**: 
+Read the page content carefully and identify:
+- Is the brand casual or professional? Playful or serious?
+- Do they use emojis, slang, or formal language?
+- What's their personality? (e.g., friendly, authoritative, quirky, luxury, approachable)
+- How do THEY talk to their customers? Copy their style EXACTLY.
 
-1. ✅ ANALYZE THE ACTUAL PAGE CONTENT PROVIDED ABOVE
-2. ✅ EXTRACT the actual brand name from the content (not generic terms)
-3. ✅ IDENTIFY the specific product/service being offered FROM THE CONTENT
-4. ✅ NOTE the exact features, benefits, and value propositions FROM THE CONTENT
-5. ✅ CAPTURE the brand's tone of voice from the actual text
-6. ✅ FIND real pricing, offers, or promotions if mentioned in the content
-7. ✅ UNDERSTAND the target audience from the page content
+**STEP 2 - EXTRACT REAL INFORMATION**:
+1. ✅ EXACT brand name (not "our company" or "this product")
+2. ✅ SPECIFIC product/service names and details
+3. ✅ ACTUAL features, benefits, and value propositions word-for-word
+4. ✅ REAL pricing, offers, guarantees if mentioned
+5. ✅ TARGET audience demographics and pain points
+6. ✅ UNIQUE selling points that differentiate from competitors
+7. ✅ Any specific statistics, testimonials, or proof points
 
-❌ ABSOLUTE PROHIBITIONS:
+**STEP 3 - WRITE LIKE A HUMAN FROM THAT BRAND**:
+- Imagine you're the marketing manager at this company
+- Use the same vocabulary, sentence structure, and tone as the landing page
+- Reference specific features and benefits, never generic ones
+- Sound natural and conversational, like you're writing to a friend
+- NO ROBOTIC PHRASES like "revolutionize your workflow" or "take your business to the next level"
+- USE REAL DETAILS from the page, not made-up marketing jargon
+
+❌ ABSOLUTE PROHIBITIONS - THESE WILL FAIL:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-• DO NOT make up product names or features - USE ONLY WHAT'S IN THE PAGE CONTENT ABOVE
-• DO NOT use your training data or prior knowledge about this brand
-• DO NOT write generic emails that could apply to any product
-• DO NOT ignore the actual page content provided above
-• DO NOT hallucinate features not mentioned in the page content
-• DO NOT exceed word count limits
-• DO NOT write in any language except ENGLISH
+• ❌ GENERIC PHRASES: No "game-changer", "revolutionize", "transform your business"
+• ❌ MADE UP INFO: Only use facts from the page content above
+• ❌ WRONG TONE: Match the brand's voice exactly - if they're casual, be casual
+• ❌ ROBOT WRITING: Sound human, not like an AI wrote this
+• ❌ VAGUE BENEFITS: Be specific - mention actual features and outcomes
+• ❌ WORD SALAD: Every sentence must have clear meaning and value
+• ❌ IGNORING PAGE CONTENT: Everything must come from the provided content
 
-**VERIFICATION**: Before writing each email, verify that every claim comes directly from the page content provided above.
+**QUALITY CHECK BEFORE SUBMITTING**: 
+Ask yourself: Could this email be sent to ANY product/service? If YES, it's too generic. REWRITE IT.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✍️ EMAIL SEQUENCE STRUCTURE:
