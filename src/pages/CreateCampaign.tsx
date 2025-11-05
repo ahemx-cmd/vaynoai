@@ -48,8 +48,8 @@ const CreateCampaign = () => {
   const [name, setName] = useState("");
   const [sequenceType, setSequenceType] = useState("");
   const [dripDuration, setDripDuration] = useState("");
-  const [wordsPerEmail, setWordsPerEmail] = useState("250");
-  const [includeCTA, setIncludeCTA] = useState(true);
+  const [wordsPerEmail, setWordsPerEmail] = useState("");
+  const [includeCTA, setIncludeCTA] = useState(false);
   const [ctaLink, setCtaLink] = useState("");
 
   useEffect(() => {

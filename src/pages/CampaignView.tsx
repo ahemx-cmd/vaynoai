@@ -11,7 +11,6 @@ import EmailCard from "@/components/campaign/EmailCard";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import URLSummary from "@/components/campaign/URLSummary";
 import AutoTranslate from "@/components/campaign/AutoTranslate";
-import ShareCampaignDialog from "@/components/campaign/ShareCampaignDialog";
 import JSZip from "jszip";
 import { generateESPReadyHTML } from "@/lib/emailUtils";
 import { trackExport, trackFunnelStep, trackCampaignGeneration } from "@/lib/analytics";
@@ -209,7 +208,6 @@ const CampaignView = () => {
               )}
               {copiedAll ? "Copied!" : "Copy All"}
             </Button>
-            <ShareCampaignDialog campaignId={id!} />
             <Button onClick={handleExportHTML} className="glow">
               <Download className="w-4 h-4 mr-2" />
               Export HTML
