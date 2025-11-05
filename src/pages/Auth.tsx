@@ -24,6 +24,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [resetMode, setResetMode] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
@@ -200,8 +201,7 @@ const Auth = () => {
       if (error) {
         toast.error(error.message);
       } else {
-        toast.success("Password reset link sent to your email!");
-        setResetMode(false);
+        setResetEmailSent(true);
       }
     } catch (err) {
       if (err instanceof z.ZodError) {
@@ -402,6 +402,31 @@ const Auth = () => {
                     )}
                   </Button>
                 </form>
+              ) : resetEmailSent ? (
+                <div className="space-y-4 text-center">
+                  <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+                    <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold">Check your email</h3>
+                  <p className="text-muted-foreground">
+                    We've sent a password reset link to <span className="font-medium text-foreground">{email}</span>
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Click the link in the email to reset your password.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setResetMode(false);
+                      setResetEmailSent(false);
+                    }}
+                    className="w-full text-sm text-primary hover:underline mt-4"
+                  >
+                    Back to sign in
+                  </button>
+                </div>
               ) : (
                 <form onSubmit={handlePasswordReset} className="space-y-4">
                   <div>
