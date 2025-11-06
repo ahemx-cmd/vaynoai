@@ -117,14 +117,18 @@ serve(async (req) => {
       const urlResponse = await fetch(url, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
+        },
+        redirect: 'follow',
+        signal: AbortSignal.timeout(15000) // 15 second timeout
       });
       
       if (!urlResponse.ok) {
-        throw new Error(`Failed to fetch URL: ${urlResponse.status}`);
+        console.error(`Failed to fetch URL. Status: ${urlResponse.status}, StatusText: ${urlResponse.statusText}`);
+        throw new Error(`HTTP ${urlResponse.status}: ${urlResponse.statusText}`);
       }
       
       const html = await urlResponse.text();
+      console.log("Fetched HTML length:", html.length);
       
       // Extract text content from HTML (basic extraction)
       pageContent = html
@@ -134,15 +138,77 @@ serve(async (req) => {
         .replace(/\s+/g, ' ') // Normalize whitespace
         .trim();
       
-      console.log("Successfully fetched page content, length:", pageContent.length);
+      console.log("Extracted page content length:", pageContent.length);
+      
+      // Validate that we have meaningful content
+      if (pageContent.length < 100) {
+        console.error("Page content too short:", pageContent.length, "characters");
+        throw new Error("Page content is too short or empty");
+      }
+      
+      // Check if content looks like an error page or blocked content
+      const errorIndicators = [
+        'access denied',
+        'forbidden',
+        'cloudflare',
+        'security check',
+        'captcha',
+        'blocked',
+        'not authorized',
+        '403 forbidden',
+        '404 not found',
+        'page not found'
+      ];
+      
+      const contentLower = pageContent.toLowerCase();
+      const hasErrorIndicator = errorIndicators.some(indicator => 
+        contentLower.includes(indicator)
+      );
+      
+      if (hasErrorIndicator && pageContent.length < 500) {
+        console.error("Content appears to be an error page or blocked access");
+        throw new Error("Website access appears to be blocked or restricted");
+      }
+      
+      console.log("✅ Successfully fetched and validated page content");
+      
     } catch (fetchError) {
-      console.error("Error fetching URL:", fetchError);
+      console.error("❌ Error fetching URL:", fetchError);
+      
+      // Determine specific error message
+      let errorMessage = "Unable to access the website";
+      let detailMessage = "";
+      
+      if (fetchError instanceof Error) {
+        if (fetchError.message.includes("timeout")) {
+          detailMessage = `The website took too long to respond. Please check if ${url} is accessible and try again.`;
+        } else if (fetchError.message.includes("HTTP 403") || fetchError.message.includes("HTTP 401")) {
+          detailMessage = `Access to ${url} is restricted. The website may be blocking automated requests or require authentication.`;
+        } else if (fetchError.message.includes("HTTP 404")) {
+          detailMessage = `The page at ${url} was not found. Please check the URL and try again.`;
+        } else if (fetchError.message.includes("too short") || fetchError.message.includes("empty")) {
+          detailMessage = `We couldn't extract enough content from ${url}. The page might be empty, behind a login, or using heavy JavaScript that we can't process.`;
+        } else if (fetchError.message.includes("blocked") || fetchError.message.includes("restricted")) {
+          detailMessage = `Access to ${url} is blocked or restricted. The website may be using security measures that prevent automated access.`;
+        } else {
+          detailMessage = `We couldn't access ${url}. This might be due to:\n• Security restrictions or firewalls\n• The website blocking automated requests\n• Network connectivity issues\n• The page requiring JavaScript to load content\n\nPlease try a different URL or ensure the website is publicly accessible.`;
+        }
+      }
+      
+      // Update campaign status to failed
+      await serviceClient
+        .from("campaigns")
+        .update({ 
+          status: "failed",
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", campaignId);
       
       // Return detailed error to user instead of generating random emails
       return new Response(
         JSON.stringify({ 
-          error: "Unable to access the website", 
-          details: `We couldn't access ${url}. This might be due to security restrictions, firewalls, or the website blocking automated requests. Please try a different URL or contact support.` 
+          error: errorMessage, 
+          details: detailMessage
         }),
         { 
           status: 400, 

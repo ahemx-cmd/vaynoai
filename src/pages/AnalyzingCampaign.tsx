@@ -84,6 +84,7 @@ const AnalyzingCampaign = () => {
           
           // Try to parse error message from the response
           let errorMessage = "Failed to generate campaign";
+          let errorDetails = "";
           
           if (error.message) {
             errorMessage = error.message;
@@ -91,6 +92,7 @@ const AnalyzingCampaign = () => {
             try {
               const errorBody = JSON.parse(error.context.body);
               errorMessage = errorBody.error || errorMessage;
+              errorDetails = errorBody.details || "";
             } catch {
               errorMessage = error.context.body;
             }
@@ -101,11 +103,15 @@ const AnalyzingCampaign = () => {
             throw new Error("Insufficient AI credits. Please add credits to continue generating campaigns.");
           }
           
-          throw new Error(errorMessage);
+          // Use detailed message if available
+          const fullError = errorDetails ? `${errorMessage}: ${errorDetails}` : errorMessage;
+          throw new Error(fullError);
         }
         
         if (!data || !data.success) {
-          throw new Error(data?.error || "Failed to generate campaign");
+          // Check if there's a detailed error message
+          const errorMsg = data?.details || data?.error || "Failed to generate campaign";
+          throw new Error(errorMsg);
         }
 
         // Update usage only if user is authenticated (not a guest)
@@ -158,15 +164,22 @@ const AnalyzingCampaign = () => {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="max-w-md w-full"
+          className="max-w-lg w-full"
         >
-          <Card className="glass-card p-8 border-destructive/50 text-center">
-            <XCircle className="w-16 h-16 text-destructive mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Analysis Failed</h2>
-            <p className="text-muted-foreground mb-6">{error}</p>
+          <Card className="glass-card p-8 border-destructive/50">
+            <div className="text-center mb-6">
+              <XCircle className="w-16 h-16 text-destructive mx-auto mb-4" />
+              <h2 className="text-2xl font-bold mb-2">Unable to Generate Campaign</h2>
+            </div>
+            <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 mb-6">
+              <p className="text-sm text-foreground whitespace-pre-line leading-relaxed">
+                {error}
+              </p>
+            </div>
             <Button 
               onClick={() => navigate(isGuestError ? "/" : "/dashboard")} 
               variant="outline"
+              className="w-full"
             >
               {isGuestError ? "Return to Home" : "Return to Dashboard"}
             </Button>
