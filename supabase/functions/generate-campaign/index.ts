@@ -130,6 +130,9 @@ serve(async (req) => {
       const html = await urlResponse.text();
       console.log("Fetched HTML length:", html.length);
       
+      // Store HTML for SPA detection
+      const htmlText = html;
+      
       // Extract text content from HTML (basic extraction)
       pageContent = html
         .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove scripts
@@ -143,7 +146,24 @@ serve(async (req) => {
       // Validate that we have meaningful content
       if (pageContent.length < 100) {
         console.error("Page content too short:", pageContent.length, "characters");
-        throw new Error("Page content is too short or empty");
+        
+        // Check if it's likely a Single Page Application
+        const isSPA = htmlText.includes('root') && 
+                      (htmlText.includes('react') || 
+                       htmlText.includes('vue') || 
+                       htmlText.includes('angular') ||
+                       htmlText.includes('app.js') ||
+                       htmlText.includes('bundle.js') ||
+                       htmlText.includes('main.js') ||
+                       htmlText.includes('vite') ||
+                       htmlText.includes('webpack'));
+        
+        if (isSPA) {
+          console.error("Detected Single Page Application (SPA)");
+          throw new Error("SPA_DETECTED");
+        } else {
+          throw new Error("Page content is too short or empty");
+        }
       }
       
       // Check if content looks like an error page or blocked content
@@ -180,18 +200,70 @@ serve(async (req) => {
       let detailMessage = "";
       
       if (fetchError instanceof Error) {
-        if (fetchError.message.includes("timeout")) {
-          detailMessage = `The website took too long to respond. Please check if ${url} is accessible and try again.`;
+        if (fetchError.message.includes("SPA_DETECTED")) {
+          errorMessage = "Single Page Application Detected";
+          detailMessage = `❌ This appears to be a Single Page Application (SPA) that loads content with JavaScript.
+
+Unfortunately, ${url} uses client-side rendering (React, Vue, Angular, etc.) which means the content isn't available in the initial HTML.
+
+✅ What you can do:
+• Use a marketing or landing page URL instead of the app URL
+• Try a "www" subdomain if available (e.g., www.${url.replace('https://', '').replace('http://', '')})
+• Use a static website, blog post, or documentation page about your product
+• If you have a separate marketing site, use that URL
+
+💡 Example: Instead of "app.example.com" or "example.lovable.app", try "example.com" or "www.example.com"`;
+        } else if (fetchError.message.includes("timeout")) {
+          detailMessage = `⏱️ The website took too long to respond (>15 seconds).
+
+Please check if ${url} is accessible and try again.`;
         } else if (fetchError.message.includes("HTTP 403") || fetchError.message.includes("HTTP 401")) {
-          detailMessage = `Access to ${url} is restricted. The website may be blocking automated requests or require authentication.`;
+          detailMessage = `🔒 Access to ${url} is restricted.
+
+This could mean:
+• The website is blocking automated requests
+• The page requires authentication
+• Security measures are preventing access
+
+Try using a different, publicly accessible page.`;
         } else if (fetchError.message.includes("HTTP 404")) {
-          detailMessage = `The page at ${url} was not found. Please check the URL and try again.`;
+          detailMessage = `❌ The page at ${url} was not found (404).
+
+Please check:
+• The URL is correct and complete
+• The page exists and is publicly accessible
+• There are no typos in the URL`;
         } else if (fetchError.message.includes("too short") || fetchError.message.includes("empty")) {
-          detailMessage = `We couldn't extract enough content from ${url}. The page might be empty, behind a login, or using heavy JavaScript that we can't process.`;
+          detailMessage = `📭 We couldn't extract enough content from ${url}.
+
+This usually means:
+• The page is empty or has very little text
+• Content is behind a login or paywall
+• The page uses heavy JavaScript to load content
+• The page is not publicly accessible
+
+Try using a different URL with more static content.`;
         } else if (fetchError.message.includes("blocked") || fetchError.message.includes("restricted")) {
-          detailMessage = `Access to ${url} is blocked or restricted. The website may be using security measures that prevent automated access.`;
+          detailMessage = `🚫 Access to ${url} is blocked or restricted.
+
+The website may be using security measures like:
+• Cloudflare protection
+• Bot detection
+• Geographic restrictions
+• Rate limiting
+
+Try a different page or contact the website owner.`;
         } else {
-          detailMessage = `We couldn't access ${url}. This might be due to:\n• Security restrictions or firewalls\n• The website blocking automated requests\n• Network connectivity issues\n• The page requiring JavaScript to load content\n\nPlease try a different URL or ensure the website is publicly accessible.`;
+          detailMessage = `❌ We couldn't access ${url}.
+
+This might be due to:
+• Security restrictions or firewalls
+• The website blocking automated requests
+• Network connectivity issues
+• The page requiring JavaScript to load content
+• CORS or access control policies
+
+Please try a different URL or ensure the website is publicly accessible.`;
         }
       }
       
