@@ -93,26 +93,30 @@ async function handleSubscriptionCreated(supabase: any, payload: any, userId: st
   const renewsAt = attributes?.renews_at;
   const status = attributes?.status || 'active';
 
-  // Determine plan based on product/variant name
-  let plan = 'free';
-  let generationsLimit = 5;
+  // Determine plan based on product/variant name with new credit system
+  let plan = 'trial';
+  let generationsLimit = 20;
 
   if (productName?.toLowerCase().includes('lifetime') || variantName?.toLowerCase().includes('lifetime')) {
-    plan = 'starter_lifetime';
-    generationsLimit = 999999; // Effectively unlimited
+    plan = 'lifetime';
+    generationsLimit = 150;
+    console.log('Detected lifetime plan - 150 credits');
   } else if (productName?.toLowerCase().includes('pro') || variantName?.toLowerCase().includes('pro')) {
     plan = 'pro';
-    generationsLimit = 500;
+    generationsLimit = 400;
+    console.log('Detected pro plan - 400 credits');
   } else if (productName?.toLowerCase().includes('starter') || variantName?.toLowerCase().includes('starter')) {
     plan = 'starter';
-    generationsLimit = 50;
+    generationsLimit = 150;
+    console.log('Detected starter plan - 150 credits');
   }
 
-  console.log(`Updating user ${userId} to plan: ${plan}`);
+  console.log(`Updating user ${userId} to plan: ${plan} with ${generationsLimit} credits`);
 
   const updateData: any = {
     plan,
     generations_limit: generationsLimit,
+    generations_used: 0, // Reset credits on new subscription
     subscription_status: status,
     lemonsqueezy_customer_id: customerId,
   };
@@ -125,11 +129,6 @@ async function handleSubscriptionCreated(supabase: any, payload: any, userId: st
     updateData.current_period_end = renewsAt;
   }
 
-  // Reset generations_used for new subscription (except lifetime)
-  if (plan !== 'starter_lifetime') {
-    updateData.generations_used = 0;
-  }
-
   const { error } = await supabase
     .from('user_usage')
     .update(updateData)
@@ -140,7 +139,7 @@ async function handleSubscriptionCreated(supabase: any, payload: any, userId: st
     throw error;
   }
 
-  console.log('Successfully updated user subscription');
+  console.log('Successfully updated user subscription with credits');
 }
 
 async function handleSubscriptionUpdated(supabase: any, payload: any, userId: string) {
@@ -174,12 +173,14 @@ async function handleSubscriptionUpdated(supabase: any, payload: any, userId: st
 async function handleSubscriptionCancelled(supabase: any, payload: any, userId: string) {
   console.log('Handling subscription cancelled for user:', userId);
 
+  // When subscription is cancelled, user goes back to trial with 0 credits
   const { error } = await supabase
     .from('user_usage')
     .update({
       subscription_status: 'cancelled',
-      plan: 'free',
-      generations_limit: 5,
+      plan: 'trial',
+      generations_limit: 0,
+      generations_used: 0,
     })
     .eq('user_id', userId);
 
@@ -188,7 +189,7 @@ async function handleSubscriptionCancelled(supabase: any, payload: any, userId: 
     throw error;
   }
 
-  console.log('Successfully cancelled subscription');
+  console.log('Successfully cancelled subscription - user moved to trial with 0 credits');
 }
 
 async function handleSubscriptionResumed(supabase: any, payload: any, userId: string) {

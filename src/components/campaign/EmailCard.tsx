@@ -25,7 +25,7 @@ const EmailCard = ({ email, index, campaignId, dripDuration, totalEmails }: Emai
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(email.content);
   const [improving, setImproving] = useState(false);
-  const { isFree } = useUserPlan();
+  const { isTrial } = useUserPlan();
 
   const handleSave = async () => {
     const { error } = await supabase
@@ -170,7 +170,7 @@ const EmailCard = ({ email, index, campaignId, dripDuration, totalEmails }: Emai
                       {content}
                     </pre>
                   </div>
-                  {isFree && <VaynoWatermark />}
+                  {isTrial && <VaynoWatermark />}
                   <div className="flex flex-wrap gap-2 pt-4 border-t border-border/50">
                     <SmartPreview 
                       subject={email.subject}

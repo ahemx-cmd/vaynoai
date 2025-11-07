@@ -19,7 +19,7 @@ const Dashboard = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [showLifetimeBanner, setShowLifetimeBanner] = useState(true);
-  const { isFree } = useUserPlan();
+  const { isTrial } = useUserPlan();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -112,7 +112,7 @@ const Dashboard = () => {
             transition={{ duration: 0.5 }}
             className="space-y-6 sm:space-y-8"
           >
-            {showLifetimeBanner && isFree && (
+            {showLifetimeBanner && isTrial && (
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -143,11 +143,11 @@ const Dashboard = () => {
                   <Button 
                     className="flex-shrink-0 w-full sm:w-auto bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg hover-lift text-sm sm:text-base"
                     size="sm"
-                    onClick={() => window.open('https://vayno.lemonsqueezy.com/buy/b9b0bdea-ddc5-42b8-8abc-aee080f88fae?logo=0', '_blank')}
+                    onClick={() => window.open('https://vaynoai.lemonsqueezy.com/buy/c58b5d67-6c25-490c-846f-3e7963b5b804', '_blank')}
                   >
                     <Sparkles className="w-4 h-4 mr-2" />
-                    <span className="hidden sm:inline">Get Lifetime Deal ($69)</span>
-                    <span className="sm:hidden">Get Deal ($69)</span>
+                    <span className="hidden sm:inline">Get Lifetime Deal ($59)</span>
+                    <span className="sm:hidden">Get Deal ($59)</span>
                   </Button>
                 </div>
               </motion.div>

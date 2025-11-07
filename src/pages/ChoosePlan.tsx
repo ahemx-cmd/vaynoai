@@ -51,20 +51,21 @@ const ChoosePlan = () => {
   const plans = [
     {
       name: "Starter",
-      price: isLifetime ? "$69" : "$12",
+      price: isLifetime ? "$59" : "$19",
       period: isLifetime ? "one-time" : "per month",
       description: "For growing businesses",
       features: [
-        "50 email generations / month",
+        isLifetime ? "150 credits (never expires)" : "150 credits per month",
+        "1 credit = 1 email generated",
         "Remove watermark",
-        "Everything in Free",
-        "Priority AI speed"
+        "Priority AI speed",
+        "Email support"
       ],
       popular: !isLifetime,
       showToggle: true,
       checkoutUrl: isLifetime 
-        ? "https://vayno.lemonsqueezy.com/buy/b9b0bdea-ddc5-42b8-8abc-aee080f88fae?logo=0"
-        : "https://vayno.lemonsqueezy.com/buy/b1c6e286-36a9-4b48-bc80-9b03182d3b83?logo=0"
+        ? "https://vaynoai.lemonsqueezy.com/buy/c58b5d67-6c25-490c-846f-3e7963b5b804"
+        : "https://vaynoai.lemonsqueezy.com/buy/3eab4f94-d13a-47e3-b2c7-63a7ed0aff11"
     },
     {
       name: "Pro",
@@ -72,13 +73,14 @@ const ChoosePlan = () => {
       period: "per month",
       description: "For power users",
       features: [
-        "500 email generations / month",
-        "Auto-Translate – localize campaigns instantly",
+        "400 credits per month",
+        "1 credit = 1 email generated",
         "Everything in Starter",
-        "Priority AI & early access to new features"
+        "Auto-Translate",
+        "Priority AI & early access"
       ],
       popular: false,
-      checkoutUrl: "https://vayno.lemonsqueezy.com/buy/b8a3207d-80e9-4092-8cfc-5f15c00511b1?logo=0"
+      checkoutUrl: "https://vaynoai.lemonsqueezy.com/buy/e47ec95f-aa1e-43fc-a57f-bb91fc20139e"
     }
   ];
 
@@ -192,7 +194,7 @@ const ChoosePlan = () => {
                   className={`w-full mb-6 ${(plan.popular || (isLifetime && plan.name === "Starter")) ? 'btn-premium shadow-lg' : ''}`} 
                   variant={(plan.popular || (isLifetime && plan.name === "Starter")) ? "default" : "outline"}
                   onClick={() => {
-                    const price = plan.name === "Starter" ? (isLifetime ? 69 : 12) : 29;
+                    const price = plan.name === "Starter" ? (isLifetime ? 59 : 19) : 29;
                     handleCheckout(plan.checkoutUrl, plan.name, price);
                   }}
                 >

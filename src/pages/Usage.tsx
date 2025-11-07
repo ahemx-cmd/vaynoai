@@ -17,7 +17,7 @@ const Usage = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [usage, setUsage] = useState<any>(null);
-  const { plan, isFree, isStarter, isPro } = useUserPlan();
+  const { plan, isTrial, isStarter, isPro, isLifetime } = useUserPlan();
 
   useEffect(() => {
     const checkUser = async () => {
@@ -45,9 +45,10 @@ const Usage = () => {
   }, [navigate]);
 
   const getLimits = () => {
-    if (isPro) return { generations: 500, name: "Pro" };
-    if (isStarter) return { generations: 50, name: "Starter" };
-    return { generations: 5, name: "Free" };
+    if (isPro) return { generations: 400, name: "Pro" };
+    if (isStarter) return { generations: 150, name: "Starter" };
+    if (isLifetime) return { generations: 150, name: "Lifetime" };
+    return { generations: 20, name: "Free Trial" };
   };
 
   const limits = getLimits();
@@ -282,9 +283,9 @@ const Usage = () => {
                     <Crown className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold mb-2">Need More Generations?</h3>
+                    <h3 className="text-lg font-semibold mb-2">Need More Credits?</h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Upgrade to {isFree ? "Starter (50/month) or Pro (500/month)" : "Pro (500/month)"} for more email generations, advanced features, and priority support.
+                      Upgrade to {isTrial ? "Starter (150 credits/month) or Pro (400 credits/month)" : "Pro (400 credits/month)"} for more credits, advanced features, and priority support.
                     </p>
                     <Button onClick={() => navigate("/billing")}>
                       <Crown className="w-4 h-4 mr-2" />

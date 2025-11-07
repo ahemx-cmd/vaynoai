@@ -52,9 +52,10 @@ export const useUserPlan = () => {
     };
   }, []);
 
-  const isFree = plan === "free";
+  const isTrial = plan === "trial";
   const isStarter = plan === "starter";
   const isPro = plan === "pro";
+  const isLifetime = plan === "lifetime";
 
-  return { plan, isFree, isStarter, isPro, loading };
+  return { plan, isTrial, isStarter, isPro, isLifetime, loading };
 };

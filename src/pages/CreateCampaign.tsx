@@ -91,22 +91,25 @@ const CreateCampaign = () => {
         return;
       }
 
-      // For authenticated users, check usage limits
+      // For authenticated users, check credit balance
       if (userId) {
         const { data: usageData, error: usageError } = await supabase
           .from("user_usage")
-          .select("*")
+          .select("generations_used, generations_limit, plan")
           .eq("user_id", userId)
           .single();
 
         if (usageError) {
-          toast.error("Failed to check usage");
+          toast.error("Failed to check your credit balance");
           setLoading(false);
           return;
         }
 
-        if (usageData.generations_used >= usageData.generations_limit) {
-          toast.error("You've reached your generation limit. Please upgrade your plan.");
+        const creditsRemaining = usageData.generations_limit - usageData.generations_used;
+
+        if (creditsRemaining <= 0) {
+          toast.error("You've used all your credits — upgrade or top up to continue.");
+          navigate("/billing");
           setLoading(false);
           return;
         }

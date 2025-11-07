@@ -80,7 +80,9 @@ const UsageCard = ({ userId }: UsageCardProps) => {
   }
 
   const percentage = (usage.used / usage.limit) * 100;
-  const isNearLimit = percentage >= 80;
+  const creditsRemaining = usage.limit - usage.used;
+  const isLowCredits = creditsRemaining < 10;
+  const isOutOfCredits = creditsRemaining <= 0;
 
   return (
     <motion.div
@@ -91,9 +93,9 @@ const UsageCard = ({ userId }: UsageCardProps) => {
       <Card className="glass-card p-6 hover-lift">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h3 className="font-semibold text-lg mb-1">Generation Usage</h3>
+            <h3 className="font-semibold text-lg mb-1">🔋 Credit Balance</h3>
             <p className="text-sm text-muted-foreground capitalize">
-              {usage.plan} Plan
+              {usage.plan === 'trial' ? 'Free Trial' : `${usage.plan} Plan`}
             </p>
           </div>
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
@@ -104,18 +106,26 @@ const UsageCard = ({ userId }: UsageCardProps) => {
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm">
             <span>
-              {usage.used} / {usage.limit} generations used
+              {creditsRemaining} credits remaining
             </span>
-            {isNearLimit && (
+            {isLowCredits && !isOutOfCredits && (
+              <span className="text-yellow-500 font-medium">
+                Running low!
+              </span>
+            )}
+            {isOutOfCredits && (
               <span className="text-destructive font-medium">
-                {usage.limit - usage.used} left
+                Out of credits
               </span>
             )}
           </div>
           <Progress value={percentage} className="h-2" />
+          <p className="text-xs text-muted-foreground">
+            {usage.used} / {usage.limit} credits used
+          </p>
         </div>
 
-        {isNearLimit && (
+        {(isLowCredits || isOutOfCredits) && (
           <Button 
             variant="outline" 
             className="w-full mt-4 hover-lift" 
@@ -123,7 +133,7 @@ const UsageCard = ({ userId }: UsageCardProps) => {
             onClick={() => navigate('/billing')}
           >
             <TrendingUp className="w-4 h-4 mr-2" />
-            Upgrade Plan
+            {isOutOfCredits ? 'Get More Credits' : 'Upgrade Plan'}
           </Button>
         )}
       </Card>

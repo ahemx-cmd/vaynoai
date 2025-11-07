@@ -23,7 +23,7 @@ const CampaignView = () => {
   const [loading, setLoading] = useState(true);
   const [isGuest, setIsGuest] = useState(false);
   const [copiedAll, setCopiedAll] = useState(false);
-  const { isFree } = useUserPlan();
+  const { isTrial } = useUserPlan();
 
   useEffect(() => {
     const fetchCampaign = async () => {
@@ -133,7 +133,7 @@ const CampaignView = () => {
           brandName,
           campaign?.cta_link || null,
           campaign?.include_cta ?? true,
-          isFree
+          isTrial
         );
         
         zip.file(fileName, htmlContent);
