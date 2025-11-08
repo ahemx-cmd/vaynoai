@@ -88,7 +88,7 @@ const Index = () => {
                 className="hover-lift"
                 onClick={() => trackButtonClick('See How It Works', 'hero-section')}
               >
-                <Link to="#how-it-works">See How It Works</Link>
+                <Link to="/how-it-works">See How It Works</Link>
               </Button>
             </div>
 

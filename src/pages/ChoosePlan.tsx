@@ -55,8 +55,7 @@ const ChoosePlan = () => {
       period: isLifetime ? "one-time" : "per month",
       description: "For growing businesses",
       features: [
-        isLifetime ? "150 credits (never expires)" : "150 credits per month",
-        "1 credit = 1 email generated",
+        "150 credits per month",
         "Remove watermark",
         "Priority AI speed",
         "Email support"
@@ -64,8 +63,8 @@ const ChoosePlan = () => {
       popular: !isLifetime,
       showToggle: true,
       checkoutUrl: isLifetime 
-        ? "https://vaynoai.lemonsqueezy.com/buy/c58b5d67-6c25-490c-846f-3e7963b5b804"
-        : "https://vaynoai.lemonsqueezy.com/buy/3eab4f94-d13a-47e3-b2c7-63a7ed0aff11"
+        ? "https://vayno.lemonsqueezy.com/checkout/buy/b9b0bdea-ddc5-42b8-8abc-aee080f88fae?logo=0"
+        : "https://vayno.lemonsqueezy.com/checkout/buy/b1c6e286-36a9-4b48-bc80-9b03182d3b83?logo=0"
     },
     {
       name: "Pro",
@@ -74,13 +73,12 @@ const ChoosePlan = () => {
       description: "For power users",
       features: [
         "400 credits per month",
-        "1 credit = 1 email generated",
         "Everything in Starter",
         "Auto-Translate",
         "Priority AI & early access"
       ],
       popular: false,
-      checkoutUrl: "https://vaynoai.lemonsqueezy.com/buy/e47ec95f-aa1e-43fc-a57f-bb91fc20139e"
+      checkoutUrl: "https://vayno.lemonsqueezy.com/checkout/buy/b8a3207d-80e9-4092-8cfc-5f15c00511b1?logo=0"
     }
   ];
 
