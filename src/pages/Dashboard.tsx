@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { User, Session } from "@supabase/supabase-js";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { Plus, Sparkles, Crown, X, Coins } from "lucide-react";
+import { Plus, Sparkles, Crown, X, Gem } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileSidebar from "@/components/dashboard/MobileSidebar";
@@ -124,7 +124,7 @@ const Dashboard = () => {
               </div>
               <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                 <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20">
-                  <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                  <Gem className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                   <span className="font-semibold text-sm sm:text-base">{creditsRemaining}</span>
                 </div>
                 <Button 

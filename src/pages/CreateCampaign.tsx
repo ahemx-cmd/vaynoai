@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { ArrowLeft, Sparkles, Loader2, Link as LinkIcon, FileText, Download } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2, Link as LinkIcon, FileText, Download, Gem } from "lucide-react";
 import { z } from "zod";
 import { trackButtonClick, trackFunnelStep } from "@/lib/analytics";
 
@@ -455,8 +455,9 @@ const CreateCampaign = () => {
                 </Button>
                 {dripDuration && (
                   <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 whitespace-nowrap">
-                    <span className="text-sm font-medium">
-                      {getEmailCount(dripDuration, parseInt(customEmails))} credits
+                    <Gem className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-semibold">
+                      {getEmailCount(dripDuration, parseInt(customEmails))}
                     </span>
                   </div>
                 )}
