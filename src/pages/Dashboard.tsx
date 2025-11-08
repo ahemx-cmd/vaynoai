@@ -5,12 +5,11 @@ import { Button } from "@/components/ui/button";
 import { User, Session } from "@supabase/supabase-js";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { Plus, Sparkles, Crown, X } from "lucide-react";
+import { Plus, Sparkles, Crown, X, Coins } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileSidebar from "@/components/dashboard/MobileSidebar";
 import CampaignsList from "@/components/dashboard/CampaignsList";
-import UsageCard from "@/components/dashboard/UsageCard";
 import { useUserPlan } from "@/hooks/useUserPlan";
 
 const Dashboard = () => {
@@ -19,6 +18,7 @@ const Dashboard = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [showLifetimeBanner, setShowLifetimeBanner] = useState(true);
+  const [creditsRemaining, setCreditsRemaining] = useState(0);
   const { isTrial } = useUserPlan();
 
   useEffect(() => {
@@ -29,6 +29,8 @@ const Dashboard = () => {
         
         if (!session) {
           navigate("/auth");
+        } else {
+          fetchCredits(session.user.id);
         }
       }
     );
@@ -39,12 +41,50 @@ const Dashboard = () => {
       
       if (!session) {
         navigate("/auth");
+      } else {
+        fetchCredits(session.user.id);
       }
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    // Set up realtime subscription for credit updates
+    const channel = supabase
+      .channel("credits_updates")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "user_usage",
+        },
+        (payload) => {
+          if (payload.new && typeof payload.new === "object") {
+            const newData = payload.new as any;
+            if (user && newData.user_id === user.id) {
+              setCreditsRemaining(newData.generations_limit - newData.generations_used);
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+      channel.unsubscribe();
+    };
+  }, [navigate, user]);
+
+  const fetchCredits = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("user_usage")
+      .select("generations_used, generations_limit")
+      .eq("user_id", userId)
+      .single();
+
+    if (!error && data) {
+      setCreditsRemaining(data.generations_limit - data.generations_used);
+    }
+  };
 
   if (loading || !user) {
     return (
@@ -83,6 +123,10 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20">
+                  <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                  <span className="font-semibold text-sm sm:text-base">{creditsRemaining}</span>
+                </div>
                 <Button 
                   onClick={() => navigate("/create-campaign")} 
                   className="btn-premium shadow-md hover-lift"
@@ -152,7 +196,6 @@ const Dashboard = () => {
                 </div>
               </motion.div>
             )}
-            <UsageCard userId={user.id} />
             <CampaignsList userId={user.id} />
           </motion.div>
         </div>

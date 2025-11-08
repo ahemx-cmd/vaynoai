@@ -31,10 +31,17 @@ const sequenceTypes = [
 ];
 
 const dripDurations = [
-  { value: "7-day", label: "7-Day Drip (4 emails)", description: "Quick sequence over one week" },
-  { value: "14-day", label: "14-Day Drip (7 emails)", description: "Medium-paced sequence over two weeks" },
-  { value: "30-day", label: "30-Day Drip (12 emails)", description: "Extended sequence over a month" },
+  { value: "7-day", label: "7-Day Drip (4 emails)", description: "Quick sequence over one week", emails: 4 },
+  { value: "14-day", label: "14-Day Drip (7 emails)", description: "Medium-paced sequence over two weeks", emails: 7 },
+  { value: "30-day", label: "30-Day Drip (12 emails)", description: "Extended sequence over a month", emails: 12 },
+  { value: "custom", label: "Custom Duration", description: "Define your own schedule", emails: 0 },
 ];
+
+const getEmailCount = (dripValue: string, customEmails?: number) => {
+  if (dripValue === "custom") return customEmails || 0;
+  const duration = dripDurations.find(d => d.value === dripValue);
+  return duration?.emails || 0;
+};
 
 const urlSchema = z.string().url("Please enter a valid URL");
 const nameSchema = z.string().min(3, "Campaign name must be at least 3 characters");
@@ -51,6 +58,8 @@ const CreateCampaign = () => {
   const [wordsPerEmail, setWordsPerEmail] = useState("");
   const [includeCTA, setIncludeCTA] = useState(false);
   const [ctaLink, setCtaLink] = useState("");
+  const [customDays, setCustomDays] = useState("");
+  const [customEmails, setCustomEmails] = useState("");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -82,6 +91,22 @@ const CreateCampaign = () => {
         toast.error("Please select a drip duration");
         setLoading(false);
         return;
+      }
+
+      // Validate custom duration if selected
+      if (dripDuration === "custom") {
+        const days = parseInt(customDays);
+        const emails = parseInt(customEmails);
+        if (isNaN(days) || days < 1 || days > 90) {
+          toast.error("Custom duration must be between 1 and 90 days");
+          setLoading(false);
+          return;
+        }
+        if (isNaN(emails) || emails < 1 || emails > 30) {
+          toast.error("Number of emails must be between 1 and 30");
+          setLoading(false);
+          return;
+        }
       }
 
       const wordsNum = parseInt(wordsPerEmail);
@@ -124,6 +149,11 @@ const CreateCampaign = () => {
         }
       }
 
+      // Prepare drip duration value
+      const finalDripDuration = dripDuration === "custom" 
+        ? `custom-${customDays}-${customEmails}` 
+        : dripDuration;
+
       const { data: campaign, error: campaignError } = await supabase
         .from("campaigns")
         .insert({
@@ -132,7 +162,7 @@ const CreateCampaign = () => {
           url,
           status: "analyzing",
           sequence_type: sequenceType,
-          drip_duration: dripDuration,
+          drip_duration: finalDripDuration,
           words_per_email: wordsNum,
           include_cta: includeCTA,
           cta_link: ctaLink || null,
@@ -317,6 +347,45 @@ const CreateCampaign = () => {
                 </p>
               </div>
 
+              {dripDuration === "custom" && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="custom-days" className="text-base">Number of Days</Label>
+                    <Input
+                      id="custom-days"
+                      type="number"
+                      min="1"
+                      max="90"
+                      value={customDays}
+                      onChange={(e) => setCustomDays(e.target.value)}
+                      placeholder="14"
+                      required
+                      className="mt-2 h-12"
+                    />
+                    <p className="text-sm text-muted-foreground mt-2">
+                      1-90 days
+                    </p>
+                  </div>
+                  <div>
+                    <Label htmlFor="custom-emails" className="text-base">Number of Emails</Label>
+                    <Input
+                      id="custom-emails"
+                      type="number"
+                      min="1"
+                      max="30"
+                      value={customEmails}
+                      onChange={(e) => setCustomEmails(e.target.value)}
+                      placeholder="7"
+                      required
+                      className="mt-2 h-12"
+                    />
+                    <p className="text-sm text-muted-foreground mt-2">
+                      1-30 emails
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <div>
                 <Label htmlFor="words-per-email" className="text-base">Words Per Email</Label>
                 <Input
@@ -365,24 +434,33 @@ const CreateCampaign = () => {
                 )}
               </div>
 
-              <Button
-                type="submit"
-                className="w-full btn-premium shadow-lg hover-lift h-12 text-base"
-                disabled={loading}
-                onClick={() => trackButtonClick('Generate Campaign', '/create-campaign')}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Creating Campaign...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-5 h-5 mr-2" />
-                    Analyze & Generate Emails
-                  </>
+              <div className="flex items-center gap-3">
+                <Button
+                  type="submit"
+                  className="flex-1 btn-premium shadow-lg hover-lift h-12 text-base"
+                  disabled={loading}
+                  onClick={() => trackButtonClick('Generate Campaign', '/create-campaign')}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Creating Campaign...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-5 h-5 mr-2" />
+                      Analyze & Generate Emails
+                    </>
+                  )}
+                </Button>
+                {dripDuration && (
+                  <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 whitespace-nowrap">
+                    <span className="text-sm font-medium">
+                      {getEmailCount(dripDuration, parseInt(customEmails))} credits
+                    </span>
+                  </div>
                 )}
-              </Button>
+              </div>
             </form>
           </Card>
 
