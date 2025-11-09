@@ -134,7 +134,12 @@ serve(async (req) => {
       throw new Error("Invalid AI response format");
     }
 
-    const improvedContent = aiData.choices[0].message.content.trim();
+    const improvedContent = aiData.choices[0].message.content.trim()
+      .replace(/\[B_INST\]/g, "")
+      .replace(/\[\/INST\]/g, "")
+      .replace(/\[INST\]/g, "")
+      .replace(/\[\/INST\]/g, "")
+      .trim();
     console.log("Content improved successfully");
 
     return new Response(JSON.stringify({ improvedContent }), {

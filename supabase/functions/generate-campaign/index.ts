@@ -678,13 +678,23 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
 
     let contentText = aiData.choices[0].message.content.trim();
     
-    // Remove markdown code blocks if present
-    if (contentText.startsWith("```json")) {
-      contentText = contentText.replace(/```json\n?/g, "").replace(/```\n?/g, "");
-    } else if (contentText.startsWith("```")) {
-      contentText = contentText.replace(/```\n?/g, "");
+    // Remove instruction tags (Mistral and other models)
+    contentText = contentText.replace(/\[B_INST\]/g, "").replace(/\[\/INST\]/g, "");
+    contentText = contentText.replace(/\[INST\]/g, "").replace(/\[\/INST\]/g, "");
+    
+    // Extract JSON from markdown code blocks
+    const jsonBlockMatch = contentText.match(/```json\s*([\s\S]*?)\s*```/);
+    if (jsonBlockMatch) {
+      contentText = jsonBlockMatch[1];
+    } else {
+      // Try generic code block
+      const codeBlockMatch = contentText.match(/```\s*([\s\S]*?)\s*```/);
+      if (codeBlockMatch) {
+        contentText = codeBlockMatch[1];
+      }
     }
     
+    contentText = contentText.trim();
     console.log("Raw AI response:", contentText);
     
     let emailsData;
