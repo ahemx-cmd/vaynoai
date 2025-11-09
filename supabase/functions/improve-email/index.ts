@@ -68,33 +68,66 @@ serve(async (req) => {
 
     const prompt = `Improve this email to be more compelling and high-converting while keeping the same length and structure: ${currentContent}`;
     
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${Deno.env.get("OPENROUTER_API_KEY")}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "openrouter/cypher-alpha:free",
-        messages: [
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 4000,
-      }),
-    });
+    const MODEL_CANDIDATES = [
+      "deepseek/deepseek-chat:free",
+      "qwen/qwen-2.5-14b-instruct:free",
+      "qwen/qwen-2.5-7b-instruct:free",
+      "mistralai/mistral-7b-instruct:free",
+      "meta-llama/llama-3.1-8b-instruct:free",
+    ];
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("AI API error:", response.status, errorText);
-      throw new Error(`AI API failed: ${response.status}`);
+    let aiData: any = null;
+    let usedModel = "";
+
+    for (const model of MODEL_CANDIDATES) {
+      const resp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${Deno.env.get("OPENROUTER_API_KEY")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "user", content: prompt }
+          ],
+          temperature: 0.7,
+          max_tokens: 4000,
+        }),
+      });
+
+      if (resp.ok) {
+        aiData = await resp.json();
+        usedModel = model;
+        break;
+      } else {
+        const errorText = await resp.text();
+        console.error(`AI API error for ${model}:`, resp.status, errorText);
+        if (resp.status === 402) {
+          return new Response(
+            JSON.stringify({ error: "Payment required on provider side. Please add credits to the OpenRouter account or try again later." }),
+            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        if (resp.status === 429) {
+          return new Response(
+            JSON.stringify({ error: "Rate limited by provider. Please wait a moment and retry." }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        continue;
+      }
     }
 
-    const aiData = await response.json();
-    
+    if (!aiData) {
+      return new Response(
+        JSON.stringify({ error: "No free model endpoints are currently available. Please try again later." }),
+        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    console.log("Using AI model:", usedModel);
+
     // OpenRouter returns OpenAI-compatible format
     if (!aiData.choices?.[0]?.message?.content) {
       console.error("Invalid AI response format:", aiData);
