@@ -196,18 +196,22 @@ const CampaignView = () => {
             {campaign.analyzed_data && (
               <URLSummary analyzedData={campaign.analyzed_data} url={campaign.url} />
             )}
-            <AutoTranslate campaignId={id!} />
-            <Button 
-              variant="outline" 
-              onClick={handleCopyAllEmails}
-            >
-              {copiedAll ? (
-                <Check className="w-4 h-4 mr-2 text-green-500" />
-              ) : (
-                <Copy className="w-4 h-4 mr-2" />
-              )}
-              {copiedAll ? "Copied!" : "Copy All"}
-            </Button>
+            {!isGuest && (
+              <>
+                <AutoTranslate campaignId={id!} />
+                <Button 
+                  variant="outline" 
+                  onClick={handleCopyAllEmails}
+                >
+                  {copiedAll ? (
+                    <Check className="w-4 h-4 mr-2 text-green-500" />
+                  ) : (
+                    <Copy className="w-4 h-4 mr-2" />
+                  )}
+                  {copiedAll ? "Copied!" : "Copy All"}
+                </Button>
+              </>
+            )}
             <Button onClick={handleExportHTML} className="glow">
               <Download className="w-4 h-4 mr-2" />
               Export HTML

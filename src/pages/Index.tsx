@@ -35,7 +35,7 @@ const Index = () => {
                 size="sm"
                 onClick={() => trackButtonClick('Try Free', 'nav-bar')}
               >
-                <Link to="/create-campaign">Try Free</Link>
+                <Link to="/guest-flow">Try Free</Link>
               </Button>
             </div>
           </div>
@@ -77,7 +77,7 @@ const Index = () => {
                 className="btn-premium shadow-lg hover-lift"
                 onClick={() => trackButtonClick('Try Free', 'hero-section')}
               >
-                <Link to="/create-campaign" className="flex items-center gap-2">
+                <Link to="/guest-flow" className="flex items-center gap-2">
                   Try Free <ArrowRight className="w-4 h-4" />
                 </Link>
               </Button>
@@ -162,7 +162,7 @@ const Index = () => {
               className="btn-premium shadow-lg hover-lift"
               onClick={() => trackButtonClick('Try Free', 'final-cta')}
             >
-              <Link to="/create-campaign" className="flex items-center gap-2">
+              <Link to="/guest-flow" className="flex items-center gap-2">
                 Try Free <ArrowRight className="w-4 h-4" />
               </Link>
             </Button>

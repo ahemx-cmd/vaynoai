@@ -20,6 +20,7 @@ import RecoveryRedirect from "./components/auth/RecoveryRedirect";
 import ChoosePlan from "./pages/ChoosePlan";
 import SharedCampaignView from "./pages/SharedCampaignView";
 import HowItWorks from "./pages/HowItWorks";
+import GuestCampaignFlow from "./pages/GuestCampaignFlow";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const AppRoutes = () => {
       <Route path="/auth" element={<Auth />} />
       <Route path="/how-it-works" element={<HowItWorks />} />
       <Route path="/choose-plan" element={<ChoosePlan />} />
+      <Route path="/guest-flow" element={<GuestCampaignFlow />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/create-campaign" element={<CreateCampaign />} />
       <Route path="/campaign/:id/analyzing" element={<AnalyzingCampaign />} />
