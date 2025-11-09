@@ -179,7 +179,24 @@ Return ONLY valid JSON (no markdown, no code blocks):
       
       contentText = contentText.trim();
       
-      const translatedData = JSON.parse(contentText);
+      let translatedData;
+      try {
+        translatedData = JSON.parse(contentText);
+      } catch (e1) {
+        const s = contentText.indexOf("{");
+        const e = contentText.lastIndexOf("}");
+        if (s !== -1 && e !== -1 && e > s) {
+          try {
+            translatedData = JSON.parse(contentText.slice(s, e + 1));
+            console.log("Parsed translation via heuristic substring extraction");
+          } catch (e2) {
+            console.error("Translate parse failed:", e2);
+            return new Response(JSON.stringify({ error: "AI returned non-JSON translation. Please retry." }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+          }
+        } else {
+          return new Response(JSON.stringify({ error: "AI returned non-JSON translation. Please retry." }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+      }
       
       translatedEmails.push({
         id: email.id,

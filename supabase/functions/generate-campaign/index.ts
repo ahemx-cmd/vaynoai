@@ -702,19 +702,35 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
       emailsData = JSON.parse(contentText);
     } catch (parseError) {
       console.error("JSON parse error:", parseError);
-      console.error("Content length:", contentText.length);
-      console.error("Content preview:", contentText.substring(0, 500));
-      console.error("Content end:", contentText.substring(contentText.length - 500));
-      
-      return new Response(
-        JSON.stringify({ 
-          error: "The AI model returned an incomplete response. Free endpoints can be unstable. Please retry or choose a paid model for more reliable results." 
-        }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+      // Heuristic fallback: extract JSON substring between first '{' and last '}'
+      const start = contentText.indexOf("{");
+      const end = contentText.lastIndexOf("}");
+      if (start !== -1 && end !== -1 && end > start) {
+        const possibleJson = contentText.slice(start, end + 1);
+        try {
+          emailsData = JSON.parse(possibleJson);
+          console.log("Parsed via heuristic substring extraction");
+        } catch (e2) {
+          console.error("Heuristic parse also failed:", e2);
+          console.error("Content length:", contentText.length);
+          console.error("Content preview:", contentText.substring(0, 500));
+          console.error("Content end:", contentText.substring(contentText.length - 500));
+          return new Response(
+            JSON.stringify({ 
+              error: "AI returned non-JSON content. Please retry in a moment; free endpoints can be unstable.",
+            }),
+            { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
         }
-      );
+      } else {
+        console.error("Could not locate JSON braces in content");
+        return new Response(
+          JSON.stringify({ 
+            error: "AI returned non-JSON output. Please retry in a moment.",
+          }),
+          { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
     
     if (!emailsData.emails || !Array.isArray(emailsData.emails)) {
