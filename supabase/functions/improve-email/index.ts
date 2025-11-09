@@ -68,14 +68,14 @@ serve(async (req) => {
 
     const prompt = `Improve this email to be more compelling and high-converting while keeping the same length and structure: ${currentContent}`;
     
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${Deno.env.get("LOVABLE_API_KEY")}`,
+        "Authorization": `Bearer ${Deno.env.get("OPENROUTER_API_KEY")}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "meta-llama/llama-3.1-70b-instruct:free",
         messages: [
           {
             role: "user",
