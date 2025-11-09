@@ -609,68 +609,59 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
 
     const fullPrompt = `${systemPrompt}\n\n${userPrompt}`;
     
-    const MODEL_CANDIDATES = [
-      "deepseek/deepseek-chat:free",
-      "qwen/qwen-2.5-14b-instruct:free",
-      "qwen/qwen-2.5-7b-instruct:free",
-      "mistralai/mistral-7b-instruct:free",
-      "meta-llama/llama-3.1-8b-instruct:free",
-    ];
-
-    let aiData: any = null;
-    let usedModel = "";
-
-    for (const model of MODEL_CANDIDATES) {
-      const resp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${Deno.env.get("OPENROUTER_API_KEY")}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: "user", content: fullPrompt }
-          ],
-          temperature: 0.8,
-          max_tokens: 8000,
-        }),
-      });
-
-      if (resp.ok) {
-        aiData = await resp.json();
-        usedModel = model;
-        break;
-      } else {
-        const errorText = await resp.text();
-        console.error(`AI API error for ${model}:`, resp.status, errorText);
-        if (resp.status === 402) {
-          return new Response(
-            JSON.stringify({ error: "Payment required on provider side. Please add credits to the OpenRouter account or try again later." }),
-            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-        if (resp.status === 429) {
-          return new Response(
-            JSON.stringify({ error: "Rate limited by provider. Please wait a moment and retry." }),
-            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-        // Otherwise, try next model
-        continue;
-      }
+    // Use Lovable AI with reliable google/gemini-2.5-flash
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      console.error("LOVABLE_API_KEY not configured");
+      return new Response(
+        JSON.stringify({ error: "AI service not configured. Please contact support." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    if (!aiData) {
+    console.log("Calling Lovable AI with google/gemini-2.5-flash");
+    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "user", content: fullPrompt }
+        ],
+      }),
+    });
+
+    if (!resp.ok) {
+      const errorText = await resp.text();
+      console.error("Lovable AI error:", resp.status, errorText);
+      
+      if (resp.status === 402) {
+        return new Response(
+          JSON.stringify({ error: "AI credits depleted. Please add credits to your Lovable workspace." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (resp.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Rate limited. Please wait a moment and retry." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
       return new Response(
-        JSON.stringify({ error: "No free model endpoints are currently available. Please try again later." }),
+        JSON.stringify({ error: "AI service temporarily unavailable. Please try again." }),
         { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log("Using AI model:", usedModel);
+    const aiData = await resp.json();
 
-    // OpenRouter returns OpenAI-compatible format
+    console.log("Successfully called Lovable AI");
+
+    // Lovable AI returns OpenAI-compatible format
     if (!aiData.choices?.[0]?.message?.content) {
       console.error("Invalid AI response format:", aiData);
       throw new Error("Invalid AI response format");
@@ -678,107 +669,47 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
 
     let contentText = aiData.choices[0].message.content.trim();
     
-    // Remove instruction tags (Mistral and other models)
-    contentText = contentText.replace(/\[B_INST\]/g, "").replace(/\[\/INST\]/g, "");
-    contentText = contentText.replace(/\[INST\]/g, "").replace(/\[\/INST\]/g, "");
-    
-    // Extract JSON from markdown code blocks
+    // Extract JSON from markdown code blocks if present
     const jsonBlockMatch = contentText.match(/```json\s*([\s\S]*?)\s*```/);
     if (jsonBlockMatch) {
-      contentText = jsonBlockMatch[1];
+      contentText = jsonBlockMatch[1].trim();
     } else {
-      // Try generic code block
       const codeBlockMatch = contentText.match(/```\s*([\s\S]*?)\s*```/);
       if (codeBlockMatch) {
-        contentText = codeBlockMatch[1];
+        contentText = codeBlockMatch[1].trim();
       }
     }
     
-    contentText = contentText.trim();
-    console.log("Raw AI response:", contentText);
+    console.log("Extracted content length:", contentText.length);
     
     let emailsData;
     try {
       emailsData = JSON.parse(contentText);
     } catch (parseError) {
       console.error("JSON parse error:", parseError);
-      // Heuristic fallback: extract JSON substring between first '{' and last '}'
+      console.error("Content preview:", contentText.substring(0, 500));
+      
+      // Try extracting JSON from the first { to last }
       const start = contentText.indexOf("{");
       const end = contentText.lastIndexOf("}");
-      let parsed = null;
       if (start !== -1 && end !== -1 && end > start) {
         const possibleJson = contentText.slice(start, end + 1);
         try {
-          parsed = JSON.parse(possibleJson);
-          console.log("Parsed via heuristic substring extraction");
+          emailsData = JSON.parse(possibleJson);
+          console.log("Parsed via substring extraction");
         } catch (e2) {
-          console.error("Heuristic parse also failed:", e2);
+          console.error("Substring parse failed:", e2);
+          return new Response(
+            JSON.stringify({ error: "AI returned invalid format. Please try again." }),
+            { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
         }
       } else {
-        console.error("Could not locate JSON braces in content");
-      }
-
-      // Final fallback: call Lovable AI gateway (more reliable) if available
-      if (!parsed) {
-        try {
-          const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-          if (LOVABLE_API_KEY) {
-            console.log("Falling back to Lovable AI (google/gemini-2.5-flash)");
-            const resp2 = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${LOVABLE_API_KEY}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                model: "google/gemini-2.5-flash",
-                messages: [{ role: "user", content: fullPrompt }],
-              }),
-            });
-            if (resp2.ok) {
-              const ai2 = await resp2.json();
-              let t = ai2.choices?.[0]?.message?.content?.trim() ?? "";
-              t = t.replace(/\[B_INST\]/g, "").replace(/\[\/INST\]/g, "");
-              t = t.replace(/\[INST\]/g, "").replace(/\[\/INST\]/g, "");
-              const m1 = t.match(/```json\s*([\s\S]*?)\s*```/);
-              if (m1) t = m1[1];
-              else {
-                const m2 = t.match(/```\s*([\s\S]*?)\s*```/);
-                if (m2) t = m2[1];
-              }
-              t = t.trim();
-              try {
-                parsed = JSON.parse(t);
-                console.log("Parsed JSON from Lovable AI fallback");
-              } catch (e3) {
-                const s2 = t.indexOf("{");
-                const e2p = t.lastIndexOf("}");
-                if (s2 !== -1 && e2p !== -1 && e2p > s2) {
-                  parsed = JSON.parse(t.slice(s2, e2p + 1));
-                  console.log("Parsed Lovable AI via heuristic substring extraction");
-                }
-              }
-            } else {
-              console.error("Lovable AI fallback failed:", resp2.status, await resp2.text());
-            }
-          } else {
-            console.warn("LOVABLE_API_KEY not configured; cannot fallback");
-          }
-        } catch (e) {
-          console.error("Lovable AI fallback error:", e);
-        }
-      }
-
-      if (!parsed) {
         return new Response(
-          JSON.stringify({ 
-            error: "AI returned non-JSON output. Please retry in a moment.",
-          }),
+          JSON.stringify({ error: "AI returned invalid format. Please try again." }),
           { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-
-      emailsData = parsed;
     }
     
     if (!emailsData.emails || !Array.isArray(emailsData.emails)) {

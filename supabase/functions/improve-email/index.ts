@@ -68,78 +68,63 @@ serve(async (req) => {
 
     const prompt = `Improve this email to be more compelling and high-converting while keeping the same length and structure: ${currentContent}`;
     
-    const MODEL_CANDIDATES = [
-      "deepseek/deepseek-chat:free",
-      "qwen/qwen-2.5-14b-instruct:free",
-      "qwen/qwen-2.5-7b-instruct:free",
-      "mistralai/mistral-7b-instruct:free",
-      "meta-llama/llama-3.1-8b-instruct:free",
-    ];
-
-    let aiData: any = null;
-    let usedModel = "";
-
-    for (const model of MODEL_CANDIDATES) {
-      const resp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${Deno.env.get("OPENROUTER_API_KEY")}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: "user", content: prompt }
-          ],
-          temperature: 0.7,
-          max_tokens: 4000,
-        }),
-      });
-
-      if (resp.ok) {
-        aiData = await resp.json();
-        usedModel = model;
-        break;
-      } else {
-        const errorText = await resp.text();
-        console.error(`AI API error for ${model}:`, resp.status, errorText);
-        if (resp.status === 402) {
-          return new Response(
-            JSON.stringify({ error: "Payment required on provider side. Please add credits to the OpenRouter account or try again later." }),
-            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-        if (resp.status === 429) {
-          return new Response(
-            JSON.stringify({ error: "Rate limited by provider. Please wait a moment and retry." }),
-            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-        continue;
-      }
+    // Use Lovable AI
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      console.error("LOVABLE_API_KEY not configured");
+      return new Response(
+        JSON.stringify({ error: "AI service not configured. Please contact support." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    if (!aiData) {
+    console.log("Calling Lovable AI to improve email");
+    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "user", content: prompt }
+        ],
+      }),
+    });
+
+    if (!resp.ok) {
+      const errorText = await resp.text();
+      console.error("Lovable AI error:", resp.status, errorText);
+      
+      if (resp.status === 402) {
+        return new Response(
+          JSON.stringify({ error: "AI credits depleted. Please add credits to your Lovable workspace." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (resp.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Rate limited. Please wait a moment and retry." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
       return new Response(
-        JSON.stringify({ error: "No free model endpoints are currently available. Please try again later." }),
+        JSON.stringify({ error: "AI service temporarily unavailable. Please try again." }),
         { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log("Using AI model:", usedModel);
+    const aiData = await resp.json();
 
-    // OpenRouter returns OpenAI-compatible format
+    // Lovable AI returns OpenAI-compatible format
     if (!aiData.choices?.[0]?.message?.content) {
       console.error("Invalid AI response format:", aiData);
       throw new Error("Invalid AI response format");
     }
 
-    const improvedContent = aiData.choices[0].message.content.trim()
-      .replace(/\[B_INST\]/g, "")
-      .replace(/\[\/INST\]/g, "")
-      .replace(/\[INST\]/g, "")
-      .replace(/\[\/INST\]/g, "")
-      .trim();
+    const improvedContent = aiData.choices[0].message.content.trim();
     console.log("Content improved successfully");
 
     return new Response(JSON.stringify({ improvedContent }), {

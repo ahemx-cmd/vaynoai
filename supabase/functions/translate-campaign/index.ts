@@ -94,90 +94,73 @@ Return ONLY valid JSON (no markdown, no code blocks):
   "html": "translated HTML content"
 }`;
 
-      const MODEL_CANDIDATES = [
-        "deepseek/deepseek-chat:free",
-        "qwen/qwen-2.5-14b-instruct:free",
-        "qwen/qwen-2.5-7b-instruct:free",
-        "mistralai/mistral-7b-instruct:free",
-        "meta-llama/llama-3.1-8b-instruct:free",
-      ];
-
-      let aiData: any = null;
-      let usedModel = "";
-
-      for (const model of MODEL_CANDIDATES) {
-        const resp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${Deno.env.get("OPENROUTER_API_KEY")}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model,
-            messages: [
-              { role: "user", content: prompt }
-            ],
-            temperature: 0.3,
-            max_tokens: 4000,
-          }),
-        });
-
-        if (resp.ok) {
-          aiData = await resp.json();
-          usedModel = model;
-          break;
-        } else {
-          const errorText = await resp.text();
-          console.error(`AI API error for ${model}:`, resp.status, errorText);
-          if (resp.status === 402) {
-            return new Response(
-              JSON.stringify({ error: "Payment required on provider side. Please add credits to the OpenRouter account or try again later." }),
-              { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
-          }
-          if (resp.status === 429) {
-            return new Response(
-              JSON.stringify({ error: "Rate limited by provider. Please wait a moment and retry." }),
-              { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
-          }
-          continue;
-        }
+      // Use Lovable AI
+      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+      if (!LOVABLE_API_KEY) {
+        console.error("LOVABLE_API_KEY not configured");
+        return new Response(
+          JSON.stringify({ error: "AI service not configured. Please contact support." }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
 
-      if (!aiData) {
+      console.log(`Translating email ${email.sequence_number} with Lovable AI`);
+      const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: [
+            { role: "user", content: prompt }
+          ],
+        }),
+      });
+
+      if (!resp.ok) {
+        const errorText = await resp.text();
+        console.error("Lovable AI error:", resp.status, errorText);
+        
+        if (resp.status === 402) {
+          return new Response(
+            JSON.stringify({ error: "AI credits depleted. Please add credits to your Lovable workspace." }),
+            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        if (resp.status === 429) {
+          return new Response(
+            JSON.stringify({ error: "Rate limited. Please wait a moment and retry." }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        
         return new Response(
-          JSON.stringify({ error: "No free model endpoints are currently available. Please try again later." }),
+          JSON.stringify({ error: "AI service temporarily unavailable. Please try again." }),
           { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
-      console.log("Using AI model:", usedModel);
+      const aiData = await resp.json();
 
-      // OpenRouter returns OpenAI-compatible format
+      // Lovable AI returns OpenAI-compatible format
       if (!aiData.choices?.[0]?.message?.content) {
         throw new Error("Invalid AI response format");
       }
       
       let contentText = aiData.choices[0].message.content.trim();
       
-      // Remove instruction tags (Mistral and other models)
-      contentText = contentText.replace(/\[B_INST\]/g, "").replace(/\[\/INST\]/g, "");
-      contentText = contentText.replace(/\[INST\]/g, "").replace(/\[\/INST\]/g, "");
-      
-      // Extract JSON from markdown code blocks
+      // Extract JSON from markdown code blocks if present
       const jsonBlockMatch = contentText.match(/```json\s*([\s\S]*?)\s*```/);
       if (jsonBlockMatch) {
-        contentText = jsonBlockMatch[1];
+        contentText = jsonBlockMatch[1].trim();
       } else {
-        // Try generic code block
         const codeBlockMatch = contentText.match(/```\s*([\s\S]*?)\s*```/);
         if (codeBlockMatch) {
-          contentText = codeBlockMatch[1];
+          contentText = codeBlockMatch[1].trim();
         }
       }
-      
-      contentText = contentText.trim();
       
       let translatedData;
       try {
@@ -188,13 +171,13 @@ Return ONLY valid JSON (no markdown, no code blocks):
         if (s !== -1 && e !== -1 && e > s) {
           try {
             translatedData = JSON.parse(contentText.slice(s, e + 1));
-            console.log("Parsed translation via heuristic substring extraction");
+            console.log("Parsed translation via substring extraction");
           } catch (e2) {
             console.error("Translate parse failed:", e2);
-            return new Response(JSON.stringify({ error: "AI returned non-JSON translation. Please retry." }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+            return new Response(JSON.stringify({ error: "AI returned invalid translation format. Please retry." }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
           }
         } else {
-          return new Response(JSON.stringify({ error: "AI returned non-JSON translation. Please retry." }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+          return new Response(JSON.stringify({ error: "AI returned invalid translation format. Please retry." }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
         }
       }
       
