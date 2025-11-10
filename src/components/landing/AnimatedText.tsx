@@ -33,33 +33,33 @@ const AnimatedText = () => {
             preserveAspectRatio="none"
           >
             <motion.path
-              d="M0,5.5 Q12,4.5 23,5.8 Q35,7 48,5.3 Q62,4 75,5.8 Q88,7.2 100,5.5"
+              d="M0,5.2 Q12,5.5 23,5.1 Q35,4.8 48,5.3 Q62,5.6 75,5 Q88,4.7 100,5.2"
+              stroke="hsl(var(--primary))"
+              strokeWidth="3.2"
+              fill="none"
+              strokeLinecap="round"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 0.75 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            />
+            <motion.path
+              d="M0,5.3 Q15,5.6 28,5.2 Q40,4.9 55,5.4 Q68,5.7 82,5.1 Q92,4.8 100,5.3"
               stroke="hsl(var(--primary))"
               strokeWidth="3"
               fill="none"
               strokeLinecap="round"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 0.7 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              transition={{ duration: 0.5, delay: 0.22 }}
             />
             <motion.path
-              d="M0,5.8 Q15,6.2 28,5 Q40,4.2 55,5.9 Q68,7 82,5.5 Q92,4.3 100,5.8"
+              d="M0,5.1 Q18,5.4 32,5 Q45,4.7 58,5.2 Q72,5.5 85,4.9 Q95,4.6 100,5.1"
               stroke="hsl(var(--primary))"
               strokeWidth="2.8"
               fill="none"
               strokeLinecap="round"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 0.65 }}
-              transition={{ duration: 0.5, delay: 0.22 }}
-            />
-            <motion.path
-              d="M0,5.3 Q18,6.5 32,5.5 Q45,4.8 58,6.2 Q72,7.5 85,5.8 Q95,4.5 100,5.3"
-              stroke="hsl(var(--primary))"
-              strokeWidth="2.5"
-              fill="none"
-              strokeLinecap="round"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.6 }}
               transition={{ duration: 0.5, delay: 0.21 }}
             />
           </svg>
