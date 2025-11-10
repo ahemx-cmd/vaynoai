@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const words = ["build", "sell", "create", "grow", "launch", "chill"];
+const words = ["build", "sell", "grow", "launch", "chill"];
 
 const AnimatedText = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -33,14 +33,34 @@ const AnimatedText = () => {
             preserveAspectRatio="none"
           >
             <motion.path
-              d="M0,7 Q25,4 50,6 T100,7"
+              d="M0,7 Q12,5 23,6.5 Q35,8 48,6 Q62,4.5 75,7 Q88,9 100,7"
+              stroke="hsl(var(--primary))"
+              strokeWidth="2.5"
+              fill="none"
+              strokeLinecap="round"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 0.4 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            />
+            <motion.path
+              d="M0,6 Q15,7 28,5.5 Q40,4 55,6.5 Q68,8.5 82,6 Q92,4.5 100,6"
               stroke="hsl(var(--primary))"
               strokeWidth="2"
               fill="none"
               strokeLinecap="round"
               initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.7 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              animate={{ pathLength: 1, opacity: 0.5 }}
+              transition={{ duration: 0.5, delay: 0.25 }}
+            />
+            <motion.path
+              d="M0,7.5 Q18,9 32,7 Q45,5.5 58,8 Q72,10 85,7.5 Q95,5.5 100,7.5"
+              stroke="hsl(var(--primary))"
+              strokeWidth="2.2"
+              fill="none"
+              strokeLinecap="round"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 0.45 }}
+              transition={{ duration: 0.5, delay: 0.22 }}
             />
           </svg>
         </motion.span>
