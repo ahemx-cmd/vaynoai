@@ -26,21 +26,44 @@ const AnimatedText = () => {
           className="inline-block gradient-text relative"
         >
           {words[currentIndex]}
-          {/* Hand-drawn underline */}
+          {/* Hand-drawn underline with multiple strokes */}
           <svg
-            className="absolute -bottom-2 left-0 w-full h-3"
-            viewBox="0 0 100 10"
+            className="absolute -bottom-2 left-0 w-full h-4"
+            viewBox="0 0 100 12"
             preserveAspectRatio="none"
           >
             <motion.path
-              d="M0,7 Q25,4 50,6 T100,7"
+              d="M2,6 Q25,5 50,6.5 T98,7"
+              stroke="hsl(var(--primary))"
+              strokeWidth="3"
+              fill="none"
+              strokeLinecap="round"
+              opacity="0.4"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            />
+            <motion.path
+              d="M1,8 Q25,7 50,8.5 T99,9"
+              stroke="hsl(var(--primary))"
+              strokeWidth="2.5"
+              fill="none"
+              strokeLinecap="round"
+              opacity="0.5"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 0.5, delay: 0.25 }}
+            />
+            <motion.path
+              d="M0,10 Q25,9 50,10.5 T100,11"
               stroke="hsl(var(--primary))"
               strokeWidth="2"
               fill="none"
               strokeLinecap="round"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.7 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              opacity="0.3"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
             />
           </svg>
         </motion.span>
