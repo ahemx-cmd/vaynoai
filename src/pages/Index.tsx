@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import PricingSection from "@/components/pricing/PricingSection";
 import FeaturesGrid from "@/components/landing/FeaturesGrid";
 import Testimonials from "@/components/landing/Testimonials";
+import AnimatedText from "@/components/landing/AnimatedText";
 import vaynoIcon from "@/assets/vayno-icon.png";
 import { trackButtonClick } from "@/lib/analytics";
 
@@ -61,9 +62,7 @@ const Index = () => {
             </div>
             
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight tracking-tight">
-              Turn your landing page into{" "}
-              <span className="gradient-text">ready-to-send</span>{" "}
-              email campaigns
+              Turn any landing page into a full email campaign while you <AnimatedText />.
             </h1>
             
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
