@@ -33,34 +33,34 @@ const AnimatedText = () => {
             preserveAspectRatio="none"
           >
             <motion.path
-              d="M0,7 Q12,5 23,6.5 Q35,8 48,6 Q62,4.5 75,7 Q88,9 100,7"
+              d="M0,5.5 Q12,4.5 23,5.8 Q35,7 48,5.3 Q62,4 75,5.8 Q88,7.2 100,5.5"
+              stroke="hsl(var(--primary))"
+              strokeWidth="3"
+              fill="none"
+              strokeLinecap="round"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 0.7 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            />
+            <motion.path
+              d="M0,5.8 Q15,6.2 28,5 Q40,4.2 55,5.9 Q68,7 82,5.5 Q92,4.3 100,5.8"
+              stroke="hsl(var(--primary))"
+              strokeWidth="2.8"
+              fill="none"
+              strokeLinecap="round"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 0.65 }}
+              transition={{ duration: 0.5, delay: 0.22 }}
+            />
+            <motion.path
+              d="M0,5.3 Q18,6.5 32,5.5 Q45,4.8 58,6.2 Q72,7.5 85,5.8 Q95,4.5 100,5.3"
               stroke="hsl(var(--primary))"
               strokeWidth="2.5"
               fill="none"
               strokeLinecap="round"
               initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.4 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            />
-            <motion.path
-              d="M0,6 Q15,7 28,5.5 Q40,4 55,6.5 Q68,8.5 82,6 Q92,4.5 100,6"
-              stroke="hsl(var(--primary))"
-              strokeWidth="2"
-              fill="none"
-              strokeLinecap="round"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.5 }}
-              transition={{ duration: 0.5, delay: 0.25 }}
-            />
-            <motion.path
-              d="M0,7.5 Q18,9 32,7 Q45,5.5 58,8 Q72,10 85,7.5 Q95,5.5 100,7.5"
-              stroke="hsl(var(--primary))"
-              strokeWidth="2.2"
-              fill="none"
-              strokeLinecap="round"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.45 }}
-              transition={{ duration: 0.5, delay: 0.22 }}
+              animate={{ pathLength: 1, opacity: 0.6 }}
+              transition={{ duration: 0.5, delay: 0.21 }}
             />
           </svg>
         </motion.span>
