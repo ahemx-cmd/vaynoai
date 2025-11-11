@@ -62,7 +62,7 @@ const Index = () => {
             </div>
             
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight tracking-tight">
-              Turn your page into email campaigns while you <AnimatedText />.
+              Turn your page into email campaigns while you <AnimatedText />
             </h1>
             
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
