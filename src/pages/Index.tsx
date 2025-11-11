@@ -62,7 +62,7 @@ const Index = () => {
             </div>
             
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight tracking-tight">
-              Turn your landing page into email campaigns while you{" "}
+              from landing page to email campaigns while you{" "}
               <AnimatedText />
             </h1>
             
