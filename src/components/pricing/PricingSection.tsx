@@ -66,7 +66,7 @@ const PricingSection = () => {
   ];
 
   return (
-    <div className="container mx-auto max-w-7xl">
+    <div className="container mx-auto max-w-5xl px-4">
       <div className="text-center mb-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -81,7 +81,7 @@ const PricingSection = () => {
         </motion.div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+      <div className="flex flex-col md:flex-row gap-8 justify-center items-stretch max-w-5xl mx-auto">
         {plans.map((plan, i) => (
           <motion.div
             key={plan.name}
