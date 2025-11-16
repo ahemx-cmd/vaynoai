@@ -8,12 +8,46 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, XCircle, Sparkles } from "lucide-react";
 
+const mapErrorToFriendly = (raw: any, url?: string): string => {
+  const msg = (typeof raw === "string" ? raw : raw?.message || "")?.toLowerCase() || "";
+  const details = (typeof raw?.details === "string" ? raw.details : "")?.toLowerCase() || "";
+  const body = (typeof (raw?.body ?? raw?.context?.body) === "string" ? (raw?.body ?? raw?.context?.body) : "") as string;
+  const combined = `${msg} ${details} ${body}`.toLowerCase();
+
+  if (combined.includes("402") || combined.includes("credit") || combined.includes("payment")) {
+    return "You’re out of AI credits. Please upgrade or add credits to continue.";
+  }
+  if (combined.includes("non-2xx") || combined.includes("non 2xx") || combined.includes("bad status") || combined.includes("unexpected response")) {
+    return "We couldn’t reach that page or it blocked our request. Make sure the URL is correct and publicly accessible, then try again.";
+  }
+  if (combined.includes("timeout") || combined.includes("timed out") || combined.includes("network") || combined.includes("failed to fetch")) {
+    return "The website took too long to respond. Please try again or use a different URL.";
+  }
+  if (combined.includes("spa") || combined.includes("single-page")) {
+    return "This website loads content dynamically and can’t be analyzed. Try a static page like a blog or product page.";
+  }
+  if (combined.includes("403") || combined.includes("401") || combined.includes("access denied") || combined.includes("forbidden")) {
+    return "Access to that page is restricted. Please use a publicly accessible URL.";
+  }
+  if (combined.includes("404") || combined.includes("not found")) {
+    return "We couldn’t find that page. Please check the URL and try again.";
+  }
+  if (combined.includes("short content") || combined.includes("not enough content") || combined.includes("content too short")) {
+    return "That page doesn’t have enough text to analyze. Try a page with more written content.";
+  }
+  if ((combined.includes("invalid") && combined.includes("url")) || combined.includes("invalid url")) {
+    return "Please enter a valid URL (including https://).";
+  }
+  return "We couldn’t analyze that page. Please try again with another URL.";
+};
+
 const AnalyzingCampaign = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [progress, setProgress] = useState(0);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [error, setError] = useState<string | null>(null);
+const [progress, setProgress] = useState(0);
+const [currentStep, setCurrentStep] = useState(0);
+const [error, setError] = useState<string | null>(null);
+const [campaignUrl, setCampaignUrl] = useState<string>("");
 
   const steps = [
     "Fetching your landing page...",
@@ -36,9 +70,10 @@ const AnalyzingCampaign = () => {
           .eq("id", id)
           .single();
 
-        if (campaignError || !campaign) {
-          throw new Error("Campaign not found");
-        }
+if (campaignError || !campaign) {
+  throw new Error("Campaign not found");
+}
+setCampaignUrl(campaign.url);
 
         // Simulate progress
         const progressInterval = setInterval(() => {
@@ -81,38 +116,36 @@ const AnalyzingCampaign = () => {
 
         if (error) {
           console.error("Edge function error:", error);
-          
-          // Try to parse error message from the response
           let errorMessage = "Failed to generate campaign";
           let errorDetails = "";
+          let body: any = undefined;
           
-          if (error.message) {
-            errorMessage = error.message;
-          } else if (error.context?.body) {
+          if ((error as any).message) {
+            errorMessage = (error as any).message;
+          } else if ((error as any).context?.body) {
+            body = (error as any).context.body;
             try {
-              const errorBody = JSON.parse(error.context.body);
+              const errorBody = JSON.parse((error as any).context.body);
               errorMessage = errorBody.error || errorMessage;
               errorDetails = errorBody.details || "";
             } catch {
-              errorMessage = error.context.body;
+              errorMessage = (error as any).context.body;
             }
           }
           
-          // Handle specific error types
-          if (errorMessage.includes('402') || errorMessage.includes('credits') || errorMessage.includes('Payment required')) {
-            throw new Error("Insufficient AI credits. Please add credits to continue generating campaigns.");
-          }
-          
-          // Use detailed message if available
-          const fullError = errorDetails ? `${errorMessage}: ${errorDetails}` : errorMessage;
-          throw new Error(fullError);
+          const friendly = mapErrorToFriendly(
+            { message: errorMessage, details: errorDetails, body, status: (error as any)?.status },
+            campaign.url
+          );
+          throw new Error(friendly);
         }
         
-        if (!data || !data.success) {
-          // Check if there's a detailed error message
-          const errorMsg = data?.details || data?.error || "Failed to generate campaign";
-          throw new Error(errorMsg);
-        }
+if (!data || !data.success) {
+  // Check if there's a detailed error message
+  const errorMsg = data?.details || data?.error || "Failed to generate campaign";
+  const friendly = mapErrorToFriendly({ message: errorMsg }, campaign.url);
+  throw new Error(friendly);
+}
 
         // Update usage only if user is authenticated (not a guest)
         if (campaign.user_id) {
@@ -128,11 +161,12 @@ const AnalyzingCampaign = () => {
         setTimeout(() => {
           navigate(`/campaign/${id}`);
         }, 1500);
-      } catch (err: any) {
-        console.error("Error analyzing campaign:", err);
-        setError(err.message || "Failed to analyze campaign");
-        toast.error("Failed to generate campaign. Please try again.");
-      }
+} catch (err: any) {
+  console.error("Error analyzing campaign:", err);
+  const friendly = mapErrorToFriendly(err, campaignUrl);
+  setError(friendly);
+  toast.error(friendly);
+}
     };
 
     analyzeAndGenerate();
