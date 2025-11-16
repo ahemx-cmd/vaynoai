@@ -8,9 +8,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Loader2, Store, Rocket, FileText, Globe, Palette, Upload } from "lucide-react";
+import { useTheme } from "next-themes";
 
 const Onboarding = () => {
   const navigate = useNavigate();
+  const { setTheme } = useTheme();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -26,6 +28,11 @@ const Onboarding = () => {
   
   // Step 3: UI Theme
   const [uiTheme, setUiTheme] = useState<"light" | "dark" | "system">("system");
+  
+  // Apply theme when it changes
+  useEffect(() => {
+    setTheme(uiTheme);
+  }, [uiTheme, setTheme]);
 
   useEffect(() => {
     checkAuth();
@@ -65,7 +72,7 @@ const Onboarding = () => {
       return;
     }
     
-    if (step < 3) {
+    if (step < 4) {
       setStep(step + 1);
     } else {
       completeOnboarding();
@@ -89,8 +96,8 @@ const Onboarding = () => {
 
       if (error) throw error;
 
-      toast.success("Welcome to Vayno! Let's create your first campaign.");
-      navigate("/dashboard");
+      toast.success("Welcome to Vayno! Let's choose your plan.");
+      navigate("/choose-plan");
     } catch (error: any) {
       console.error("Onboarding error:", error);
       toast.error("Failed to complete onboarding. Please try again.");
@@ -109,7 +116,7 @@ const Onboarding = () => {
         <Card className="p-8 space-y-6">
           {/* Progress indicator */}
           <div className="flex justify-between items-center mb-8">
-            {[1, 2, 3].map((s) => (
+            {[1, 2, 3, 4].map((s) => (
               <div key={s} className="flex items-center flex-1">
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
@@ -120,7 +127,7 @@ const Onboarding = () => {
                 >
                   {s}
                 </div>
-                {s < 3 && (
+                {s < 4 && (
                   <div
                     className={`flex-1 h-1 mx-2 transition-all ${
                       s < step ? "bg-primary" : "bg-muted"
@@ -369,6 +376,31 @@ const Onboarding = () => {
             </motion.div>
           )}
 
+          {/* Step 4: Choose Plan */}
+          {step === 4 && (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="space-y-6"
+            >
+              <div>
+                <h2 className="text-3xl font-bold mb-2">Choose Your Plan to Continue</h2>
+                <p className="text-muted-foreground">
+                  Select a plan that fits your needs to start creating campaigns
+                </p>
+              </div>
+
+              <div className="text-center py-8">
+                <p className="text-lg text-muted-foreground mb-4">
+                  You'll be able to select your plan on the next page
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Start with a free trial or choose a paid plan to unlock full features
+                </p>
+              </div>
+            </motion.div>
+          )}
+
           {/* Navigation buttons */}
           <div className="flex justify-between pt-6">
             <Button
@@ -384,7 +416,7 @@ const Onboarding = () => {
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Saving...
                 </>
-              ) : step === 3 ? (
+              ) : step === 4 ? (
                 "Complete Setup"
               ) : (
                 "Continue"
