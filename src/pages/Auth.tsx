@@ -94,11 +94,34 @@ const Auth = () => {
           
           // Navigate to the campaign after plan selection
           localStorage.setItem("pendingCampaignId", guestCampaignId);
+          
+          // Check if onboarding is completed
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("onboarding_completed")
+            .eq("id", userId)
+            .single();
+
           setTimeout(() => {
-            navigate("/choose-plan");
+            if (!profile?.onboarding_completed) {
+              navigate("/onboarding");
+            } else {
+              navigate("/choose-plan");
+            }
           }, 1000);
         } else {
-          navigate("/choose-plan");
+          // Check if onboarding is completed
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("onboarding_completed")
+            .eq("id", userId)
+            .single();
+
+          if (!profile?.onboarding_completed) {
+            navigate("/onboarding");
+          } else {
+            navigate("/choose-plan");
+          }
         }
       } catch (err) {
         console.error("Error claiming guest campaign:", err);
@@ -125,7 +148,7 @@ const Auth = () => {
           data: {
             full_name: fullName,
           },
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/onboarding`,
         },
       });
 

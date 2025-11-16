@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import CreateCampaign from "./pages/CreateCampaign";
+import Onboarding from "./pages/Onboarding";
 import AnalyzingCampaign from "./pages/AnalyzingCampaign";
 import CampaignView from "./pages/CampaignView";
 import Profile from "./pages/Profile";
@@ -31,6 +32,7 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={<Index />} />
       <Route path="/auth" element={<Auth />} />
+      <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/how-it-works" element={<HowItWorks />} />
       <Route path="/choose-plan" element={<ChoosePlan />} />
       <Route path="/guest-flow" element={<GuestCampaignFlow />} />
