@@ -42,7 +42,7 @@ const GuestCampaignFlow = () => {
   const [url, setUrl] = useState("");
   const [sequenceType, setSequenceType] = useState("");
   const [dripDuration, setDripDuration] = useState("");
-  const [wordCount, setWordCount] = useState("500");
+  const [wordCount, setWordCount] = useState("");
 
   const handleNext = () => {
     if (step === 1 && !url) {
@@ -58,7 +58,19 @@ const GuestCampaignFlow = () => {
       return;
     }
     if (step === 3 && !dripDuration) {
-      toast.error("Please select a drip duration");
+      toast.error("Please enter a drip duration");
+      return;
+    }
+    if (step === 3 && (isNaN(parseInt(dripDuration)) || parseInt(dripDuration) < 1)) {
+      toast.error("Please enter a valid duration (minimum 1 day)");
+      return;
+    }
+    if (step === 4 && !wordCount) {
+      toast.error("Please enter the email length");
+      return;
+    }
+    if (step === 4 && (isNaN(parseInt(wordCount)) || parseInt(wordCount) < 50)) {
+      toast.error("Please enter a valid word count (minimum 50 words)");
       return;
     }
     
@@ -74,7 +86,8 @@ const GuestCampaignFlow = () => {
 
     try {
       const campaignName = `Campaign for ${new URL(url).hostname}`;
-      const emailCount = dripDurations.find(d => d.value === dripDuration)?.emails || 5;
+      const durationDays = parseInt(dripDuration);
+      const emailCount = Math.max(3, Math.ceil(durationDays / 5));
 
       const { data: campaign, error: campaignError } = await supabase
         .from("campaigns")
@@ -170,14 +183,7 @@ const GuestCampaignFlow = () => {
                 transition={{ duration: 0.3 }}
               >
                 <Card className="relative overflow-hidden border-2 border-primary/20 backdrop-blur-xl bg-background/95">
-                  {/* Glassmorphic effect with neon edges */}
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
-                  <div className="absolute inset-0 border-2 border-transparent bg-gradient-to-r from-primary/50 via-accent/50 to-primary/50 rounded-lg animate-pulse" 
-                       style={{ 
-                         clipPath: 'polygon(0 0, 100% 0, 100% 2px, 0 2px, 0 100%, 2px 100%, 2px 0, calc(100% - 2px) 0, calc(100% - 2px) calc(100% - 2px), 0 calc(100% - 2px))',
-                         opacity: 0.6 
-                       }} 
-                  />
                   
                   <div className="relative p-12">
                     <div className="text-center mb-8">
@@ -288,10 +294,10 @@ const GuestCampaignFlow = () => {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <Card className="relative overflow-hidden border-2 border-primary/20 backdrop-blur-xl bg-background/95 p-12">
+                <Card className="relative overflow-hidden border-2 border-primary/20 backdrop-blur-xl bg-background/95">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
                   
-                  <div className="relative">
+                  <div className="relative p-12">
                     <div className="text-center mb-8">
                       <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                         <Clock className="w-8 h-8 text-primary" />
@@ -302,48 +308,40 @@ const GuestCampaignFlow = () => {
                       </p>
                     </div>
 
-                    <div className="grid gap-4 mb-6">
-                      {dripDurations.map((duration) => (
-                        <button
-                          key={duration.value}
-                          onClick={() => setDripDuration(duration.value)}
-                          className={`p-6 rounded-xl border-2 transition-all text-left hover:scale-102 ${
-                            dripDuration === duration.value
-                              ? 'border-primary bg-primary/10 shadow-lg'
-                              : 'border-border hover:border-primary/50'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h3 className="font-semibold text-xl mb-1">{duration.label}</h3>
-                              <p className="text-sm text-muted-foreground">{duration.description}</p>
-                            </div>
-                            <div className="text-right">
-                              <div className="text-3xl font-bold text-primary">{duration.emails}</div>
-                              <div className="text-xs text-muted-foreground">emails</div>
-                            </div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="duration" className="text-base mb-2 block">
+                          Duration (in days)
+                        </Label>
+                        <Input
+                          id="duration"
+                          type="number"
+                          placeholder="Enter number of days (e.g., 7, 14, 30)"
+                          value={dripDuration}
+                          onChange={(e) => setDripDuration(e.target.value)}
+                          className="h-14 text-lg border-2 focus:border-primary transition-all"
+                          onKeyDown={(e) => e.key === 'Enter' && handleNext()}
+                          min="1"
+                        />
+                      </div>
 
-                    <div className="flex gap-3">
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        onClick={handleBack}
-                        className="flex-1"
-                      >
-                        <ArrowLeft className="w-5 h-5 mr-2" /> Back
-                      </Button>
-                      <Button
-                        size="lg"
-                        onClick={handleNext}
-                        className="flex-1 btn-premium"
-                        disabled={!dripDuration}
-                      >
-                        Next <ArrowRight className="w-5 h-5 ml-2" />
-                      </Button>
+                      <div className="flex gap-3">
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          onClick={handleBack}
+                          className="flex-1"
+                        >
+                          <ArrowLeft className="w-5 h-5 mr-2" /> Back
+                        </Button>
+                        <Button
+                          size="lg"
+                          onClick={handleNext}
+                          className="flex-1 btn-premium"
+                        >
+                          Next <ArrowRight className="w-5 h-5 ml-2" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </Card>
@@ -359,10 +357,10 @@ const GuestCampaignFlow = () => {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <Card className="relative overflow-hidden border-2 border-primary/20 backdrop-blur-xl bg-background/95 p-12">
+                <Card className="relative overflow-hidden border-2 border-primary/20 backdrop-blur-xl bg-background/95">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
                   
-                  <div className="relative">
+                  <div className="relative p-12">
                     <div className="text-center mb-8">
                       <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                         <FileText className="w-8 h-8 text-primary" />
@@ -373,63 +371,63 @@ const GuestCampaignFlow = () => {
                       </p>
                     </div>
 
-                    <div className="grid gap-4 mb-8">
-                      {wordCounts.map((wc) => (
-                        <button
-                          key={wc.value}
-                          onClick={() => setWordCount(wc.value)}
-                          className={`p-6 rounded-xl border-2 transition-all text-left hover:scale-102 ${
-                            wordCount === wc.value
-                              ? 'border-primary bg-primary/10 shadow-lg'
-                              : 'border-border hover:border-primary/50'
-                          }`}
-                        >
-                          <h3 className="font-semibold text-xl mb-1">{wc.label}</h3>
-                          <p className="text-sm text-muted-foreground">{wc.description}</p>
-                        </button>
-                      ))}
-                    </div>
+                    <div className="space-y-6">
+                      <div>
+                        <Label htmlFor="wordCount" className="text-base mb-2 block">
+                          Words per email
+                        </Label>
+                        <Input
+                          id="wordCount"
+                          type="number"
+                          placeholder="Enter word count (e.g., 250, 500, 750)"
+                          value={wordCount}
+                          onChange={(e) => setWordCount(e.target.value)}
+                          className="h-14 text-lg border-2 focus:border-primary transition-all"
+                          min="50"
+                        />
+                      </div>
 
-                    <div className="bg-muted/30 rounded-xl p-6 mb-6">
-                      <h4 className="font-semibold mb-3">Your Campaign Summary:</h4>
-                      <div className="grid md:grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="text-muted-foreground">URL:</span>
-                          <p className="font-medium truncate">{url}</p>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Sequence:</span>
-                          <p className="font-medium">{sequenceTypes.find(s => s.value === sequenceType)?.label}</p>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Duration:</span>
-                          <p className="font-medium">{dripDuration} days</p>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Emails:</span>
-                          <p className="font-medium">{dripDurations.find(d => d.value === dripDuration)?.emails} emails</p>
+                      <div className="bg-muted/30 rounded-xl p-6">
+                        <h4 className="font-semibold mb-3">Your Campaign Summary:</h4>
+                        <div className="grid md:grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <span className="text-muted-foreground">URL:</span>
+                            <p className="font-medium truncate">{url}</p>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Sequence:</span>
+                            <p className="font-medium">{sequenceTypes.find(s => s.value === sequenceType)?.label}</p>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Duration:</span>
+                            <p className="font-medium">{dripDuration} days</p>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Words per email:</span>
+                            <p className="font-medium">{wordCount || '—'} words</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="flex gap-3">
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        onClick={handleBack}
-                        className="flex-1"
-                      >
-                        <ArrowLeft className="w-5 h-5 mr-2" /> Back
-                      </Button>
-                      <Button
-                        size="lg"
-                        onClick={handleGenerate}
-                        className="flex-1 btn-premium"
-                        disabled={submitting}
-                      >
-                        {submitting ? "Generating..." : "Analyze & Generate"}
-                        {!submitting && <Sparkles className="w-5 h-5 ml-2" />}
-                      </Button>
+                      <div className="flex gap-3">
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          onClick={handleBack}
+                          className="flex-1"
+                        >
+                          <ArrowLeft className="w-5 h-5 mr-2" /> Back
+                        </Button>
+                        <Button
+                          size="lg"
+                          onClick={handleGenerate}
+                          className="flex-1 btn-premium"
+                          disabled={submitting}
+                        >
+                          {submitting ? "Generating..." : "Analyze & Generate"}
+                          {!submitting && <Sparkles className="w-5 h-5 ml-2" />}
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </Card>
