@@ -42,6 +42,7 @@ const GuestCampaignFlow = () => {
   const [url, setUrl] = useState("");
   const [sequenceType, setSequenceType] = useState("");
   const [dripDuration, setDripDuration] = useState("");
+  const [emailCount, setEmailCount] = useState("");
   const [wordCount, setWordCount] = useState("");
 
   const handleNext = () => {
@@ -63,6 +64,14 @@ const GuestCampaignFlow = () => {
     }
     if (step === 3 && (isNaN(parseInt(dripDuration)) || parseInt(dripDuration) < 1)) {
       toast.error("Please enter a valid duration (minimum 1 day)");
+      return;
+    }
+    if (step === 3 && !emailCount) {
+      toast.error("Please enter the number of emails");
+      return;
+    }
+    if (step === 3 && (isNaN(parseInt(emailCount)) || parseInt(emailCount) < 1)) {
+      toast.error("Please enter a valid number of emails (minimum 1)");
       return;
     }
     if (step === 4 && !wordCount) {
@@ -320,6 +329,21 @@ const GuestCampaignFlow = () => {
                           value={dripDuration}
                           onChange={(e) => setDripDuration(e.target.value)}
                           className="h-14 text-lg border-2 focus:border-primary transition-all"
+                          min="1"
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="emailCount" className="text-base mb-2 block">
+                          Number of emails
+                        </Label>
+                        <Input
+                          id="emailCount"
+                          type="number"
+                          placeholder="Enter number of emails (e.g., 3, 5, 7)"
+                          value={emailCount}
+                          onChange={(e) => setEmailCount(e.target.value)}
+                          className="h-14 text-lg border-2 focus:border-primary transition-all"
                           onKeyDown={(e) => e.key === 'Enter' && handleNext()}
                           min="1"
                         />
@@ -401,6 +425,10 @@ const GuestCampaignFlow = () => {
                           <div>
                             <span className="text-muted-foreground">Duration:</span>
                             <p className="font-medium">{dripDuration} days</p>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Number of emails:</span>
+                            <p className="font-medium">{emailCount || '—'} emails</p>
                           </div>
                           <div>
                             <span className="text-muted-foreground">Words per email:</span>
