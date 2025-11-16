@@ -11,9 +11,11 @@ import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileSidebar from "@/components/dashboard/MobileSidebar";
 import CampaignsList from "@/components/dashboard/CampaignsList";
 import { useUserPlan } from "@/hooks/useUserPlan";
+import { useTheme } from "next-themes";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { setTheme } = useTheme();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -31,6 +33,7 @@ const Dashboard = () => {
           navigate("/auth");
         } else {
           fetchCredits(session.user.id);
+          loadUserTheme(session.user.id);
         }
       }
     );
@@ -43,6 +46,7 @@ const Dashboard = () => {
         navigate("/auth");
       } else {
         fetchCredits(session.user.id);
+        loadUserTheme(session.user.id);
       }
       setLoading(false);
     });
@@ -73,6 +77,22 @@ const Dashboard = () => {
       channel.unsubscribe();
     };
   }, [navigate, user]);
+
+  const loadUserTheme = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("ui_theme")
+        .eq("id", userId)
+        .single();
+
+      if (!error && data?.ui_theme) {
+        setTheme(data.ui_theme);
+      }
+    } catch (err) {
+      console.error("Error loading theme:", err);
+    }
+  };
 
   const fetchCredits = async (userId: string) => {
     const { data, error } = await supabase
