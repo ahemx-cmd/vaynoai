@@ -12,23 +12,8 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Sparkles, Loader2, Link as LinkIcon, FileText, Download, Gem } from "lucide-react";
 import { z } from "zod";
 import { trackButtonClick, trackFunnelStep } from "@/lib/analytics";
+import { getSequenceTypes } from "@/lib/sequenceTypes";
 
-const sequenceTypes = [
-  { value: "welcome", label: "Welcome Series 📝", description: "Introduce your brand, set the tone, and build trust with new subscribers or buyers." },
-  { value: "product-launch", label: "Product Launch 🚀", description: "Announce your new product or feature with excitement and storytelling that drives conversions." },
-  { value: "sales-promotion", label: "Sales / Promotion 💰", description: "Run limited-time discounts, flash sales, or special offers with urgency and clear CTAs." },
-  { value: "abandoned-cart", label: "Abandoned Cart 🛒", description: "Remind visitors what they left behind and gently nudge them to complete their purchase." },
-  { value: "re-engagement", label: "Re-engagement / Win-Back 🔄", description: "Bring inactive users or subscribers back with updates, offers, or fresh value." },
-  { value: "nurture", label: "Nurture / Educational 🎓", description: "Share helpful insights or tutorials to build authority and trust over time." },
-  { value: "onboarding", label: "Onboarding (SaaS) ⚙️", description: "Guide new users through setup, value discovery, and first success milestones." },
-  { value: "feature-announcement", label: "Feature Announcement / Update 🔔", description: "Highlight what's new — keep users engaged with updates and improvements." },
-  { value: "pre-launch", label: "Pre-Launch / Waitlist ⏳", description: "Build excitement before launch day. Perfect for early access or new releases." },
-  { value: "testimonial", label: "Customer Testimonial / Proof 🌟", description: "Leverage stories, reviews, or user wins to increase credibility and trust." },
-  { value: "newsletter", label: "Newsletter / Content Series 🗞️", description: "Share recurring updates, educational content, or brand stories that keep your audience warm." },
-  { value: "seasonal", label: "Seasonal / Holiday Campaign 🎉", description: "Engage your audience during key seasons — Black Friday, holidays, or special events." },
-  { value: "upsell", label: "Upsell / Cross-Sell Sequence 🔼", description: "Recommend complementary products or upgrades after purchase." },
-  { value: "event-followup", label: "Event Follow-up 🎤", description: "Send post-event recaps, replays, or offers to attendees." },
-];
 
 const dripDurations = [
   { value: "7-day", label: "7-Day Drip (4 emails)", description: "Quick sequence over one week", emails: 4 },
@@ -51,6 +36,7 @@ const CreateCampaign = () => {
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [isGuest, setIsGuest] = useState(true);
+  const [userPlatform, setUserPlatform] = useState<string | null>(null);
   const [url, setUrl] = useState("");
   const [name, setName] = useState("");
   const [sequenceType, setSequenceType] = useState("");
@@ -62,14 +48,28 @@ const CreateCampaign = () => {
   const [customEmails, setCustomEmails] = useState("");
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const fetchUserData = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setUserId(session.user.id);
         setIsGuest(false);
+        
+        // Fetch user platform
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("user_platform")
+          .eq("id", session.user.id)
+          .single();
+        
+        if (profile) {
+          setUserPlatform(profile.user_platform);
+        }
       } else {
         setIsGuest(true);
       }
-    });
+    };
+    
+    fetchUserData();
   }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -310,7 +310,7 @@ const CreateCampaign = () => {
                     <SelectValue placeholder="Choose your email sequence purpose" />
                   </SelectTrigger>
                   <SelectContent className="max-h-[300px]">
-                    {sequenceTypes.map((type) => (
+                    {getSequenceTypes(userPlatform).map((type) => (
                       <SelectItem key={type.value} value={type.value}>
                         <div className="flex flex-col">
                           <span className="font-medium">{type.label}</span>

@@ -11,15 +11,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { trackFunnelStep } from "@/lib/analytics";
 import vaynoIcon from "@/assets/vayno-icon.png";
+import { getSequenceTypes } from "@/lib/sequenceTypes";
 
-const sequenceTypes = [
-  { value: "welcome", label: "Welcome Series", description: "Onboard new subscribers", icon: "👋" },
-  { value: "product-launch", label: "Product Launch", description: "Announce new products", icon: "🚀" },
-  { value: "nurture", label: "Lead Nurture", description: "Build relationships", icon: "🌱" },
-  { value: "promotional", label: "Promotional", description: "Drive sales & conversions", icon: "💰" },
-  { value: "abandoned-cart", label: "Abandoned Cart", description: "Recover lost sales", icon: "🛒" },
-  { value: "educational", label: "Educational", description: "Share knowledge & tips", icon: "📚" },
-];
 
 const dripDurations = [
   { value: "7", label: "7 days", emails: 4, description: "Focused & concise" },
@@ -254,7 +247,7 @@ const GuestCampaignFlow = () => {
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-4 mb-6">
-                      {sequenceTypes.map((type) => (
+                      {getSequenceTypes(null).map((type) => (
                         <button
                           key={type.value}
                           onClick={() => setSequenceType(type.value)}
@@ -264,7 +257,6 @@ const GuestCampaignFlow = () => {
                               : 'border-border hover:border-primary/50'
                           }`}
                         >
-                          <div className="text-3xl mb-2">{type.icon}</div>
                           <h3 className="font-semibold text-lg mb-1">{type.label}</h3>
                           <p className="text-sm text-muted-foreground">{type.description}</p>
                         </button>
@@ -420,7 +412,7 @@ const GuestCampaignFlow = () => {
                           </div>
                           <div>
                             <span className="text-muted-foreground">Sequence:</span>
-                            <p className="font-medium">{sequenceTypes.find(s => s.value === sequenceType)?.label}</p>
+                            <p className="font-medium">{getSequenceTypes(null).find(s => s.value === sequenceType)?.label}</p>
                           </div>
                           <div>
                             <span className="text-muted-foreground">Duration:</span>
