@@ -72,8 +72,15 @@ const Auth = () => {
   const claimGuestCampaign = async (userId: string) => {
     const guestCampaignId = localStorage.getItem("guestCampaignId");
     
-    if (guestCampaignId) {
-      try {
+    try {
+      // Check if onboarding is completed first
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("onboarding_completed")
+        .eq("id", userId)
+        .single();
+
+      if (guestCampaignId) {
         // Update campaign with user_id
         const { error: updateError } = await supabase
           .from("campaigns")
@@ -94,41 +101,35 @@ const Auth = () => {
           
           // Navigate to the campaign after plan selection
           localStorage.setItem("pendingCampaignId", guestCampaignId);
-          
-          // Check if onboarding is completed
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("onboarding_completed")
-            .eq("id", userId)
-            .single();
-
-          setTimeout(() => {
-            if (!profile?.onboarding_completed) {
-              navigate("/onboarding");
-            } else {
-              navigate("/choose-plan");
-            }
-          }, 1000);
-        } else {
-          // Check if onboarding is completed
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("onboarding_completed")
-            .eq("id", userId)
-            .single();
-
-          if (!profile?.onboarding_completed) {
-            navigate("/onboarding");
-          } else {
-            navigate("/choose-plan");
-          }
         }
-      } catch (err) {
-        console.error("Error claiming guest campaign:", err);
-        navigate("/choose-plan");
       }
-    } else {
-      navigate("/choose-plan");
+
+      // Always check onboarding status
+      setTimeout(() => {
+        if (!profile?.onboarding_completed) {
+          navigate("/onboarding");
+        } else {
+          navigate("/choose-plan");
+        }
+      }, 1000);
+    } catch (err) {
+      console.error("Error in claimGuestCampaign:", err);
+      // Still check onboarding even if there's an error
+      try {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("onboarding_completed")
+          .eq("id", userId)
+          .single();
+
+        if (!profile?.onboarding_completed) {
+          navigate("/onboarding");
+        } else {
+          navigate("/choose-plan");
+        }
+      } catch {
+        navigate("/onboarding");
+      }
     }
   };
 
