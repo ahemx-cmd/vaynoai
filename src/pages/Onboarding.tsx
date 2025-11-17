@@ -8,11 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Loader2, Store, Rocket, FileText, Globe, Palette, Upload } from "lucide-react";
-import { useTheme } from "next-themes";
 
 const Onboarding = () => {
   const navigate = useNavigate();
-  const { setTheme } = useTheme();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -25,14 +23,6 @@ const Onboarding = () => {
     type: "", // "document", "website", "tone", "manual"
     content: ""
   });
-  
-  // Step 3: UI Theme
-  const [uiTheme, setUiTheme] = useState<"light" | "dark" | "system">("system");
-  
-  // Apply theme when it changes
-  useEffect(() => {
-    setTheme(uiTheme);
-  }, [uiTheme, setTheme]);
 
   useEffect(() => {
     checkAuth();
@@ -72,7 +62,7 @@ const Onboarding = () => {
       return;
     }
     
-    if (step < 4) {
+    if (step < 3) {
       setStep(step + 1);
     } else {
       completeOnboarding();
@@ -89,7 +79,6 @@ const Onboarding = () => {
         .update({
           user_platform: userPlatform,
           brand_guidelines: brandGuidelines,
-          ui_theme: uiTheme,
           onboarding_completed: true
         })
         .eq("id", userId);
@@ -116,7 +105,7 @@ const Onboarding = () => {
         <Card className="p-8 space-y-6">
           {/* Progress indicator */}
           <div className="flex justify-between items-center mb-8">
-            {[1, 2, 3, 4].map((s) => (
+            {[1, 2, 3].map((s) => (
               <div key={s} className="flex items-center flex-1">
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
@@ -127,7 +116,7 @@ const Onboarding = () => {
                 >
                   {s}
                 </div>
-                {s < 4 && (
+                {s < 3 && (
                   <div
                     className={`flex-1 h-1 mx-2 transition-all ${
                       s < step ? "bg-primary" : "bg-muted"
@@ -301,83 +290,8 @@ const Onboarding = () => {
             </motion.div>
           )}
 
-          {/* Step 3: UI Theme */}
+          {/* Step 3: Choose Plan */}
           {step === 3 && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-6"
-            >
-              <div>
-                <h2 className="text-3xl font-bold mb-2">Which theme do you prefer?</h2>
-                <p className="text-muted-foreground">
-                  Choose your preferred visual appearance
-                </p>
-              </div>
-
-              <div className="grid gap-4">
-                <Card
-                  className={`p-6 cursor-pointer transition-all hover:shadow-lg ${
-                    uiTheme === "light"
-                      ? "border-primary border-2 bg-primary/5"
-                      : "border-2"
-                  }`}
-                  onClick={() => setUiTheme("light")}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-white border-2 flex items-center justify-center">
-                      ☀️
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold">Light</h3>
-                      <p className="text-sm text-muted-foreground">Bright and clean interface</p>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card
-                  className={`p-6 cursor-pointer transition-all hover:shadow-lg ${
-                    uiTheme === "dark"
-                      ? "border-primary border-2 bg-primary/5"
-                      : "border-2"
-                  }`}
-                  onClick={() => setUiTheme("dark")}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-gray-900 border-2 flex items-center justify-center">
-                      🌙
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold">Dark</h3>
-                      <p className="text-sm text-muted-foreground">Easy on the eyes</p>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card
-                  className={`p-6 cursor-pointer transition-all hover:shadow-lg ${
-                    uiTheme === "system"
-                      ? "border-primary border-2 bg-primary/5"
-                      : "border-2"
-                  }`}
-                  onClick={() => setUiTheme("system")}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-white to-gray-900 border-2 flex items-center justify-center">
-                      🖥️
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold">System</h3>
-                      <p className="text-sm text-muted-foreground">Match your device settings</p>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Step 4: Choose Plan */}
-          {step === 4 && (
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -416,7 +330,7 @@ const Onboarding = () => {
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Saving...
                 </>
-              ) : step === 4 ? (
+              ) : step === 3 ? (
                 "Complete Setup"
               ) : (
                 "Continue"
