@@ -9,10 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { ArrowLeft, Sparkles, Loader2, Link as LinkIcon, FileText, Download, Gem } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2, Link as LinkIcon, FileText, Download, Gem, ChevronDown, Upload } from "lucide-react";
 import { z } from "zod";
 import { trackButtonClick, trackFunnelStep } from "@/lib/analytics";
 import { getSequenceTypes } from "@/lib/sequenceTypes";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 
 const dripDurations = [
@@ -46,6 +47,8 @@ const CreateCampaign = () => {
   const [ctaLink, setCtaLink] = useState("");
   const [customDays, setCustomDays] = useState("");
   const [customEmails, setCustomEmails] = useState("");
+  const [brandGuidelinesFile, setBrandGuidelinesFile] = useState<File | null>(null);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -403,6 +406,41 @@ const CreateCampaign = () => {
                   Choose between 50-500 words per email
                 </p>
               </div>
+
+              {/* Advanced Options Collapsible */}
+              <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
+                <CollapsibleTrigger asChild>
+                  <Button 
+                    type="button"
+                    variant="ghost" 
+                    className="w-full flex items-center justify-between p-4 hover:bg-muted/50"
+                  >
+                    <span className="text-base font-medium">Advanced Options</span>
+                    <ChevronDown className={`w-5 h-5 transition-transform ${advancedOpen ? 'rotate-180' : ''}`} />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="pt-4 space-y-4">
+                  <div>
+                    <Label htmlFor="brand-guidelines" className="text-base">
+                      Upload Brand Guidelines (Optional)
+                    </Label>
+                    <div className="mt-2">
+                      <Input
+                        id="brand-guidelines"
+                        type="file"
+                        accept=".pdf,.doc,.docx,.txt"
+                        onChange={(e) => setBrandGuidelinesFile(e.target.files?.[0] || null)}
+                        className="h-12 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                      />
+                      <p className="text-sm text-muted-foreground mt-2">
+                        {brandGuidelinesFile 
+                          ? `Selected: ${brandGuidelinesFile.name}` 
+                          : "PDF, DOC, DOCX, or TXT format"}
+                      </p>
+                    </div>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
 
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
