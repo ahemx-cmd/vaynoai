@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { Loader2, Store, Rocket, FileText, Globe, Palette, Upload } from "lucide-react";
+import { Loader2, Store, Rocket } from "lucide-react";
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -18,11 +18,11 @@ const Onboarding = () => {
   // Step 1: Platform selection
   const [userPlatform, setUserPlatform] = useState<"seller" | "founder" | "">("");
   
-  // Step 2: Brand guidelines
-  const [brandGuidelines, setBrandGuidelines] = useState({
-    type: "", // "document", "website", "tone", "manual"
-    content: ""
-  });
+  // Step 2: What brings you to Vayno
+  const [purpose, setPurpose] = useState("");
+  
+  // Step 3: Email marketing experience
+  const [experience, setExperience] = useState("");
 
   useEffect(() => {
     checkAuth();
@@ -53,12 +53,12 @@ const Onboarding = () => {
       toast.error("Please select a platform");
       return;
     }
-    if (step === 2 && !brandGuidelines.type) {
-      toast.error("Please select how you want to set brand guidelines");
+    if (step === 2 && !purpose) {
+      toast.error("Please select what brings you to Vayno");
       return;
     }
-    if (step === 2 && brandGuidelines.type === "manual" && !brandGuidelines.content) {
-      toast.error("Please describe your brand voice");
+    if (step === 3 && !experience) {
+      toast.error("Please select your experience level");
       return;
     }
     
@@ -78,14 +78,14 @@ const Onboarding = () => {
         .from("profiles")
         .update({
           user_platform: userPlatform,
-          brand_guidelines: brandGuidelines,
+          brand_guidelines: { purpose, experience },
           onboarding_completed: true
         })
         .eq("id", userId);
 
       if (error) throw error;
 
-      toast.success("Welcome to Vayno! Let's choose your plan.");
+      toast.success("Welcome to Vayno!");
       navigate("/choose-plan");
     } catch (error: any) {
       console.error("Onboarding error:", error);
@@ -191,7 +191,7 @@ const Onboarding = () => {
             </motion.div>
           )}
 
-          {/* Step 2: Brand Guidelines */}
+          {/* Step 2: What brings you to Vayno */}
           {step === 2 && (
             <motion.div
               initial={{ opacity: 0, x: 20 }}
@@ -199,98 +199,39 @@ const Onboarding = () => {
               className="space-y-6"
             >
               <div>
-                <h2 className="text-3xl font-bold mb-2">Do you have brand guidelines?</h2>
+                <h2 className="text-3xl font-bold mb-2">What brings you to Vayno today?</h2>
                 <p className="text-muted-foreground">
-                  Help us understand your brand voice and tone
+                  Help us understand your goals
                 </p>
               </div>
 
-              <div className="grid gap-4">
-                <Card
-                  className={`p-6 cursor-pointer transition-all hover:shadow-lg ${
-                    brandGuidelines.type === "document"
-                      ? "border-primary border-2 bg-primary/5"
-                      : "border-2"
-                  }`}
-                  onClick={() => setBrandGuidelines({ ...brandGuidelines, type: "document" })}
-                >
-                  <div className="flex items-center gap-4">
-                    <Upload className="w-6 h-6 text-primary" />
-                    <div className="flex-1">
-                      <h3 className="font-semibold">I have a document</h3>
-                      <p className="text-sm text-muted-foreground">Upload your brand guidelines</p>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card
-                  className={`p-6 cursor-pointer transition-all hover:shadow-lg ${
-                    brandGuidelines.type === "website"
-                      ? "border-primary border-2 bg-primary/5"
-                      : "border-2"
-                  }`}
-                  onClick={() => setBrandGuidelines({ ...brandGuidelines, type: "website" })}
-                >
-                  <div className="flex items-center gap-4">
-                    <Globe className="w-6 h-6 text-primary" />
-                    <div className="flex-1">
-                      <h3 className="font-semibold">Learn from my website</h3>
-                      <p className="text-sm text-muted-foreground">We'll analyze your website's tone</p>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card
-                  className={`p-6 cursor-pointer transition-all hover:shadow-lg ${
-                    brandGuidelines.type === "tone"
-                      ? "border-primary border-2 bg-primary/5"
-                      : "border-2"
-                  }`}
-                  onClick={() => setBrandGuidelines({ ...brandGuidelines, type: "tone" })}
-                >
-                  <div className="flex items-center gap-4">
-                    <Palette className="w-6 h-6 text-primary" />
-                    <div className="flex-1">
-                      <h3 className="font-semibold">No, just match a general tone</h3>
-                      <p className="text-sm text-muted-foreground">We'll use best practices</p>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card
-                  className={`p-6 cursor-pointer transition-all hover:shadow-lg ${
-                    brandGuidelines.type === "manual"
-                      ? "border-primary border-2 bg-primary/5"
-                      : "border-2"
-                  }`}
-                  onClick={() => setBrandGuidelines({ ...brandGuidelines, type: "manual" })}
-                >
-                  <div className="flex items-center gap-4">
-                    <FileText className="w-6 h-6 text-primary" />
-                    <div className="flex-1">
-                      <h3 className="font-semibold">Let me describe my brand voice manually</h3>
-                      <p className="text-sm text-muted-foreground">Write your own description</p>
-                    </div>
-                  </div>
-                </Card>
+              <div className="grid gap-3">
+                {[
+                  "Grow my business",
+                  "Promote a new product",
+                  "Set up automated email sequences",
+                  "Improve my marketing",
+                  "Build stronger customer relationships",
+                  "Just trying it out",
+                  "School project / research"
+                ].map((option) => (
+                  <Card
+                    key={option}
+                    className={`p-4 cursor-pointer transition-all hover:shadow-lg ${
+                      purpose === option
+                        ? "border-primary border-2 bg-primary/5"
+                        : "border-2"
+                    }`}
+                    onClick={() => setPurpose(option)}
+                  >
+                    <p className="font-medium">{option}</p>
+                  </Card>
+                ))}
               </div>
-
-              {brandGuidelines.type === "manual" && (
-                <div className="space-y-2">
-                  <Label>Describe your brand voice</Label>
-                  <Textarea
-                    placeholder="e.g., Professional yet friendly, with a focus on clarity and trust..."
-                    value={brandGuidelines.content}
-                    onChange={(e) => setBrandGuidelines({ ...brandGuidelines, content: e.target.value })}
-                    rows={4}
-                    className="resize-none"
-                  />
-                </div>
-              )}
             </motion.div>
           )}
 
-          {/* Step 3: Choose Plan */}
+          {/* Step 3: Email marketing experience */}
           {step === 3 && (
             <motion.div
               initial={{ opacity: 0, x: 20 }}
@@ -298,19 +239,32 @@ const Onboarding = () => {
               className="space-y-6"
             >
               <div>
-                <h2 className="text-3xl font-bold mb-2">Choose Your Plan to Continue</h2>
+                <h2 className="text-3xl font-bold mb-2">What's your experience with email marketing?</h2>
                 <p className="text-muted-foreground">
-                  Select a plan that fits your needs to start creating campaigns
+                  This helps us tailor the experience for you
                 </p>
               </div>
 
-              <div className="text-center py-8">
-                <p className="text-lg text-muted-foreground mb-4">
-                  You'll be able to select your plan on the next page
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Start with a free trial or choose a paid plan to unlock full features
-                </p>
+              <div className="grid gap-3">
+                {[
+                  "I'm a total beginner",
+                  "I know the basics",
+                  "I'm comfortable",
+                  "I'm advanced",
+                  "I'm a pro (I live in Klaviyo/Mailchimp)"
+                ].map((option) => (
+                  <Card
+                    key={option}
+                    className={`p-4 cursor-pointer transition-all hover:shadow-lg ${
+                      experience === option
+                        ? "border-primary border-2 bg-primary/5"
+                        : "border-2"
+                    }`}
+                    onClick={() => setExperience(option)}
+                  >
+                    <p className="font-medium">{option}</p>
+                  </Card>
+                ))}
               </div>
             </motion.div>
           )}
@@ -331,7 +285,7 @@ const Onboarding = () => {
                   Saving...
                 </>
               ) : step === 3 ? (
-                "Complete Setup"
+                "Finish"
               ) : (
                 "Continue"
               )}
