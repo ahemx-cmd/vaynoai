@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -44,10 +44,11 @@ const mapErrorToFriendly = (raw: any, url?: string): string => {
 const AnalyzingCampaign = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-const [progress, setProgress] = useState(0);
-const [currentStep, setCurrentStep] = useState(0);
-const [error, setError] = useState<string | null>(null);
-const [campaignUrl, setCampaignUrl] = useState<string>("");
+  const location = useLocation();
+  const [progress, setProgress] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [campaignUrl, setCampaignUrl] = useState<string>("");
 
   const steps = [
     "Fetching your landing page...",
@@ -100,11 +101,15 @@ setCampaignUrl(campaign.url);
         const { data: { session } } = await supabase.auth.getSession();
         const authHeader = session?.access_token ? `Bearer ${session.access_token}` : '';
         
+        // Get brand guidelines from location state if available
+        const brandGuidelines = (location.state as any)?.brandGuidelines || null;
+        
         // Call edge function to analyze and generate
         const { data, error } = await supabase.functions.invoke("generate-campaign", {
           body: {
             campaignId: id,
             url: campaign.url,
+            brandGuidelines: brandGuidelines,
           },
           headers: authHeader ? {
             Authorization: authHeader

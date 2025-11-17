@@ -11,6 +11,7 @@ const corsHeaders = {
 const requestSchema = z.object({
   campaignId: z.string().uuid("Invalid campaign ID format"),
   url: z.string().url("Invalid URL format").max(2000, "URL too long"),
+  brandGuidelines: z.string().optional().nullable(),
 });
 
 serve(async (req) => {
@@ -61,7 +62,7 @@ serve(async (req) => {
       );
     }
 
-    const { campaignId, url } = validationResult.data;
+    const { campaignId, url, brandGuidelines } = validationResult.data;
     
     // Use service role for campaign operations
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -461,11 +462,72 @@ ABSOLUTE PROHIBITIONS (INSTANT FAILURE):
 
 ${pageContent.substring(0, 8000)}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔍 STEP-BY-STEP ANALYSIS (DO THIS FIRST):
+${brandGuidelines ? `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 BRAND GUIDELINES (HIGH PRIORITY):
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-STEP 1: TONE DETECTION
+${brandGuidelines.substring(0, 4000)}
+
+⚠️ CRITICAL: The brand guidelines above take PRIORITY over any conflicting information from the landing page. Blend insights from both sources, but when they conflict, follow the brand guidelines.` : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔍 DEEP LANDING PAGE ANALYSIS (DO THIS FIRST):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 1: COMPREHENSIVE CONTENT EXTRACTION
+Read the landing page and identify:
+
+✓ HEADLINE & SUB-COPY:
+  • Main headline (H1) - what's the primary promise?
+  • Supporting sub-headlines (H2, H3) - what do they emphasize?
+  • Opening paragraph copy - how do they hook visitors?
+
+✓ PRODUCT BENEFITS (Why should someone care?):
+  • List 3-5 core benefits mentioned
+  • Transformation promises ("go from X to Y")
+  • Outcome-focused language (results, not features)
+
+✓ PRODUCT FEATURES (What exactly do they get?):
+  • Specific features mentioned by name
+  • Technical capabilities or tools included
+  • Unique functionality that stands out
+
+✓ PRICING & OFFERS:
+  • Price points mentioned (if any)
+  • Special offers, discounts, or urgency elements
+  • Guarantees or risk-reversal (money-back, free trial, etc.)
+  • Payment plans or pricing tiers
+
+✓ TESTIMONIALS & SOCIAL PROOF:
+  • Customer quotes or reviews
+  • Stats, numbers, or metrics ("10,000 users", "97% success rate")
+  • Case studies or success stories
+  • Brand logos, partnerships, or credentials
+
+✓ BRAND TONE & WRITING STYLE:
+  • Formal vs. casual vs. playful vs. serious
+  • Sentence length: short & punchy or long & flowing?
+  • Use of emojis, exclamation points, or unique punctuation
+  • Vocabulary: simple/accessible or sophisticated/technical?
+  • Personality markers: humor, urgency, calm confidence, authority?
+
+✓ TARGET AUDIENCE TYPE:
+  • Who are they talking to? (entrepreneurs, parents, designers, etc.)
+  • Experience level: beginners, intermediate, experts?
+  • Demographics or psychographics hinted at
+  • Pain points or frustrations they address
+
+✓ EMOTIONAL TRIGGERS:
+  • What's the PRIMARY emotion? (trust, urgency, calm, curiosity, excitement, fear, hope, belonging)
+  • What feelings do they evoke? (FOMO, relief, inspiration, confidence)
+  • Do they use fear-based or aspiration-based language?
+
+✓ CALLS-TO-ACTION:
+  • What CTAs appear on the page? ("Shop Now", "Get Started", "Book a Call")
+  • How often do they repeat CTAs?
+  • What's the main conversion action? (purchase, signup, book, download)
+
+STEP 2: TONE DETECTION
 Read the content above carefully and identify:
 • Writing style: casual/formal/playful/serious/emotional?
 • Sentence structure: short and punchy or long and flowing?
@@ -473,14 +535,14 @@ Read the content above carefully and identify:
 • Personality markers: emojis? Humor? Urgency? Calm confidence?
 • Examples of their exact phrasing that shows their voice
 
-STEP 2: PRODUCT TYPE & CTA STRATEGY
+STEP 3: PRODUCT TYPE & CTA STRATEGY
 Determine what they're selling:
 • Physical product, digital product, SaaS, service, event, or info product?
 • Price point: budget, mid-range, premium, luxury?
 • Sales cycle: impulse buy or considered purchase?
 • Best CTA style for THIS specific product type
 
-STEP 3: EMOTION IDENTIFICATION
+STEP 4: EMOTION IDENTIFICATION
 What's the PRIMARY emotion they're triggering?
 • Trust (proof, testimonials, guarantees)
 • Urgency (limited time, scarcity)
@@ -491,7 +553,7 @@ What's the PRIMARY emotion they're triggering?
 • Hope (possibility, better future)
 • Belonging (community, insider)
 
-STEP 4: EXTRACT BRAND-SPECIFIC DETAILS
+STEP 5: EXTRACT BRAND-SPECIFIC DETAILS
 Pull these EXACT details from the content:
 ✓ Brand name (use it, don't say "our company")
 ✓ Specific product/service names
@@ -503,7 +565,7 @@ Pull these EXACT details from the content:
 ✓ Statistics, testimonials, proof points
 ✓ Their unique angle or positioning
 
-STEP 5: BUILD YOUR VOICE VOCABULARY
+STEP 6: BUILD YOUR VOICE VOCABULARY
 Create a list of:
 • 5 words/phrases they use repeatedly
 • 3 conversational connectors that match their style
