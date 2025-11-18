@@ -148,12 +148,32 @@ async function handleSubscriptionUpdated(supabase: any, payload: any, userId: st
   const attributes = payload.data?.attributes;
   const status = attributes?.status;
   const renewsAt = attributes?.renews_at;
+  const updatedAt = attributes?.updated_at;
+
+  // Fetch current user data to detect renewals
+  const { data: currentData } = await supabase
+    .from('user_usage')
+    .select('current_period_end, plan, generations_limit')
+    .eq('user_id', userId)
+    .single();
 
   const updateData: any = {
     subscription_status: status,
   };
 
-  if (renewsAt) {
+  // Check if this is a renewal event (period has advanced)
+  if (renewsAt && currentData?.current_period_end) {
+    const oldPeriodEnd = new Date(currentData.current_period_end);
+    const newPeriodEnd = new Date(renewsAt);
+    
+    // If the new period is in the future and different from old period, it's a renewal
+    if (newPeriodEnd > oldPeriodEnd && newPeriodEnd > new Date()) {
+      console.log('Detected subscription renewal - resetting credits');
+      updateData.generations_used = 0; // Reset credits on renewal
+    }
+    
+    updateData.current_period_end = renewsAt;
+  } else if (renewsAt) {
     updateData.current_period_end = renewsAt;
   }
 
