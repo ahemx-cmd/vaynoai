@@ -48,6 +48,9 @@ serve(async (req) => {
     // Handle different webhook events
     switch (eventName) {
       case 'order_created':
+        await handleOrderCreated(supabase, payload, userId);
+        break;
+      
       case 'subscription_created':
         await handleSubscriptionCreated(supabase, payload, userId);
         break;
@@ -81,6 +84,79 @@ serve(async (req) => {
     });
   }
 });
+
+async function handleOrderCreated(supabase: any, payload: any, userId: string) {
+  console.log('Handling order created for user:', userId);
+
+  const attributes = payload.data?.attributes;
+  const productName = attributes?.product_name || attributes?.first_order_item?.product_name;
+  const variantName = attributes?.variant_name || attributes?.first_order_item?.variant_name;
+  const orderId = payload.data?.id?.toString();
+
+  // Check if this is a one-time credit pack purchase
+  const creditPackMap: { [key: string]: number } = {
+    'starter pack': 40,
+    'growth pack': 120,
+    'pro pack': 300,
+    'agency pack': 800,
+  };
+
+  const packKey = (productName?.toLowerCase() || variantName?.toLowerCase() || '');
+  let creditsToAdd = 0;
+
+  for (const [key, credits] of Object.entries(creditPackMap)) {
+    if (packKey.includes(key)) {
+      creditsToAdd = credits;
+      console.log(`Detected credit pack: ${key} - ${credits} credits`);
+      break;
+    }
+  }
+
+  if (creditsToAdd > 0) {
+    // This is a one-time credit pack purchase
+    console.log(`Adding ${creditsToAdd} topup credits to user ${userId}`);
+
+    // Check for duplicate processing using order_id
+    const { data: existingOrder } = await supabase
+      .from('user_usage')
+      .select('id')
+      .eq('user_id', userId)
+      .single();
+
+    if (existingOrder) {
+      // Add credits to topup_credits column
+      const { error } = await supabase.rpc('add_topup_credits', {
+        p_user_id: userId,
+        p_credits: creditsToAdd
+      });
+
+      if (error) {
+        // Fallback to direct update if function doesn't exist
+        const { data: currentUsage } = await supabase
+          .from('user_usage')
+          .select('topup_credits')
+          .eq('user_id', userId)
+          .single();
+
+        const currentTopup = currentUsage?.topup_credits || 0;
+
+        const { error: updateError } = await supabase
+          .from('user_usage')
+          .update({ topup_credits: currentTopup + creditsToAdd })
+          .eq('user_id', userId);
+
+        if (updateError) {
+          console.error('Error adding topup credits:', updateError);
+          throw updateError;
+        }
+      }
+
+      console.log(`Successfully added ${creditsToAdd} topup credits to user ${userId}`);
+    }
+  } else {
+    console.log('Order is not a credit pack, skipping topup credit addition');
+  }
+}
 
 async function handleSubscriptionCreated(supabase: any, payload: any, userId: string) {
   console.log('Handling subscription created for user:', userId);

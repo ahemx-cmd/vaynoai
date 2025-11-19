@@ -13,6 +13,7 @@ import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileSidebar from "@/components/dashboard/MobileSidebar";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { trackPlanUpgrade, trackButtonClick } from "@/lib/analytics";
+import CreditPacks from "@/components/billing/CreditPacks";
 
 const Billing = () => {
   const navigate = useNavigate();
@@ -347,6 +348,17 @@ const Billing = () => {
               )}
             </Card>
           </motion.div>
+
+          {/* Credit Packs Section */}
+          {user && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <CreditPacks userId={user.id} />
+            </motion.div>
+          )}
         </div>
       </div>
     </div>
