@@ -109,6 +109,40 @@ serve(async (req) => {
     
     console.log("Authorization check passed - proceeding with generation");
 
+    // Check credit balance for authenticated users
+    if (user) {
+      console.log("Checking credit balance for user:", user.id);
+      const { data: usageData, error: usageError } = await serviceClient
+        .from("user_usage")
+        .select("generations_used, generations_limit, topup_credits")
+        .eq("user_id", user.id)
+        .single();
+
+      if (usageError) {
+        console.error("Error fetching user usage:", usageError);
+        return new Response(
+          JSON.stringify({ error: "Unable to verify credit balance" }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const totalCredits = usageData.generations_limit + usageData.topup_credits;
+      const creditsRemaining = totalCredits - usageData.generations_used;
+      
+      console.log(`User has ${creditsRemaining} credits remaining (${usageData.generations_limit - usageData.generations_used} subscription + ${usageData.topup_credits} topup)`);
+
+      if (creditsRemaining <= 0) {
+        console.error("Insufficient credits for user:", user.id);
+        return new Response(
+          JSON.stringify({ 
+            error: "Insufficient credits", 
+            details: "Not enough credits. Please buy a credit pack to continue." 
+          }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
     console.log("Starting campaign generation for:", campaignId);
 
     // CRITICAL: Fetch the actual URL content first
@@ -805,6 +839,21 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
     }
 
     console.log("Campaign generation completed successfully");
+
+    // Increment user credits for authenticated users
+    if (user) {
+      console.log("Incrementing credits for user:", user.id);
+      const { error: creditError } = await serviceClient.rpc('increment_user_generations', {
+        user_id: user.id
+      });
+
+      if (creditError) {
+        console.error("Error incrementing credits:", creditError);
+        // Don't fail the request, but log the error
+      } else {
+        console.log("Successfully incremented credits for user:", user.id);
+      }
+    }
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

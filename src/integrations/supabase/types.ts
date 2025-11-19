@@ -212,6 +212,7 @@ export type Database = {
           plan: string
           subscription_id: string | null
           subscription_status: string | null
+          topup_credits: number
           updated_at: string
           user_id: string
         }
@@ -225,6 +226,7 @@ export type Database = {
           plan?: string
           subscription_id?: string | null
           subscription_status?: string | null
+          topup_credits?: number
           updated_at?: string
           user_id: string
         }
@@ -238,6 +240,7 @@ export type Database = {
           plan?: string
           subscription_id?: string | null
           subscription_status?: string | null
+          topup_credits?: number
           updated_at?: string
           user_id?: string
         }
@@ -248,6 +251,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_topup_credits: {
+        Args: { p_credits: number; p_user_id: string }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

@@ -16,6 +16,7 @@ const UsageCard = ({ userId }: UsageCardProps) => {
   const [usage, setUsage] = useState({
     used: 0,
     limit: 5,
+    topupCredits: 0,
     plan: "free",
   });
   const [loading, setLoading] = useState(true);
@@ -34,6 +35,7 @@ const UsageCard = ({ userId }: UsageCardProps) => {
         setUsage({
           used: data.generations_used,
           limit: data.generations_limit,
+          topupCredits: data.topup_credits || 0,
           plan: data.plan,
         });
       }
@@ -59,6 +61,7 @@ const UsageCard = ({ userId }: UsageCardProps) => {
             setUsage({
               used: newData.generations_used,
               limit: newData.generations_limit,
+              topupCredits: newData.topup_credits || 0,
               plan: newData.plan,
             });
           }
@@ -79,8 +82,9 @@ const UsageCard = ({ userId }: UsageCardProps) => {
     );
   }
 
-  const percentage = (usage.used / usage.limit) * 100;
-  const creditsRemaining = usage.limit - usage.used;
+  const totalCredits = usage.limit + usage.topupCredits;
+  const percentage = (usage.used / totalCredits) * 100;
+  const creditsRemaining = totalCredits - usage.used;
   const isLowCredits = creditsRemaining < 10;
   const isOutOfCredits = creditsRemaining <= 0;
 
@@ -121,11 +125,32 @@ const UsageCard = ({ userId }: UsageCardProps) => {
           </div>
           <Progress value={percentage} className="h-2" />
           <p className="text-xs text-muted-foreground">
-            {usage.used} / {usage.limit} credits used
+            {usage.used} / {totalCredits} credits used
+            {usage.topupCredits > 0 && (
+              <span className="ml-1 text-primary">
+                ({usage.topupCredits} bonus)
+              </span>
+            )}
           </p>
         </div>
 
-        {(isLowCredits || isOutOfCredits) && (
+        {isOutOfCredits && (
+          <div className="mt-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+            <p className="text-sm text-destructive font-medium mb-2">
+              You're out of credits — buy a pack to continue.
+            </p>
+            <Button 
+              variant="default" 
+              className="w-full" 
+              size="sm"
+              onClick={() => navigate('/billing')}
+            >
+              <TrendingUp className="w-4 h-4 mr-2" />
+              Buy Credits
+            </Button>
+          </div>
+        )}
+        {isLowCredits && !isOutOfCredits && (
           <Button 
             variant="outline" 
             className="w-full mt-4 hover-lift" 
@@ -133,7 +158,7 @@ const UsageCard = ({ userId }: UsageCardProps) => {
             onClick={() => navigate('/billing')}
           >
             <TrendingUp className="w-4 h-4 mr-2" />
-            {isOutOfCredits ? 'Get More Credits' : 'Upgrade Plan'}
+            Buy More Credits
           </Button>
         )}
       </Card>
