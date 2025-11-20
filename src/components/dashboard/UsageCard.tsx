@@ -3,9 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Zap, TrendingUp } from "lucide-react";
+import { Zap, TrendingUp, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
 
 interface UsageCardProps {
   userId: string;
@@ -20,6 +21,7 @@ const UsageCard = ({ userId }: UsageCardProps) => {
     plan: "free",
   });
   const [loading, setLoading] = useState(true);
+  const [hasShownLowCreditWarning, setHasShownLowCreditWarning] = useState(false);
 
   useEffect(() => {
     const fetchUsage = async () => {
@@ -73,6 +75,41 @@ const UsageCard = ({ userId }: UsageCardProps) => {
       channel.unsubscribe();
     };
   }, [userId]);
+
+  // Low credit notification effect
+  useEffect(() => {
+    if (loading) return;
+
+    const totalCredits = usage.limit + usage.topupCredits;
+    const creditsRemaining = totalCredits - usage.used;
+    const isLowCredits = creditsRemaining < 10;
+    const isOutOfCredits = creditsRemaining <= 0;
+
+    if (isLowCredits && !isOutOfCredits && !hasShownLowCreditWarning) {
+      toast({
+        title: "Low Credits Warning",
+        description: `You have ${creditsRemaining} credits remaining. Consider buying more to continue creating campaigns.`,
+        variant: "destructive",
+        action: (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => navigate('/billing')}
+            className="gap-2"
+          >
+            <TrendingUp className="w-4 h-4" />
+            Buy Credits
+          </Button>
+        ),
+      });
+      setHasShownLowCreditWarning(true);
+    }
+
+    // Reset warning flag when credits are replenished above threshold
+    if (creditsRemaining >= 10 && hasShownLowCreditWarning) {
+      setHasShownLowCreditWarning(false);
+    }
+  }, [usage, loading, hasShownLowCreditWarning, navigate]);
 
   if (loading) {
     return (
