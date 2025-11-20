@@ -215,25 +215,27 @@ const Billing = () => {
                   </p>
                 </div>
 
-                <div className="p-4 rounded-lg bg-muted/30">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Calendar className="w-4 h-4 text-muted-foreground" />
-                    <p className="text-sm font-medium">Next Billing Date</p>
-                  </div>
-                  <p className="text-lg font-semibold">
-                    {isTrial || isLifetime ? "—" : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </p>
-                </div>
+                {!isTrial && !isLifetime && (
+                  <>
+                    <div className="p-4 rounded-lg bg-muted/30">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Calendar className="w-4 h-4 text-muted-foreground" />
+                        <p className="text-sm font-medium">Next Billing Date</p>
+                      </div>
+                      <p className="text-lg font-semibold">
+                        {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </p>
+                    </div>
 
-                <div className="p-4 rounded-lg bg-muted/30">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CreditCard className="w-4 h-4 text-muted-foreground" />
-                    <p className="text-sm font-medium">Payment Method</p>
-                  </div>
-                  <p className="text-lg font-semibold">
-                    {isTrial ? "None" : "•••• 4242"}
-                  </p>
-                </div>
+                    <div className="p-4 rounded-lg bg-muted/30">
+                      <div className="flex items-center gap-2 mb-2">
+                        <CreditCard className="w-4 h-4 text-muted-foreground" />
+                        <p className="text-sm font-medium">Payment Method</p>
+                      </div>
+                      <p className="text-lg font-semibold">On file</p>
+                    </div>
+                  </>
+                )}
               </div>
             </Card>
 
@@ -315,50 +317,23 @@ const Billing = () => {
             {/* Billing History */}
             <Card className="glass-card p-6 border-primary/20">
               <h2 className="text-xl font-semibold mb-4">Billing History</h2>
-              <p className="text-sm text-muted-foreground mb-4">
+              <p className="text-sm text-muted-foreground">
                 Your payment history and invoices will appear here once you upgrade to a paid plan.
               </p>
-              
-              {!isTrial && (
-                <div className="space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
-                      <div className="flex items-center gap-3">
-                        <Receipt className="w-5 h-5 text-muted-foreground" />
-                        <div>
-                          <p className="text-sm font-medium">
-                            {plan.charAt(0).toUpperCase() + plan.slice(1)} Plan - Monthly
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(Date.now() - i * 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <Badge variant="secondary" className="bg-green-500/10 text-green-500">
-                          Paid
-                        </Badge>
-                        <Button variant="ghost" size="sm">
-                          Download
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
             </Card>
-          </motion.div>
 
-          {/* Credit Packs Section */}
-          {user && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              <CreditPacks userId={user.id} />
-            </motion.div>
-          )}
+            {/* Credit Packs Section */}
+            {user && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="mt-8"
+              >
+                <CreditPacks userId={user.id} />
+              </motion.div>
+            )}
+          </motion.div>
         </div>
       </div>
     </div>
