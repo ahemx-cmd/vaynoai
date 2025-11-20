@@ -14,6 +14,7 @@ import { z } from "zod";
 import { trackButtonClick, trackFunnelStep } from "@/lib/analytics";
 import { getSequenceTypes } from "@/lib/sequenceTypes";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import OutOfCreditsModal from "@/components/billing/OutOfCreditsModal";
 
 
 const dripDurations = [
@@ -49,6 +50,7 @@ const CreateCampaign = () => {
   const [customEmails, setCustomEmails] = useState("");
   const [brandGuidelinesFile, setBrandGuidelinesFile] = useState<File | null>(null);
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [showOutOfCreditsModal, setShowOutOfCreditsModal] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -123,7 +125,7 @@ const CreateCampaign = () => {
       if (userId) {
         const { data: usageData, error: usageError } = await supabase
           .from("user_usage")
-          .select("generations_used, generations_limit, plan")
+          .select("generations_used, generations_limit, topup_credits")
           .eq("user_id", userId)
           .single();
 
@@ -133,11 +135,11 @@ const CreateCampaign = () => {
           return;
         }
 
-        const creditsRemaining = usageData.generations_limit - usageData.generations_used;
+        const totalCredits = usageData.generations_limit + usageData.topup_credits;
+        const creditsRemaining = totalCredits - usageData.generations_used;
 
         if (creditsRemaining <= 0) {
-          toast.error("You've used all your credits — upgrade or top up to continue.");
-          navigate("/billing");
+          setShowOutOfCreditsModal(true);
           setLoading(false);
           return;
         }
@@ -526,6 +528,15 @@ const CreateCampaign = () => {
             ))}
           </div>
         </motion.div>
+
+        {/* Out of Credits Modal */}
+        {userId && (
+          <OutOfCreditsModal 
+            open={showOutOfCreditsModal}
+            onClose={() => setShowOutOfCreditsModal(false)}
+            userId={userId}
+          />
+        )}
       </div>
     </div>
   );
