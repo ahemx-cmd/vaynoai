@@ -71,16 +71,26 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
       price: 19,
       icon: CreditCard,
       color: "from-primary to-accent",
-      checkoutUrl: "https://vaynoai.lemonsqueezy.com/buy/3eab4f94-d13a-47e3-b2c7-63a7ed0aff11",
-      features: ["150 credits per month", "Remove watermark", "Priority AI speed"]
+      checkoutUrl: "https://vayno.lemonsqueezy.com/buy/87a59f11-f8d0-461d-88a8-a21ca5bce2d2",
+      features: ["20 campaigns/month", "Priority support", "Advanced features"]
     },
     {
       name: "Pro",
-      price: 29,
+      price: 49,
       icon: Crown,
       color: "from-accent to-primary",
-      checkoutUrl: "https://vaynoai.lemonsqueezy.com/buy/e47ec95f-aa1e-43fc-a57f-bb91fc20139e",
-      features: ["400 credits per month", "Everything in Starter", "Auto-Translate"]
+      checkoutUrl: "https://vayno.lemonsqueezy.com/buy/1d63b26a-69ae-4c20-894e-4c53a3b8cd0d",
+      features: ["Unlimited campaigns", "Priority support", "Custom branding"],
+      popular: true
+    },
+    {
+      name: "Lifetime",
+      price: 299,
+      icon: Sparkles,
+      color: "from-primary to-accent",
+      checkoutUrl: "https://vayno.lemonsqueezy.com/buy/LIFETIME_CHECKOUT_LINK",
+      features: ["Lifetime access", "Unlimited campaigns", "All features"],
+      isLifetime: true
     }
   ];
 
@@ -300,7 +310,7 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                     Back
                   </Button>
 
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {plans.map((plan, index) => {
                       const Icon = plan.icon;
                       return (
@@ -316,29 +326,42 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                             stiffness: 400, 
                             damping: 17 
                           }}
+                          className="h-full"
                         >
-                          <Card className="p-6 rounded-[24px] bg-background/40 backdrop-blur-lg border-white/20 hover:border-primary/50 hover:bg-background/60 transition-all duration-300 shadow-[0_4px_16px_rgba(0,0,0,0.1)]">
-                            <div className="flex items-center justify-between gap-4">
-                              <div className="flex items-center gap-4">
-                                <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${plan.color} flex items-center justify-center shadow-lg`}>
-                                  <Icon className="w-6 h-6 text-primary-foreground" />
-                                </div>
-                                <div>
-                                  <h4 className="font-bold text-lg text-foreground">{plan.name}</h4>
-                                  <p className="text-sm text-muted-foreground">
-                                    ${plan.price}/month
-                                  </p>
-                                </div>
+                          <Card className={`p-6 rounded-[24px] bg-background/40 backdrop-blur-lg border-white/20 hover:bg-background/60 transition-all duration-300 shadow-[0_4px_16px_rgba(0,0,0,0.1)] h-[380px] flex flex-col relative ${(plan as any).popular ? 'border-primary/50' : ''}`}>
+                            {(plan as any).popular && (
+                              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                                <span className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground text-xs font-semibold shadow-md">
+                                  Most Popular
+                                </span>
                               </div>
-                              <div className="flex flex-col items-end gap-2">
-                                <p className="text-sm font-semibold text-foreground">{plan.features[0]}</p>
-                                <Button
-                                  onClick={() => handleUpgrade(plan.checkoutUrl)}
-                                  className="h-10 rounded-[16px] bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity text-primary-foreground shadow-md text-sm font-semibold px-6"
-                                >
-                                  Upgrade
-                                </Button>
+                            )}
+                            <div className="flex flex-col items-center text-center space-y-4 flex-1">
+                              <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${plan.color} flex items-center justify-center shadow-lg`}>
+                                <Icon className="w-8 h-8 text-primary-foreground" />
                               </div>
+                              <div>
+                                <h4 className="font-bold text-2xl text-foreground mb-2">{plan.name}</h4>
+                                <p className="text-3xl font-bold text-foreground">
+                                  ${plan.price}
+                                  <span className="text-sm font-normal text-muted-foreground">
+                                    {(plan as any).isLifetime ? '/once' : '/mo'}
+                                  </span>
+                                </p>
+                              </div>
+                              <ul className="space-y-2 flex-1">
+                                {plan.features.map((feature, idx) => (
+                                  <li key={idx} className="text-sm text-muted-foreground">
+                                    {feature}
+                                  </li>
+                                ))}
+                              </ul>
+                              <Button
+                                onClick={() => handleUpgrade(plan.checkoutUrl)}
+                                className="w-full h-12 rounded-[16px] bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity text-primary-foreground shadow-md font-semibold mt-auto"
+                              >
+                                {(plan as any).isLifetime ? 'Get Lifetime' : 'Upgrade'}
+                              </Button>
                             </div>
                           </Card>
                         </motion.div>
