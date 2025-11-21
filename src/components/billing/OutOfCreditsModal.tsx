@@ -1,10 +1,11 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Zap, Crown, CreditCard, TrendingUp, Sparkles } from "lucide-react";
-import { motion } from "framer-motion";
+import { Zap, Crown, CreditCard, Sparkles, ArrowLeft } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { useState } from "react";
+import type { CarouselApi } from "@/components/ui/carousel";
 
 interface OutOfCreditsModalProps {
   open: boolean;
@@ -13,7 +14,9 @@ interface OutOfCreditsModalProps {
 }
 
 const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) => {
+  const [view, setView] = useState<'choice' | 'credits' | 'plans'>('choice');
   const [selectedPack, setSelectedPack] = useState(1); // Growth Pack default
+  const [api, setApi] = useState<CarouselApi>();
   
   const creditPacks = [
     {
@@ -78,178 +81,267 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden border-0 bg-background/95 backdrop-blur-xl shadow-2xl p-0">
+      <DialogContent className="max-w-4xl border-0 bg-background/10 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] p-0 rounded-[28px] border border-white/10">
         <div className="relative overflow-hidden">
-          {/* Floating animation background effect */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 animate-pulse" />
+          {/* Soft animated background glow */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 animate-pulse opacity-50" />
           
-          <div className="relative p-8">
+          <motion.div 
+            className="relative p-8"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+          >
             <DialogHeader className="text-center space-y-3 mb-8">
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
                 className="flex justify-center mb-2"
               >
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
-                  <Sparkles className="w-8 h-8 text-white" />
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/80 to-accent/80 backdrop-blur-sm flex items-center justify-center shadow-[0_8px_16px_rgba(0,0,0,0.2)]">
+                  <Sparkles className="w-8 h-8 text-primary-foreground" />
                 </div>
               </motion.div>
-              <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+              <DialogTitle className="text-3xl font-bold text-foreground drop-shadow-sm">
                 You're out of credits
               </DialogTitle>
               <p className="text-muted-foreground text-lg">Choose how you'd like to continue</p>
             </DialogHeader>
 
-            <div className="grid lg:grid-cols-2 gap-6 mb-6">
-              {/* Buy Credits Card */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 }}
-              >
-                <Card className="glass-card p-6 h-full hover-lift border-border/50">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                        <Zap className="w-5 h-5 text-white" />
+            <AnimatePresence mode="wait">
+              {view === 'choice' && (
+                <motion.div
+                  key="choice"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-4"
+                >
+                  {/* Buy Credits Button */}
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  >
+                    <Button
+                      onClick={() => setView('credits')}
+                      className="w-full h-24 rounded-[24px] bg-gradient-to-r from-primary/20 to-accent/20 hover:from-primary/30 hover:to-accent/30 backdrop-blur-md border border-white/20 shadow-[0_8px_16px_rgba(0,0,0,0.1)] transition-all duration-300"
+                      variant="outline"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
+                          <Zap className="w-6 h-6 text-primary-foreground" />
+                        </div>
+                        <div className="text-left">
+                          <h3 className="text-xl font-bold text-foreground">Buy More Credits</h3>
+                          <p className="text-sm text-muted-foreground">Top-up to keep generating campaigns</p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="text-xl font-bold">Buy Credits</h3>
-                        <p className="text-sm text-muted-foreground">Top-up to keep generating campaigns</p>
-                      </div>
-                    </div>
+                    </Button>
+                  </motion.div>
 
-                    {/* Horizontal Carousel for Credit Packs */}
-                    <div className="relative px-12">
-                      <Carousel className="w-full" opts={{ align: "center", loop: true }}>
-                        <CarouselContent className="-ml-2">
-                          {creditPacks.map((pack, index) => (
-                            <CarouselItem key={pack.id} className="pl-2 basis-full">
-                              <motion.div
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={() => setSelectedPack(index)}
-                                className={`cursor-pointer transition-all duration-300 ${
-                                  selectedPack === index ? 'opacity-100' : 'opacity-40 blur-[2px]'
-                                }`}
-                              >
-                                <Card className={`glass-card p-6 transition-all duration-300 ${
-                                  selectedPack === index 
-                                    ? 'border-primary/50 shadow-lg shadow-primary/20' 
-                                    : 'border-border/30'
-                                }`}>
-                                  {pack.popular && (
-                                    <div className="mb-3">
-                                      <span className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-primary to-accent text-white text-xs font-semibold">
-                                        Most Popular
-                                      </span>
-                                    </div>
-                                  )}
-                                  <div className="text-center space-y-2">
-                                    <h4 className="font-bold text-lg">{pack.name}</h4>
-                                    <div>
-                                      <span className="text-4xl font-bold">${pack.price}</span>
-                                    </div>
-                                    <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                                      <Zap className="w-4 h-4 text-primary" />
-                                      <span className="text-lg font-semibold">{pack.credits} credits</span>
-                                    </div>
+                  {/* Upgrade Plan Button */}
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  >
+                    <Button
+                      onClick={() => setView('plans')}
+                      className="w-full h-24 rounded-[24px] bg-gradient-to-r from-accent/20 to-primary/20 hover:from-accent/30 hover:to-primary/30 backdrop-blur-md border border-white/20 shadow-[0_8px_16px_rgba(0,0,0,0.1)] transition-all duration-300"
+                      variant="outline"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center shadow-lg">
+                          <Crown className="w-6 h-6 text-primary-foreground" />
+                        </div>
+                        <div className="text-left">
+                          <h3 className="text-xl font-bold text-foreground">Upgrade Your Plan</h3>
+                          <p className="text-sm text-muted-foreground">Unlock monthly credits + advanced features</p>
+                        </div>
+                      </div>
+                    </Button>
+                  </motion.div>
+
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-center text-sm text-muted-foreground pt-4"
+                  >
+                    Not sure what to choose? Start with a small top-up.
+                  </motion.p>
+                </motion.div>
+              )}
+
+              {view === 'credits' && (
+                <motion.div
+                  key="credits"
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -50 }}
+                  transition={{ duration: 0.3, type: "spring", stiffness: 200, damping: 20 }}
+                  className="space-y-6"
+                >
+                  <Button
+                    onClick={() => setView('choice')}
+                    variant="ghost"
+                    className="mb-4 text-muted-foreground hover:text-foreground"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back
+                  </Button>
+
+                  {/* Carousel for Credit Packs */}
+                  <div className="relative px-16">
+                    <Carousel 
+                      className="w-full" 
+                      opts={{ align: "center", loop: true }}
+                      setApi={setApi}
+                    >
+                      <CarouselContent className="-ml-4">
+                        {creditPacks.map((pack, index) => (
+                          <CarouselItem key={pack.id} className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
+                            <motion.div
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => setSelectedPack(index)}
+                              className="cursor-pointer h-full"
+                              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                            >
+                              <Card className={`
+                                h-full p-6 rounded-[24px] backdrop-blur-lg transition-all duration-500
+                                ${selectedPack === index 
+                                  ? 'bg-background/80 border-primary/50 shadow-[0_8px_32px_rgba(0,0,0,0.2)] scale-105' 
+                                  : 'bg-background/30 border-white/10 opacity-60 blur-[2px] scale-90'
+                                }
+                              `}>
+                                {pack.popular && selectedPack === index && (
+                                  <motion.div 
+                                    className="mb-3"
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                  >
+                                    <span className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground text-xs font-semibold shadow-md">
+                                      Most Popular
+                                    </span>
+                                  </motion.div>
+                                )}
+                                <div className="text-center space-y-3">
+                                  <h4 className="font-bold text-lg text-foreground">{pack.name}</h4>
+                                  <div>
+                                    <span className="text-4xl font-bold text-foreground">${pack.price}</span>
                                   </div>
-                                </Card>
-                              </motion.div>
-                            </CarouselItem>
-                          ))}
-                        </CarouselContent>
-                        <CarouselPrevious className="glass-card border-border/50" />
-                        <CarouselNext className="glass-card border-border/50" />
-                      </Carousel>
-                    </div>
+                                  <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                                    <Zap className="w-4 h-4 text-primary" />
+                                    <span className="text-lg font-semibold">{pack.credits} credits</span>
+                                  </div>
+                                </div>
+                              </Card>
+                            </motion.div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious className="rounded-full bg-background/40 backdrop-blur-md border-white/20 hover:bg-background/60" />
+                      <CarouselNext className="rounded-full bg-background/40 backdrop-blur-md border-white/20 hover:bg-background/60" />
+                    </Carousel>
+                  </div>
 
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
                     <Button
                       onClick={() => handleBuyCredits(creditPacks[selectedPack].checkoutUrl)}
-                      className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity text-white shadow-lg"
+                      className="w-full h-14 rounded-[24px] bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity text-primary-foreground shadow-[0_8px_16px_rgba(0,0,0,0.2)] text-lg font-semibold"
                       size="lg"
                     >
-                      <CreditCard className="w-4 h-4 mr-2" />
+                      <CreditCard className="w-5 h-5 mr-2" />
                       Buy {creditPacks[selectedPack].name}
                     </Button>
-                  </div>
-                </Card>
-              </motion.div>
+                  </motion.div>
+                </motion.div>
+              )}
 
-              {/* Upgrade Plan Card */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <Card className="glass-card p-6 h-full hover-lift border-border/50">
+              {view === 'plans' && (
+                <motion.div
+                  key="plans"
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -50 }}
+                  transition={{ duration: 0.3, type: "spring", stiffness: 200, damping: 20 }}
+                  className="space-y-6"
+                >
+                  <Button
+                    onClick={() => setView('choice')}
+                    variant="ghost"
+                    className="mb-4 text-muted-foreground hover:text-foreground"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back
+                  </Button>
+
                   <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-accent to-primary flex items-center justify-center">
-                        <Crown className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold">Upgrade Plan</h3>
-                        <p className="text-sm text-muted-foreground">Unlock monthly credits + advanced features</p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      {plans.map((plan, index) => {
-                        const Icon = plan.icon;
-                        return (
-                          <motion.div
-                            key={plan.name}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                          >
-                            <Card className="glass-card p-4 hover:border-primary/50 transition-all duration-300 cursor-pointer border-border/30">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${plan.color} flex items-center justify-center`}>
-                                    <Icon className="w-5 h-5 text-white" />
-                                  </div>
-                                  <div>
-                                    <h4 className="font-bold">{plan.name}</h4>
-                                    <p className="text-sm text-muted-foreground">
-                                      ${plan.price}/month
-                                    </p>
-                                  </div>
+                    {plans.map((plan, index) => {
+                      const Icon = plan.icon;
+                      return (
+                        <motion.div
+                          key={plan.name}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ 
+                            delay: index * 0.1,
+                            type: "spring", 
+                            stiffness: 400, 
+                            damping: 17 
+                          }}
+                        >
+                          <Card className="p-6 rounded-[24px] bg-background/40 backdrop-blur-lg border-white/20 hover:border-primary/50 hover:bg-background/60 transition-all duration-300 cursor-pointer shadow-[0_4px_16px_rgba(0,0,0,0.1)]">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-4">
+                                <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${plan.color} flex items-center justify-center shadow-lg`}>
+                                  <Icon className="w-6 h-6 text-primary-foreground" />
                                 </div>
-                                <div className="text-right">
-                                  <p className="text-xs text-muted-foreground">{plan.features[0]}</p>
+                                <div>
+                                  <h4 className="font-bold text-lg text-foreground">{plan.name}</h4>
+                                  <p className="text-sm text-muted-foreground">
+                                    ${plan.price}/month
+                                  </p>
                                 </div>
                               </div>
-                            </Card>
-                          </motion.div>
-                        );
-                      })}
-                    </div>
+                              <div className="text-right">
+                                <p className="text-sm font-semibold text-foreground">{plan.features[0]}</p>
+                                <p className="text-xs text-muted-foreground mt-1">{plan.features[1]}</p>
+                              </div>
+                            </div>
+                          </Card>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
 
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
                     <Button
                       onClick={() => handleUpgrade(plans[0].checkoutUrl)}
+                      className="w-full h-14 rounded-[24px] bg-background/40 backdrop-blur-lg border border-white/30 hover:bg-background/60 hover:border-primary/50 transition-all duration-300 text-foreground shadow-[0_4px_16px_rgba(0,0,0,0.1)] text-lg font-semibold"
                       variant="outline"
-                      className="w-full glass-card border-border/50 hover:border-primary/50"
-                      size="lg"
                     >
-                      <TrendingUp className="w-4 h-4 mr-2" />
-                      View Plans
+                      View All Plans
                     </Button>
-                  </div>
-                </Card>
-              </motion.div>
-            </div>
-
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="text-center text-sm text-muted-foreground"
-            >
-              Not sure what to choose? Start with a small top-up.
-            </motion.p>
-          </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
         </div>
       </DialogContent>
     </Dialog>
