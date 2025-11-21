@@ -69,27 +69,30 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
     {
       name: "Starter",
       price: 19,
+      description: "For growing businesses",
       icon: CreditCard,
       color: "from-primary to-accent",
-      checkoutUrl: "https://vayno.lemonsqueezy.com/buy/87a59f11-f8d0-461d-88a8-a21ca5bce2d2",
-      features: ["20 campaigns/month", "Priority support", "Advanced features"]
-    },
-    {
-      name: "Pro",
-      price: 49,
-      icon: Crown,
-      color: "from-accent to-primary",
-      checkoutUrl: "https://vayno.lemonsqueezy.com/buy/1d63b26a-69ae-4c20-894e-4c53a3b8cd0d",
-      features: ["Unlimited campaigns", "Priority support", "Custom branding"],
+      checkoutUrl: "https://vayno.lemonsqueezy.com/buy/b1c6e286-36a9-4b48-bc80-9b03182d3b83?logo=0",
+      features: ["150 credits per month", "Remove watermark", "Priority AI speed", "Email support"],
       popular: true
     },
     {
+      name: "Pro",
+      price: 29,
+      description: "For power users",
+      icon: Crown,
+      color: "from-accent to-primary",
+      checkoutUrl: "https://vayno.lemonsqueezy.com/buy/b8a3207d-80e9-4092-8cfc-5f15c00511b1?logo=0",
+      features: ["400 credits per month", "Everything in Starter", "Auto-Translate", "Priority AI & early access"]
+    },
+    {
       name: "Lifetime",
-      price: 299,
+      price: 59,
+      description: "For growing businesses",
       icon: Sparkles,
       color: "from-primary to-accent",
-      checkoutUrl: "https://vayno.lemonsqueezy.com/buy/LIFETIME_CHECKOUT_LINK",
-      features: ["Lifetime access", "Unlimited campaigns", "All features"],
+      checkoutUrl: "https://vayno.lemonsqueezy.com/buy/b9b0bdea-ddc5-42b8-8abc-aee080f88fae?logo=0",
+      features: ["150 credits per month", "Remove watermark", "Priority AI speed", "Email support"],
       isLifetime: true
     }
   ];
@@ -341,18 +344,20 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                                 <Icon className="w-8 h-8 text-primary-foreground" />
                               </div>
                               <div>
-                                <h4 className="font-bold text-2xl text-foreground mb-2">{plan.name}</h4>
+                                <h4 className="font-bold text-2xl text-foreground mb-1">{plan.name}</h4>
+                                <p className="text-sm text-muted-foreground mb-2">{(plan as any).description}</p>
                                 <p className="text-3xl font-bold text-foreground">
                                   ${plan.price}
                                   <span className="text-sm font-normal text-muted-foreground">
-                                    {(plan as any).isLifetime ? '/once' : '/mo'}
+                                    {(plan as any).isLifetime ? ' / one-time' : ' / per month'}
                                   </span>
                                 </p>
                               </div>
-                              <ul className="space-y-2 flex-1">
+                              <ul className="space-y-2 flex-1 w-full px-4">
                                 {plan.features.map((feature, idx) => (
-                                  <li key={idx} className="text-sm text-muted-foreground">
-                                    {feature}
+                                  <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
+                                    <span className="text-primary mt-0.5">✓</span>
+                                    <span>{feature}</span>
                                   </li>
                                 ))}
                               </ul>
