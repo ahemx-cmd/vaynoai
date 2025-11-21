@@ -228,10 +228,10 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                               transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             >
                               <Card className={`
-                                h-full p-6 rounded-[24px] backdrop-blur-lg transition-all duration-500
+                                h-full p-6 rounded-[24px] transition-all duration-500
                                 ${selectedPack === index 
-                                  ? 'bg-background/80 border-primary/50 shadow-[0_8px_32px_rgba(0,0,0,0.2)]' 
-                                  : 'bg-background/30 border-white/10 opacity-60 blur-[2px] scale-95'
+                                  ? 'bg-background/80 backdrop-blur-lg border-primary/50 shadow-[0_8px_32px_rgba(0,0,0,0.2)] opacity-100 scale-100' 
+                                  : 'bg-background/30 backdrop-blur-md border-white/10 opacity-60 scale-95 blur-[2px]'
                                 }
                               `}>
                                 {pack.popular && selectedPack === index && (
@@ -276,7 +276,7 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                       size="lg"
                     >
                       <CreditCard className="w-5 h-5 mr-2" />
-                      Buy {creditPacks[selectedPack].name}
+                      Buy {creditPacks[selectedPack]?.name || 'Credits'}
                     </Button>
                   </motion.div>
                 </motion.div>
