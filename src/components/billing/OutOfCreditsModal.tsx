@@ -273,8 +273,6 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                           </CarouselItem>
                         ))}
                       </CarouselContent>
-                      <CarouselPrevious className="rounded-full bg-background/40 backdrop-blur-md border-white/20 hover:bg-background/60" />
-                      <CarouselNext className="rounded-full bg-background/40 backdrop-blur-md border-white/20 hover:bg-background/60" />
                     </Carousel>
                   </div>
 
