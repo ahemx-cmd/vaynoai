@@ -17,6 +17,21 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
   const [view, setView] = useState<'choice' | 'credits' | 'plans'>('choice');
   const [selectedPack, setSelectedPack] = useState(1); // Growth Pack default
   const [api, setApi] = useState<CarouselApi>();
+
+  // Update selected pack based on carousel scroll
+  useState(() => {
+    if (!api) return;
+
+    const onSelect = () => {
+      const selected = api.selectedScrollSnap();
+      setSelectedPack(selected);
+    };
+
+    api.on('select', onSelect);
+    return () => {
+      api.off('select', onSelect);
+    };
+  });
   
   const creditPacks = [
     {
@@ -198,24 +213,25 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                   <div className="relative px-16">
                     <Carousel 
                       className="w-full" 
-                      opts={{ align: "center", loop: true }}
+                      opts={{ align: "center", loop: false, startIndex: 1 }}
                       setApi={setApi}
                     >
                       <CarouselContent className="-ml-4">
                         {creditPacks.map((pack, index) => (
                           <CarouselItem key={pack.id} className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
                             <motion.div
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => setSelectedPack(index)}
+                              onClick={() => {
+                                api?.scrollTo(index);
+                                setSelectedPack(index);
+                              }}
                               className="cursor-pointer h-full"
                               transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             >
                               <Card className={`
                                 h-full p-6 rounded-[24px] backdrop-blur-lg transition-all duration-500
                                 ${selectedPack === index 
-                                  ? 'bg-background/80 border-primary/50 shadow-[0_8px_32px_rgba(0,0,0,0.2)] scale-105' 
-                                  : 'bg-background/30 border-white/10 opacity-60 blur-[2px] scale-90'
+                                  ? 'bg-background/80 border-primary/50 shadow-[0_8px_32px_rgba(0,0,0,0.2)]' 
+                                  : 'bg-background/30 border-white/10 opacity-60 blur-[2px] scale-95'
                                 }
                               `}>
                                 {pack.popular && selectedPack === index && (
@@ -301,8 +317,8 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                             damping: 17 
                           }}
                         >
-                          <Card className="p-6 rounded-[24px] bg-background/40 backdrop-blur-lg border-white/20 hover:border-primary/50 hover:bg-background/60 transition-all duration-300 cursor-pointer shadow-[0_4px_16px_rgba(0,0,0,0.1)]">
-                            <div className="flex items-center justify-between">
+                          <Card className="p-6 rounded-[24px] bg-background/40 backdrop-blur-lg border-white/20 hover:border-primary/50 hover:bg-background/60 transition-all duration-300 shadow-[0_4px_16px_rgba(0,0,0,0.1)]">
+                            <div className="flex items-center justify-between gap-4">
                               <div className="flex items-center gap-4">
                                 <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${plan.color} flex items-center justify-center shadow-lg`}>
                                   <Icon className="w-6 h-6 text-primary-foreground" />
@@ -314,9 +330,14 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                                   </p>
                                 </div>
                               </div>
-                              <div className="text-right">
+                              <div className="flex flex-col items-end gap-2">
                                 <p className="text-sm font-semibold text-foreground">{plan.features[0]}</p>
-                                <p className="text-xs text-muted-foreground mt-1">{plan.features[1]}</p>
+                                <Button
+                                  onClick={() => handleUpgrade(plan.checkoutUrl)}
+                                  className="h-10 rounded-[16px] bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity text-primary-foreground shadow-md text-sm font-semibold px-6"
+                                >
+                                  Upgrade
+                                </Button>
                               </div>
                             </div>
                           </Card>
@@ -324,20 +345,6 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                       );
                     })}
                   </div>
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                  >
-                    <Button
-                      onClick={() => handleUpgrade(plans[0].checkoutUrl)}
-                      className="w-full h-14 rounded-[24px] bg-background/40 backdrop-blur-lg border border-white/30 hover:bg-background/60 hover:border-primary/50 transition-all duration-300 text-foreground shadow-[0_4px_16px_rgba(0,0,0,0.1)] text-lg font-semibold"
-                      variant="outline"
-                    >
-                      View All Plans
-                    </Button>
-                  </motion.div>
                 </motion.div>
               )}
             </AnimatePresence>
