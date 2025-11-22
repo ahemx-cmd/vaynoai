@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ArrowLeft, Sparkles, Globe, Clock, FileText } from "lucide-react";
+import { ArrowRight, ArrowLeft, Sparkles, Globe, Clock, FileText, Store, Rocket } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { trackFunnelStep } from "@/lib/analytics";
@@ -33,6 +33,7 @@ const GuestCampaignFlow = () => {
   
   // Form state
   const [url, setUrl] = useState("");
+  const [userPlatform, setUserPlatform] = useState<"seller" | "founder" | "">("");
   const [sequenceType, setSequenceType] = useState("");
   const [dripDuration, setDripDuration] = useState("");
   const [emailCount, setEmailCount] = useState("");
@@ -47,31 +48,35 @@ const GuestCampaignFlow = () => {
       toast.error("Please enter a valid URL starting with http:// or https://");
       return;
     }
-    if (step === 2 && !sequenceType) {
+    if (step === 2 && !userPlatform) {
+      toast.error("Please select what best describes you");
+      return;
+    }
+    if (step === 3 && !sequenceType) {
       toast.error("Please select a sequence type");
       return;
     }
-    if (step === 3 && !dripDuration) {
+    if (step === 4 && !dripDuration) {
       toast.error("Please enter a drip duration");
       return;
     }
-    if (step === 3 && (isNaN(parseInt(dripDuration)) || parseInt(dripDuration) < 1)) {
+    if (step === 4 && (isNaN(parseInt(dripDuration)) || parseInt(dripDuration) < 1)) {
       toast.error("Please enter a valid duration (minimum 1 day)");
       return;
     }
-    if (step === 3 && !emailCount) {
+    if (step === 4 && !emailCount) {
       toast.error("Please enter the number of emails");
       return;
     }
-    if (step === 3 && (isNaN(parseInt(emailCount)) || parseInt(emailCount) < 1)) {
+    if (step === 4 && (isNaN(parseInt(emailCount)) || parseInt(emailCount) < 1)) {
       toast.error("Please enter a valid number of emails (minimum 1)");
       return;
     }
-    if (step === 4 && !wordCount) {
+    if (step === 5 && !wordCount) {
       toast.error("Please enter the email length");
       return;
     }
-    if (step === 4 && (isNaN(parseInt(wordCount)) || parseInt(wordCount) < 50)) {
+    if (step === 5 && (isNaN(parseInt(wordCount)) || parseInt(wordCount) < 50)) {
       toast.error("Please enter a valid word count (minimum 50 words)");
       return;
     }
@@ -149,14 +154,14 @@ const GuestCampaignFlow = () => {
         {/* Progress Indicator */}
         <div className="max-w-2xl mx-auto mb-8">
           <div className="flex items-center justify-between mb-2">
-            {[1, 2, 3, 4].map((s) => (
+            {[1, 2, 3, 4, 5].map((s) => (
               <div key={s} className="flex items-center flex-1">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
                   s <= step ? 'bg-primary text-primary-foreground shadow-lg scale-110' : 'bg-muted text-muted-foreground'
                 }`}>
                   {s}
                 </div>
-                {s < 4 && (
+                {s < 5 && (
                   <div className={`flex-1 h-1 mx-2 rounded transition-all ${
                     s < step ? 'bg-primary' : 'bg-muted'
                   }`} />
@@ -166,6 +171,7 @@ const GuestCampaignFlow = () => {
           </div>
           <div className="flex justify-between text-xs text-muted-foreground mt-2">
             <span>URL</span>
+            <span>Platform</span>
             <span>Type</span>
             <span>Duration</span>
             <span>Generate</span>
@@ -223,10 +229,101 @@ const GuestCampaignFlow = () => {
               </motion.div>
             )}
 
-            {/* Step 2: Sequence Type */}
+            {/* Step 2: Platform Selection */}
             {step === 2 && (
               <motion.div
                 key="step2"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Card className="relative overflow-hidden border-2 border-primary/20 backdrop-blur-xl bg-background/95">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
+                  
+                  <div className="relative p-12">
+                    <div className="text-center mb-8">
+                      <h2 className="text-3xl font-bold mb-3">What best describes you?</h2>
+                      <p className="text-muted-foreground">
+                        This helps us personalize your email sequences
+                      </p>
+                    </div>
+
+                    <div className="grid gap-4 mb-6">
+                      <button
+                        onClick={() => setUserPlatform("seller")}
+                        className={`p-6 rounded-xl border-2 transition-all text-left hover:scale-105 ${
+                          userPlatform === "seller"
+                            ? 'border-primary bg-primary/10 shadow-lg'
+                            : 'border-border hover:border-primary/50'
+                        }`}
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                            <Store className="w-6 h-6 text-primary" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-xl font-semibold mb-2">
+                              Seller (Shopify / ecommerce)
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              For Shopify stores, dropshipping, ecommerce, POD, DTC brands
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+
+                      <button
+                        onClick={() => setUserPlatform("founder")}
+                        className={`p-6 rounded-xl border-2 transition-all text-left hover:scale-105 ${
+                          userPlatform === "founder"
+                            ? 'border-primary bg-primary/10 shadow-lg'
+                            : 'border-border hover:border-primary/50'
+                        }`}
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                            <Rocket className="w-6 h-6 text-primary" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-xl font-semibold mb-2">
+                              Founder (SaaS / newsletters / digital products)
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              For SaaS founders, indie hackers, newsletters, startup builders, coaches
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        onClick={handleBack}
+                        className="flex-1"
+                      >
+                        <ArrowLeft className="w-5 h-5 mr-2" /> Back
+                      </Button>
+                      <Button
+                        size="lg"
+                        onClick={handleNext}
+                        className="flex-1 btn-premium"
+                        disabled={!userPlatform}
+                      >
+                        Next <ArrowRight className="w-5 h-5 ml-2" />
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            )}
+
+            {/* Step 3: Sequence Type */}
+            {step === 3 && (
+              <motion.div
+                key="step3"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -247,7 +344,7 @@ const GuestCampaignFlow = () => {
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-4 mb-6">
-                      {getSequenceTypes(null).map((type) => (
+                      {getSequenceTypes(userPlatform).map((type) => (
                         <button
                           key={type.value}
                           onClick={() => setSequenceType(type.value)}
@@ -286,10 +383,10 @@ const GuestCampaignFlow = () => {
               </motion.div>
             )}
 
-            {/* Step 3: Drip Duration */}
-            {step === 3 && (
+            {/* Step 4: Drip Duration */}
+            {step === 4 && (
               <motion.div
-                key="step3"
+                key="step4"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -364,10 +461,10 @@ const GuestCampaignFlow = () => {
               </motion.div>
             )}
 
-            {/* Step 4: Word Count & Generate */}
-            {step === 4 && (
+            {/* Step 5: Word Count & Generate */}
+            {step === 5 && (
               <motion.div
-                key="step4"
+                key="step5"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -412,7 +509,7 @@ const GuestCampaignFlow = () => {
                           </div>
                           <div>
                             <span className="text-muted-foreground">Sequence:</span>
-                            <p className="font-medium">{getSequenceTypes(null).find(s => s.value === sequenceType)?.label}</p>
+                            <p className="font-medium">{getSequenceTypes(userPlatform).find(s => s.value === sequenceType)?.label}</p>
                           </div>
                           <div>
                             <span className="text-muted-foreground">Duration:</span>
