@@ -1,4 +1,5 @@
 import { ExternalLink } from "lucide-react";
+import vaynoIcon from "@/assets/vayno-icon.png";
 
 interface VaynoWatermarkProps {
   className?: string;
@@ -14,6 +15,7 @@ const VaynoWatermark = ({ className = "" }: VaynoWatermarkProps) => {
         rel="noopener noreferrer"
         className="font-semibold text-primary hover:text-primary/80 flex items-center gap-1 transition-smooth"
       >
+        <img src={vaynoIcon} alt="Vayno" className="w-4 h-4" />
         Vayno
         <ExternalLink className="w-3 h-3 text-primary" />
       </a>
