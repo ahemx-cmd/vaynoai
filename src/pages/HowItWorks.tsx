@@ -51,9 +51,9 @@ const HowItWorks = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f8f9fb]">
+    <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-lg border-b border-border/50">
+      <nav className="fixed top-0 w-full z-50 bg-card/80 backdrop-blur-lg border-b border-border/50">
         <div className="container mx-auto px-4 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3">
@@ -116,7 +116,7 @@ const HowItWorks = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-16 px-4 bg-white">
+      <section className="py-16 px-4 bg-background">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4 tracking-tight">Why Choose Vayno?</h2>
@@ -214,7 +214,7 @@ const HowItWorks = () => {
       </section>
 
       {/* Use Cases Section */}
-      <section className="py-16 px-4 bg-white">
+      <section className="py-16 px-4 bg-background">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4 tracking-tight">Perfect For</h2>
@@ -264,7 +264,7 @@ const HowItWorks = () => {
             viewport={{ once: true }}
             className="glass-card rounded-3xl p-12 text-center hover-lift"
           >
-            <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center mx-auto mb-6 shadow-lg p-4">
+            <div className="w-20 h-20 rounded-2xl bg-card flex items-center justify-center mx-auto mb-6 shadow-lg p-4">
               <img src={vaynoIcon} alt="Vayno" className="w-full h-full" />
             </div>
             <h2 className="text-4xl font-bold mb-4 tracking-tight">
@@ -283,7 +283,7 @@ const HowItWorks = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-white py-12">
+      <footer className="border-t border-border bg-card py-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
