@@ -17,9 +17,7 @@ const Index = () => {
         <div className="container mx-auto px-4 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center p-2">
-                <img src={vaynoIcon} alt="Vayno" className="w-full h-full" />
-              </div>
+              <img src={vaynoIcon} alt="Vayno" className="w-12 h-12" />
               <span className="font-bold text-2xl tracking-tight">Vayno</span>
             </Link>
             <div className="flex items-center gap-2 sm:gap-3">
@@ -177,9 +175,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center p-2">
-                <img src={vaynoIcon} alt="Vayno" className="w-full h-full" />
-              </div>
+              <img src={vaynoIcon} alt="Vayno" className="w-10 h-10" />
               <span className="font-bold text-xl">Vayno</span>
             </div>
             
