@@ -26,7 +26,7 @@ const DashboardSidebar = () => {
 
   return (
     <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-      <div className="flex flex-col flex-1 bg-white border-r border-border">
+      <div className="flex flex-col flex-1 bg-card border-r border-border">
         {/* Logo */}
         <div className="flex items-center gap-3 px-6 py-6 border-b border-border">
           <img src={vaynoIcon} alt="Vayno" className="w-11 h-11" />

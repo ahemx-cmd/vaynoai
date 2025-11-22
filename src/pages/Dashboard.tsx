@@ -88,7 +88,7 @@ const Dashboard = () => {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-[#f8f9fb] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
       </div>
     );
@@ -103,12 +103,12 @@ const Dashboard = () => {
   const firstName = user.user_metadata?.full_name?.split(" ")[0] || "there";
 
   return (
-    <div className="min-h-screen bg-[#f8f9fb] flex">
+    <div className="min-h-screen bg-background flex">
       <DashboardSidebar />
       
       <div className="flex-1 lg:ml-64">
         {/* Top Bar */}
-        <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-lg border-b border-border">
+        <div className="sticky top-0 z-40 bg-card/80 backdrop-blur-lg border-b border-border">
           <div className="px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 flex-1 min-w-0">

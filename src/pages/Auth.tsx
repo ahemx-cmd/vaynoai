@@ -280,7 +280,7 @@ const Auth = () => {
   // If user is updating password from reset email
   if (isUpdatingPassword) {
     return (
-      <div className="min-h-screen bg-[#f8f9fb] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -346,7 +346,7 @@ const Auth = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fb] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="absolute top-4 left-4">
         <Button variant="ghost" asChild>
           <Link to="/" className="flex items-center gap-2">

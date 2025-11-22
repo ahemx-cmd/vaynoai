@@ -284,7 +284,7 @@ const CampaignView = () => {
                 />
                 {/* Blur overlay for emails 4+ for guests */}
                 {isGuest && i >= 3 && (
-                  <div className="absolute inset-0 bg-white/60 backdrop-blur-md rounded-lg flex items-center justify-center z-10">
+                  <div className="absolute inset-0 bg-background/60 backdrop-blur-md rounded-lg flex items-center justify-center z-10">
                     <Card className="glass-card p-6 max-w-sm mx-4 text-center shadow-xl">
                       <Sparkles className="w-10 h-10 text-primary mx-auto mb-3" />
                       <h3 className="font-bold text-lg mb-2">Sign in to view all emails</h3>
