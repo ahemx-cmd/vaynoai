@@ -42,7 +42,7 @@ const FeaturesGrid = () => {
   ];
 
   return (
-    <section className="py-20 px-4 bg-gradient-to-b from-white to-primary/5">
+    <section className="py-20 px-4 bg-gradient-to-b from-background to-primary/5">
       <div className="container mx-auto max-w-6xl">
         <div className="text-center mb-16">
           <motion.div

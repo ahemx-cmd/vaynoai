@@ -11,9 +11,9 @@ import { trackButtonClick } from "@/lib/analytics";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-[#f8f9fb]">
+    <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-lg border-b border-border/50">
+      <nav className="fixed top-0 w-full z-50 bg-card/80 backdrop-blur-lg border-b border-border/50">
         <div className="container mx-auto px-4 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3">
@@ -107,16 +107,16 @@ const Index = () => {
             <div className="glass-card rounded-2xl p-2 max-w-4xl mx-auto hover-lift">
               <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-xl p-8 aspect-video flex flex-col items-center justify-center gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-white shadow-md flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-xl bg-card shadow-md flex items-center justify-center">
                     <Mail className="w-6 h-6 text-primary" />
                   </div>
                   <ArrowRight className="w-6 h-6 text-muted-foreground" />
-                  <div className="w-12 h-12 rounded-xl bg-white shadow-lg flex items-center justify-center p-2">
+                  <div className="w-12 h-12 rounded-xl bg-card shadow-lg flex items-center justify-center p-2">
                     <img src={vaynoIcon} alt="Vayno AI" className="w-full h-full" />
                   </div>
                   <ArrowRight className="w-6 h-6 text-muted-foreground" />
-                  <div className="w-12 h-12 rounded-xl bg-white shadow-md flex items-center justify-center">
-                    <CheckCircle2 className="w-6 h-6 text-green-500" />
+                  <div className="w-12 h-12 rounded-xl bg-card shadow-md flex items-center justify-center">
+                    <CheckCircle2 className="w-6 h-6 text-primary" />
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground">Paste URL → AI Generates → Export & Send</p>
@@ -130,7 +130,7 @@ const Index = () => {
       <FeaturesGrid />
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-20 px-4 bg-white">
+      <section id="pricing" className="py-20 px-4 bg-background">
         <PricingSection />
       </section>
 
@@ -138,7 +138,7 @@ const Index = () => {
       <Testimonials />
 
       {/* Final CTA Section */}
-      <section className="py-20 px-4 bg-gradient-to-b from-white to-primary/5">
+      <section className="py-20 px-4 bg-gradient-to-b from-background to-primary/5">
         <div className="container mx-auto max-w-4xl">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -147,7 +147,7 @@ const Index = () => {
             viewport={{ once: true }}
             className="glass-card rounded-3xl p-12 text-center hover-lift"
           >
-            <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center mx-auto mb-6 shadow-lg p-4">
+            <div className="w-20 h-20 rounded-2xl bg-card flex items-center justify-center mx-auto mb-6 shadow-lg p-4">
               <img src={vaynoIcon} alt="Vayno" className="w-full h-full" />
             </div>
             <h2 className="text-4xl font-bold mb-4 tracking-tight">
@@ -171,7 +171,7 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-white py-12">
+      <footer className="border-t border-border bg-card py-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
