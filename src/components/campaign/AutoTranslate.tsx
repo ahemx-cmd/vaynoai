@@ -100,7 +100,7 @@ const AutoTranslate = ({ campaignId }: AutoTranslateProps) => {
               </p>
               <Button 
                 className="btn-premium" 
-                onClick={() => window.open('https://vaynoai.lemonsqueezy.com/buy/41de1603-c08e-47de-810f-e60e2eb91c5d', '_blank')}
+                onClick={() => window.open('https://vayno.lemonsqueezy.com/buy/b8a3207d-80e9-4092-8cfc-5f15c00511b1?logo=0', '_blank')}
               >
                 <Crown className="w-4 h-4 mr-2" />
                 Upgrade to Pro

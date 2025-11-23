@@ -63,8 +63,8 @@ const ChoosePlan = () => {
       popular: !isLifetime,
       showToggle: true,
       checkoutUrl: isLifetime 
-        ? "https://vayno.lemonsqueezy.com/checkout/buy/b9b0bdea-ddc5-42b8-8abc-aee080f88fae?logo=0"
-        : "https://vayno.lemonsqueezy.com/checkout/buy/b1c6e286-36a9-4b48-bc80-9b03182d3b83?logo=0"
+        ? "https://vayno.lemonsqueezy.com/buy/b9b0bdea-ddc5-42b8-8abc-aee080f88fae?logo=0"
+        : "https://vayno.lemonsqueezy.com/buy/b1c6e286-36a9-4b48-bc80-9b03182d3b83?logo=0"
     },
     {
       name: "Pro",
@@ -78,7 +78,7 @@ const ChoosePlan = () => {
         "Priority AI & early access"
       ],
       popular: false,
-      checkoutUrl: "https://vayno.lemonsqueezy.com/checkout/buy/b8a3207d-80e9-4092-8cfc-5f15c00511b1?logo=0"
+      checkoutUrl: "https://vayno.lemonsqueezy.com/buy/b8a3207d-80e9-4092-8cfc-5f15c00511b1?logo=0"
     }
   ];
 
