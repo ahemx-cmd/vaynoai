@@ -840,19 +840,24 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
 
     console.log("Campaign generation completed successfully");
 
-    // Increment user credits for authenticated users
+    // Increment user credits for authenticated users - CHARGE PER EMAIL
     if (user) {
-      console.log("Incrementing credits for user:", user.id);
-      const { error: creditError } = await serviceClient.rpc('increment_user_generations', {
-        user_id: user.id
-      });
+      const emailCount = emailsData.emails.length;
+      console.log(`Deducting ${emailCount} credits for user: ${user.id} (1 credit per email)`);
+      
+      // Call increment function once per email generated
+      for (let i = 0; i < emailCount; i++) {
+        const { error: creditError } = await serviceClient.rpc('increment_user_generations', {
+          user_id: user.id
+        });
 
-      if (creditError) {
-        console.error("Error incrementing credits:", creditError);
-        // Don't fail the request, but log the error
-      } else {
-        console.log("Successfully incremented credits for user:", user.id);
+        if (creditError) {
+          console.error(`Error incrementing credit ${i + 1}/${emailCount}:`, creditError);
+          // Don't fail the request, but log the error
+        }
       }
+      
+      console.log(`Successfully deducted ${emailCount} credits for user: ${user.id}`);
     }
 
     return new Response(JSON.stringify({ success: true }), {

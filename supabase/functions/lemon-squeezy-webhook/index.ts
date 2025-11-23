@@ -189,21 +189,23 @@ async function handleSubscriptionCreated(supabase: any, payload: any, userId: st
 
   console.log(`Updating user ${userId} to plan: ${plan} with ${generationsLimit} credits`);
 
+  // Calculate period end: use renewsAt if provided, otherwise set to 1 month from now
+  const periodEnd = renewsAt || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
   const updateData: any = {
     plan,
     generations_limit: generationsLimit,
     generations_used: 0, // Reset credits on new subscription
     subscription_status: status,
     lemonsqueezy_customer_id: customerId,
+    current_period_end: periodEnd, // ALWAYS set period end for monthly resets
   };
 
   if (subscriptionId) {
     updateData.subscription_id = subscriptionId;
   }
 
-  if (renewsAt) {
-    updateData.current_period_end = renewsAt;
-  }
+  console.log(`Setting current_period_end to: ${periodEnd}`);
 
   const { error } = await supabase
     .from('user_usage')
