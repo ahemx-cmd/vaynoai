@@ -53,25 +53,29 @@ const HowItWorks = () => {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="glass-card p-8 rounded-2xl hover-lift h-full">
+              <div className="glass-card p-8 rounded-2xl hover-lift h-full transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 border-2 border-transparent hover:border-primary/20">
                 <div className="mb-6 relative">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mb-4">
+                  <motion.div 
+                    className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mb-4 shadow-lg"
+                    whileHover={{ scale: 1.05, rotate: 5 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
                     {step.isCustomIcon ? (
                       <Sparkles className="w-8 h-8 text-primary" />
                     ) : (
                       step.icon && <step.icon className="w-8 h-8 text-primary" />
                     )}
-                  </div>
-                  <span className="absolute top-0 right-0 text-6xl font-bold text-primary/10">
+                  </motion.div>
+                  <span className="absolute -top-2 -right-2 text-7xl font-bold text-primary/10 select-none">
                     {step.number}
                   </span>
                 </div>
-                <h3 className="text-xl font-semibold mb-3">{step.title}</h3>
+                <h3 className="text-xl font-semibold mb-3 tracking-tight">{step.title}</h3>
                 <p className="text-muted-foreground leading-relaxed">{step.description}</p>
               </div>
               
               {i < steps.length - 1 && (
-                <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-primary/50 to-transparent" />
+                <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-1 bg-gradient-to-r from-primary/40 via-primary/20 to-transparent rounded-full" />
               )}
             </motion.div>
           ))}
