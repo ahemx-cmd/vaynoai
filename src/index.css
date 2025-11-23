@@ -145,22 +145,78 @@ All colors MUST be HSL.
     transition: var(--transition-smooth);
   }
 
-  /* Premium button */
+  /* Premium button with refined hover */
   .btn-premium {
     position: relative;
     overflow: hidden;
+    box-shadow: 0 0 20px hsl(158 100% 50% / 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .btn-premium::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, transparent, hsl(0 0% 100% / 0.1));
+    background: linear-gradient(135deg, transparent, hsl(158 100% 60% / 0.2));
     opacity: 0;
     transition: opacity 0.3s;
   }
 
+  .btn-premium:hover {
+    box-shadow: 0 0 30px hsl(158 100% 50% / 0.4), 0 0 60px hsl(158 100% 50% / 0.2);
+    transform: translateY(-2px);
+  }
+
   .btn-premium:hover::before {
     opacity: 1;
+  }
+
+  .btn-premium:active {
+    transform: translateY(0);
+  }
+
+  /* Icon pulse animation */
+  .icon-pulse {
+    animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse-subtle {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.9;
+      transform: scale(1.05);
+    }
+  }
+
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Better link underline */
+  .link-underline {
+    position: relative;
+    text-decoration: none;
+  }
+
+  .link-underline::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background: var(--gradient-primary);
+    transform: scaleX(0);
+    transform-origin: bottom right;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .link-underline:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
   }
 }

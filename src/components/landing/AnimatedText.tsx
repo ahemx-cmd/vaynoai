@@ -9,7 +9,7 @@ const AnimatedText = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % words.length);
-    }, 2500);
+    }, 3200); // More natural, less mechanical timing
 
     return () => clearInterval(interval);
   }, []);
@@ -19,10 +19,13 @@ const AnimatedText = () => {
       <AnimatePresence mode="wait">
         <motion.span
           key={currentIndex}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
+          initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          exit={{ opacity: 0, y: -20, filter: "blur(4px)" }}
+          transition={{ 
+            duration: 0.5,
+            ease: [0.4, 0, 0.2, 1]
+          }}
           className="inline-block gradient-text relative"
         >
           {words[currentIndex]}
@@ -39,8 +42,8 @@ const AnimatedText = () => {
               fill="none"
               strokeLinecap="round"
               initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.75 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              animate={{ pathLength: 1, opacity: 0.8 }}
+              transition={{ duration: 0.6, delay: 0.3, ease: [0.4, 0, 0.2, 1] }}
             />
             <motion.path
               d="M0,5.3 Q15,5.6 28,5.2 Q40,4.9 55,5.4 Q68,5.7 82,5.1 Q92,4.8 100,5.3"
@@ -49,8 +52,8 @@ const AnimatedText = () => {
               fill="none"
               strokeLinecap="round"
               initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.7 }}
-              transition={{ duration: 0.5, delay: 0.22 }}
+              animate={{ pathLength: 1, opacity: 0.6 }}
+              transition={{ duration: 0.6, delay: 0.35, ease: [0.4, 0, 0.2, 1] }}
             />
             <motion.path
               d="M0,5.1 Q18,5.4 32,5 Q45,4.7 58,5.2 Q72,5.5 85,4.9 Q95,4.6 100,5.1"
@@ -59,8 +62,8 @@ const AnimatedText = () => {
               fill="none"
               strokeLinecap="round"
               initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.65 }}
-              transition={{ duration: 0.5, delay: 0.21 }}
+              animate={{ pathLength: 1, opacity: 0.5 }}
+              transition={{ duration: 0.6, delay: 0.32, ease: [0.4, 0, 0.2, 1] }}
             />
           </svg>
         </motion.span>

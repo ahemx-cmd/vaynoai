@@ -66,16 +66,20 @@ const FeaturesGrid = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
               viewport={{ once: true }}
-              className="glass-card p-6 rounded-2xl hover-lift"
+              className="glass-card p-6 rounded-2xl hover-lift transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 border-2 border-transparent hover:border-primary/20 group"
             >
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mb-4">
+              <motion.div 
+                className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mb-5 shadow-md group-hover:shadow-lg transition-shadow"
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
                 {feature.isCustomIcon ? (
-                  <Sparkles className="w-6 h-6 text-primary" />
+                  <Sparkles className="w-7 h-7 text-primary" />
                 ) : (
-                  feature.icon && <feature.icon className="w-6 h-6 text-primary" />
+                  feature.icon && <feature.icon className="w-7 h-7 text-primary" />
                 )}
-              </div>
-              <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+              </motion.div>
+              <h3 className="text-lg font-semibold mb-3 tracking-tight">{feature.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
             </motion.div>
           ))}
