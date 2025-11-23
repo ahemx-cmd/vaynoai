@@ -12,16 +12,74 @@ interface AutoTranslateProps {
 }
 
 const languages = [
+  // European Languages
   { code: 'es', name: 'Spanish', flag: '🇪🇸' },
   { code: 'fr', name: 'French', flag: '🇫🇷' },
   { code: 'de', name: 'German', flag: '🇩🇪' },
   { code: 'it', name: 'Italian', flag: '🇮🇹' },
   { code: 'pt', name: 'Portuguese', flag: '🇵🇹' },
+  { code: 'nl', name: 'Dutch', flag: '🇳🇱' },
+  { code: 'pl', name: 'Polish', flag: '🇵🇱' },
+  { code: 'ru', name: 'Russian', flag: '🇷🇺' },
+  { code: 'uk', name: 'Ukrainian', flag: '🇺🇦' },
+  { code: 'cs', name: 'Czech', flag: '🇨🇿' },
+  { code: 'ro', name: 'Romanian', flag: '🇷🇴' },
+  { code: 'hu', name: 'Hungarian', flag: '🇭🇺' },
+  { code: 'sv', name: 'Swedish', flag: '🇸🇪' },
+  { code: 'no', name: 'Norwegian', flag: '🇳🇴' },
+  { code: 'da', name: 'Danish', flag: '🇩🇰' },
+  { code: 'fi', name: 'Finnish', flag: '🇫🇮' },
+  { code: 'el', name: 'Greek', flag: '🇬🇷' },
+  { code: 'tr', name: 'Turkish', flag: '🇹🇷' },
+  { code: 'bg', name: 'Bulgarian', flag: '🇧🇬' },
+  { code: 'hr', name: 'Croatian', flag: '🇭🇷' },
+  { code: 'sk', name: 'Slovak', flag: '🇸🇰' },
+  { code: 'sr', name: 'Serbian', flag: '🇷🇸' },
+  { code: 'sl', name: 'Slovenian', flag: '🇸🇮' },
+  { code: 'et', name: 'Estonian', flag: '🇪🇪' },
+  { code: 'lv', name: 'Latvian', flag: '🇱🇻' },
+  { code: 'lt', name: 'Lithuanian', flag: '🇱🇹' },
+  
+  // Asian Languages
   { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
-  { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
+  { code: 'zh', name: 'Chinese (Simplified)', flag: '🇨🇳' },
+  { code: 'zh-TW', name: 'Chinese (Traditional)', flag: '🇹🇼' },
   { code: 'ko', name: 'Korean', flag: '🇰🇷' },
-  { code: 'ar', name: 'Arabic', flag: '🇸🇦' },
   { code: 'hi', name: 'Hindi', flag: '🇮🇳' },
+  { code: 'th', name: 'Thai', flag: '🇹🇭' },
+  { code: 'vi', name: 'Vietnamese', flag: '🇻🇳' },
+  { code: 'id', name: 'Indonesian', flag: '🇮🇩' },
+  { code: 'ms', name: 'Malay', flag: '🇲🇾' },
+  { code: 'tl', name: 'Filipino (Tagalog)', flag: '🇵🇭' },
+  { code: 'bn', name: 'Bengali', flag: '🇧🇩' },
+  { code: 'ur', name: 'Urdu', flag: '🇵🇰' },
+  { code: 'ta', name: 'Tamil', flag: '🇮🇳' },
+  { code: 'te', name: 'Telugu', flag: '🇮🇳' },
+  { code: 'mr', name: 'Marathi', flag: '🇮🇳' },
+  { code: 'kn', name: 'Kannada', flag: '🇮🇳' },
+  
+  // Middle Eastern & African Languages
+  { code: 'ar', name: 'Arabic', flag: '🇸🇦' },
+  { code: 'he', name: 'Hebrew', flag: '🇮🇱' },
+  { code: 'fa', name: 'Persian (Farsi)', flag: '🇮🇷' },
+  { code: 'sw', name: 'Swahili', flag: '🇰🇪' },
+  { code: 'am', name: 'Amharic', flag: '🇪🇹' },
+  
+  // Americas Languages
+  { code: 'pt-BR', name: 'Portuguese (Brazil)', flag: '🇧🇷' },
+  { code: 'es-MX', name: 'Spanish (Mexico)', flag: '🇲🇽' },
+  { code: 'es-AR', name: 'Spanish (Argentina)', flag: '🇦🇷' },
+  
+  // Additional European Languages
+  { code: 'ca', name: 'Catalan', flag: '🇪🇸' },
+  { code: 'eu', name: 'Basque', flag: '🇪🇸' },
+  { code: 'gl', name: 'Galician', flag: '🇪🇸' },
+  { code: 'cy', name: 'Welsh', flag: '🏴󠁧󠁢󠁷󠁬󠁳󠁿' },
+  { code: 'ga', name: 'Irish', flag: '🇮🇪' },
+  { code: 'is', name: 'Icelandic', flag: '🇮🇸' },
+  { code: 'sq', name: 'Albanian', flag: '🇦🇱' },
+  { code: 'mk', name: 'Macedonian', flag: '🇲🇰' },
+  { code: 'mt', name: 'Maltese', flag: '🇲🇹' },
 ];
 
 const AutoTranslate = ({ campaignId }: AutoTranslateProps) => {
