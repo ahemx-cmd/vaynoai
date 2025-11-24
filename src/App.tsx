@@ -22,6 +22,8 @@ import ChoosePlan from "./pages/ChoosePlan";
 import SharedCampaignView from "./pages/SharedCampaignView";
 import HowItWorks from "./pages/HowItWorks";
 import GuestCampaignFlow from "./pages/GuestCampaignFlow";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +48,8 @@ const AppRoutes = () => {
       <Route path="/usage" element={<Usage />} />
       <Route path="/support" element={<Support />} />
       <Route path="/updates" element={<Updates />} />
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>
