@@ -295,9 +295,8 @@ const HowItWorks = () => {
               <a href="mailto:teamvaynosupport@gmail.com" className="hover:text-foreground transition-smooth">
                 Support
               </a>
-              <a href="#" className="hover:text-foreground transition-smooth">Terms</a>
-              <a href="#" className="hover:text-foreground transition-smooth">Privacy</a>
-              <a href="#" className="hover:text-foreground transition-smooth">Refund Policy</a>
+              <a href="/terms" className="hover:text-foreground transition-smooth">Terms</a>
+              <a href="/privacy" className="hover:text-foreground transition-smooth">Privacy</a>
             </div>
             
             <p className="text-sm text-muted-foreground">

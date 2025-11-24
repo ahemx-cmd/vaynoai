@@ -217,14 +217,11 @@ const Index = () => {
               >
                 Support
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-all duration-300 link-underline font-medium">
+              <a href="/terms" className="text-muted-foreground hover:text-primary transition-all duration-300 link-underline font-medium">
                 Terms
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-all duration-300 link-underline font-medium">
+              <a href="/privacy" className="text-muted-foreground hover:text-primary transition-all duration-300 link-underline font-medium">
                 Privacy
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-all duration-300 link-underline font-medium">
-                Refund Policy
               </a>
             </div>
             
