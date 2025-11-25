@@ -45,9 +45,9 @@ const Usage = () => {
   }, [navigate]);
 
   const getLimits = () => {
-    if (isPro) return { generations: 400, name: "Pro" };
-    if (isStarter) return { generations: 150, name: "Starter" };
-    if (isLifetime) return { generations: 150, name: "Lifetime" };
+    if (isPro) return { generations: 500, name: "Pro" };
+    if (isStarter) return { generations: 120, name: "Starter" };
+    if (isLifetime) return { generations: 120, name: "Lifetime" };
     return { generations: 20, name: "Free Trial" };
   };
 
@@ -285,7 +285,7 @@ const Usage = () => {
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold mb-2">Need More Credits?</h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Upgrade to {isTrial ? "Starter (150 credits/month) or Pro (400 credits/month)" : "Pro (400 credits/month)"} for more credits, advanced features, and priority support.
+                      Upgrade to {isTrial ? "Starter (120 credits/month) or Pro (500 credits/month)" : "Pro (500 credits/month)"} for more credits, advanced features, and priority support.
                     </p>
                     <Button onClick={() => navigate("/billing")}>
                       <Crown className="w-4 h-4 mr-2" />

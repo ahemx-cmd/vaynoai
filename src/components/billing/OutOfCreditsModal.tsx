@@ -68,12 +68,12 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
   const plans = [
     {
       name: "Starter",
-      price: 19,
+      price: 9,
       description: "For growing businesses",
       icon: CreditCard,
       color: "from-primary to-accent",
       checkoutUrl: "https://vayno.lemonsqueezy.com/buy/b1c6e286-36a9-4b48-bc80-9b03182d3b83?logo=0",
-      features: ["150 credits per month", "Remove watermark", "Priority AI speed", "Email support"],
+      features: ["120 credits per month", "Remove watermark", "Priority AI speed", "Email support"],
       popular: true
     },
     {
@@ -83,7 +83,7 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
       icon: Crown,
       color: "from-accent to-primary",
       checkoutUrl: "https://vayno.lemonsqueezy.com/buy/b8a3207d-80e9-4092-8cfc-5f15c00511b1?logo=0",
-      features: ["400 credits per month", "Everything in Starter", "Auto-Translate", "Priority AI & early access"]
+      features: ["500 credits per month", "Everything in Starter", "Auto-Translate", "Priority AI & early access"]
     },
     {
       name: "Lifetime",
@@ -92,7 +92,7 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
       icon: Sparkles,
       color: "from-primary to-accent",
       checkoutUrl: "https://vayno.lemonsqueezy.com/buy/b9b0bdea-ddc5-42b8-8abc-aee080f88fae?logo=0",
-      features: ["150 credits per month", "Remove watermark", "Priority AI speed", "Email support"],
+      features: ["120 credits per month", "Remove watermark", "Priority AI speed", "Email support"],
       isLifetime: true
     }
   ];
