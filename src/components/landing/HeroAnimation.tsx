@@ -1,0 +1,297 @@
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { FileText, Mail, Zap, Send } from "lucide-react";
+
+const HeroAnimation = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const springConfig = { stiffness: 150, damping: 15 };
+  const x = useSpring(mouseX, springConfig);
+  const y = useSpring(mouseY, springConfig);
+
+  const [isHovering, setIsHovering] = useState(false);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      
+      mouseX.set((e.clientX - centerX) / 25);
+      mouseY.set((e.clientY - centerY) / 25);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [mouseX, mouseY]);
+
+  const emailCards = [
+    {
+      subject: "Welcome to [Product Name]",
+      preview: "Thanks for signing up! Here's what to expect...",
+      day: "Day 0",
+      icon: Mail,
+      delay: 2,
+    },
+    {
+      subject: "Here's how [Product] solves your problem",
+      preview: "Let me show you the key features that make...",
+      day: "Day 2",
+      icon: Zap,
+      delay: 2.3,
+    },
+    {
+      subject: "Real results from customers like you",
+      preview: "Don't just take our word for it. See how...",
+      day: "Day 5",
+      icon: FileText,
+      delay: 2.6,
+    },
+    {
+      subject: "Ready to get started?",
+      preview: "You've seen what we can do. Let's make it happen...",
+      day: "Day 7",
+      icon: Send,
+      delay: 2.9,
+    },
+  ];
+
+  return (
+    <div 
+      ref={containerRef}
+      className="relative w-full h-[600px]"
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
+      {/* Orbit ring background */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 0.3, scale: 1 }}
+        transition={{ duration: 1.5, delay: 1 }}
+        className="absolute inset-0 flex items-center justify-center"
+      >
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+          className="w-[500px] h-[500px] rounded-full border border-primary/20"
+          style={{ boxShadow: '0 0 40px rgba(35,255,128,0.1)' }}
+        />
+      </motion.div>
+
+      {/* Landing page screenshot mockup */}
+      <motion.div
+        initial={{ opacity: 0, x: -50, scale: 0.9 }}
+        animate={{ opacity: 1, x: 0, scale: 1 }}
+        transition={{ duration: 0.8, delay: 0.5 }}
+        className="absolute left-0 top-1/2 -translate-y-1/2 w-64 h-80 glass-card rounded-2xl border-primary/30 overflow-hidden"
+        style={{
+          x: useTransform(x, [-50, 50], [-10, 10]),
+          y: useTransform(y, [-50, 50], [-10, 10]),
+        }}
+      >
+        {/* Mockup landing page content */}
+        <div className="p-6 space-y-4 relative z-10">
+          <div className="h-4 bg-primary/20 rounded-full w-3/4" />
+          <div className="h-3 bg-muted/30 rounded-full w-full" />
+          <div className="h-3 bg-muted/30 rounded-full w-5/6" />
+          <div className="h-3 bg-muted/30 rounded-full w-4/6" />
+          
+          <div className="pt-4 space-y-2">
+            <div className="h-8 bg-primary/10 rounded-lg border border-primary/20" />
+            <div className="h-8 bg-primary/10 rounded-lg border border-primary/20" />
+          </div>
+        </div>
+
+        {/* Scan line effect */}
+        <motion.div
+          initial={{ y: '-100%', opacity: 0 }}
+          animate={{ 
+            y: ['0%', '200%'], 
+            opacity: [0, 1, 1, 0] 
+          }}
+          transition={{ 
+            duration: 2.5, 
+            delay: 1.2,
+            ease: "easeInOut"
+          }}
+          className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/40 to-transparent pointer-events-none"
+          style={{ 
+            height: '80px',
+            boxShadow: '0 0 30px rgba(35,255,128,0.5)'
+          }}
+        />
+
+        {/* Blur overlay during scan */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0.5, 0] }}
+          transition={{ duration: 2.5, delay: 1.2 }}
+          className="absolute inset-0 backdrop-blur-[2px] bg-background/20"
+        />
+      </motion.div>
+
+      {/* Email cards floating */}
+      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[400px] h-full flex items-center">
+        <div className="relative w-full h-[500px]">
+          {emailCards.map((card, index) => {
+            const rotateX = useTransform(y, [-50, 50], [5, -5]);
+            const rotateY = useTransform(x, [-50, 50], [-5, 5]);
+            
+            return (
+              <motion.div
+                key={index}
+                initial={{ 
+                  opacity: 0, 
+                  scale: 0.5,
+                  x: -100,
+                  rotateX: -20,
+                }}
+                animate={{ 
+                  opacity: 1, 
+                  scale: 1,
+                  x: 0,
+                  rotateX: 0,
+                }}
+                transition={{ 
+                  duration: 0.6, 
+                  delay: card.delay,
+                  type: "spring",
+                  stiffness: 100
+                }}
+                style={{
+                  position: 'absolute',
+                  top: `${index * 25}%`,
+                  left: `${index * 10}px`,
+                  rotateX: isHovering ? rotateX : 0,
+                  rotateY: isHovering ? rotateY : 0,
+                  x: useTransform(x, [-50, 50], [-index * 3, index * 3]),
+                  y: useTransform(y, [-50, 50], [-index * 3, index * 3]),
+                  transformPerspective: 1000,
+                  zIndex: emailCards.length - index,
+                }}
+                className="glass-card rounded-2xl p-5 border-primary/30 hover:border-primary/50 transition-all cursor-pointer group"
+                whileHover={{ 
+                  scale: 1.05,
+                  boxShadow: '0 0 40px rgba(35,255,128,0.3)'
+                }}
+              >
+                {/* Glow effect */}
+                <div className="absolute inset-0 rounded-2xl bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
+                
+                <div className="relative z-10">
+                  {/* Icon and day badge */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center">
+                      <card.icon className="w-4 h-4 text-primary" />
+                    </div>
+                    <span className="text-xs font-mono text-primary">{card.day}</span>
+                  </div>
+
+                  {/* Email subject */}
+                  <h4 className="text-sm font-bold mb-2 leading-tight">
+                    {card.subject}
+                  </h4>
+
+                  {/* Email preview */}
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {card.preview}
+                  </p>
+
+                  {/* Animated dots indicator */}
+                  <div className="flex items-center gap-1 mt-3">
+                    <motion.div
+                      animate={{ opacity: [0.3, 1, 0.3] }}
+                      transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
+                      className="w-1 h-1 rounded-full bg-primary"
+                    />
+                    <motion.div
+                      animate={{ opacity: [0.3, 1, 0.3] }}
+                      transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
+                      className="w-1 h-1 rounded-full bg-primary"
+                    />
+                    <motion.div
+                      animate={{ opacity: [0.3, 1, 0.3] }}
+                      transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
+                      className="w-1 h-1 rounded-full bg-primary"
+                    />
+                  </div>
+                </div>
+
+                {/* Card edge glow */}
+                <motion.div
+                  className="absolute inset-0 rounded-2xl pointer-events-none"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(35,255,128,0.1), transparent)',
+                    opacity: 0,
+                  }}
+                  whileHover={{ opacity: 1 }}
+                />
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Connecting lines animation */}
+      <svg 
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        style={{ zIndex: 1 }}
+      >
+        <motion.path
+          d="M 280 300 Q 400 300 450 200"
+          stroke="hsl(152 100% 56% / 0.3)"
+          strokeWidth="2"
+          fill="none"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 1 }}
+          transition={{ duration: 1, delay: 2.5 }}
+        />
+        <motion.path
+          d="M 280 300 Q 400 300 450 300"
+          stroke="hsl(152 100% 56% / 0.3)"
+          strokeWidth="2"
+          fill="none"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 1 }}
+          transition={{ duration: 1, delay: 2.7 }}
+        />
+        <motion.path
+          d="M 280 300 Q 400 300 450 400"
+          stroke="hsl(152 100% 56% / 0.3)"
+          strokeWidth="2"
+          fill="none"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 1 }}
+          transition={{ duration: 1, delay: 2.9 }}
+        />
+      </svg>
+
+      {/* Floating particles */}
+      {[...Array(8)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-1 h-1 rounded-full bg-primary/30"
+          style={{
+            left: `${20 + i * 10}%`,
+            top: `${30 + (i % 3) * 20}%`,
+          }}
+          animate={{
+            y: [0, -20, 0],
+            opacity: [0.2, 0.6, 0.2],
+            scale: [1, 1.5, 1],
+          }}
+          transition={{
+            duration: 3 + i * 0.5,
+            repeat: Infinity,
+            delay: i * 0.3,
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+export default HeroAnimation;

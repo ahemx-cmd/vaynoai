@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Zap, FileText, Sparkles, Code2, Mail } from "lucide-react";
+import { ArrowRight, Sparkles, Code2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import PricingSection from "@/components/pricing/PricingSection";
 import FeaturesGrid from "@/components/landing/FeaturesGrid";
 import HowItWorks from "@/components/landing/HowItWorks";
+import HeroAnimation from "@/components/landing/HeroAnimation";
 import vaynoIcon from "@/assets/vayno-icon.png";
-import dashboardPreview from "@/assets/dashboard-preview.png";
 import { trackButtonClick } from "@/lib/analytics";
 import { useRef } from "react";
 
@@ -95,7 +95,7 @@ const Index = () => {
           className="absolute top-60 left-16 hidden lg:block"
         >
           <div className="float glass-card rounded-xl p-3 border-primary/20" style={{ animationDelay: '1s' }}>
-            <Mail className="w-5 h-5 text-primary" />
+            <Sparkles className="w-5 h-5 text-primary" />
           </div>
         </motion.div>
 
@@ -153,60 +153,12 @@ const Index = () => {
 
             {/* Right: AI Transformation Animation */}
             <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1, delay: 0.4 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 0.3 }}
               className="relative"
             >
-              {/* Dashboard preview with scan effect */}
-              <div className="relative">
-                <div className="glass-card rounded-3xl overflow-hidden border-primary/30 glow-soft hover-lift">
-                  <img 
-                    src={dashboardPreview} 
-                    alt="Vayno Dashboard" 
-                    className="w-full h-auto"
-                  />
-                  {/* Scan line effect */}
-                  <motion.div
-                    initial={{ y: '-100%', opacity: 0 }}
-                    animate={{ y: ['0%', '200%'], opacity: [0, 1, 0] }}
-                    transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
-                    className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/30 to-transparent pointer-events-none"
-                    style={{ height: '100px' }}
-                  />
-                </div>
-
-                {/* Floating email cards */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8, x: 20, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
-                  transition={{ delay: 1.5, duration: 0.8 }}
-                  className="absolute -right-8 -bottom-8 glass-card rounded-2xl p-4 border-primary/30 shadow-[0_0_30px_rgba(35,255,128,0.3)]"
-                >
-                  <div className="flex items-start gap-3">
-                    <FileText className="w-5 h-5 text-primary mt-1" />
-                    <div>
-                      <p className="font-semibold text-sm mb-1">Welcome Email</p>
-                      <p className="text-xs text-muted-foreground">Day 0 · 180 words</p>
-                    </div>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8, x: -20, y: 40 }}
-                  animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
-                  transition={{ delay: 1.8, duration: 0.8 }}
-                  className="absolute -left-8 top-20 glass-card rounded-2xl p-4 border-primary/30 shadow-[0_0_30px_rgba(35,255,128,0.3)]"
-                >
-                  <div className="flex items-start gap-3">
-                    <Zap className="w-5 h-5 text-primary mt-1" />
-                    <div>
-                      <p className="font-semibold text-sm mb-1">Value Prop</p>
-                      <p className="text-xs text-muted-foreground">Day 2 · 220 words</p>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
+              <HeroAnimation />
             </motion.div>
           </div>
         </motion.div>
