@@ -115,10 +115,10 @@ const Dashboard = () => {
                 <MobileSidebar />
                 <div className="flex-1 min-w-0">
                   <h1 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight truncate">
-                    Hi, {firstName} ✨
+                    {firstName}
                   </h1>
                   <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 hidden sm:block">
-                    Create and manage your email campaigns
+                    Your campaigns
                   </p>
                 </div>
               </div>
@@ -129,11 +129,11 @@ const Dashboard = () => {
                 </div>
                 <Button 
                   onClick={() => navigate("/create-campaign")} 
-                  className="btn-premium shadow-md hover-lift"
+                  className="btn-premium"
                   size="sm"
                 >
                   <Plus className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">New Campaign</span>
+                  <span className="hidden sm:inline">New</span>
                 </Button>
                 <Avatar 
                   className="cursor-pointer hover-lift h-9 w-9 sm:h-10 sm:w-10"
@@ -154,48 +154,7 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="space-y-6 sm:space-y-8"
           >
-            {showLifetimeBanner && isTrial && (
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="relative bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 border border-amber-500/30 rounded-xl p-4 sm:p-6 overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-orange-500/5 animate-pulse" />
-                <button
-                  onClick={() => setShowLifetimeBanner(false)}
-                  className="absolute top-3 right-3 sm:top-4 sm:right-4 text-muted-foreground hover:text-foreground transition-colors z-10"
-                >
-                  <X className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
-                <div className="relative flex flex-col sm:flex-row items-center gap-4 pr-8">
-                  <div className="flex-shrink-0">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
-                      <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
-                    </div>
-                  </div>
-                  <div className="flex-1 text-center sm:text-left">
-                    <h3 className="text-base sm:text-xl font-bold mb-1 flex items-center gap-2 justify-center sm:justify-start flex-wrap">
-                      <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
-                      <span>Limited Time: Lifetime Deal Available!</span>
-                    </h3>
-                    <p className="text-sm sm:text-base text-muted-foreground">
-                      Get access to the Starter plan features forever. Pay once, use forever – no monthly fees!
-                    </p>
-                  </div>
-                  <Button 
-                    className="flex-shrink-0 w-full sm:w-auto bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg hover-lift text-sm sm:text-base"
-                    size="sm"
-                    onClick={() => window.open('https://vaynoai.lemonsqueezy.com/buy/c58b5d67-6c25-490c-846f-3e7963b5b804', '_blank')}
-                  >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    <span className="hidden sm:inline">Get Lifetime Deal ($59)</span>
-                    <span className="sm:hidden">Get Deal ($59)</span>
-                  </Button>
-                </div>
-              </motion.div>
-            )}
             <CampaignsList userId={user.id} />
           </motion.div>
         </div>

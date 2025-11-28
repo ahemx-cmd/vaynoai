@@ -132,9 +132,9 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                 </div>
               </motion.div>
               <DialogTitle className="text-3xl font-bold text-foreground drop-shadow-sm">
-                You're out of credits
+                Out of credits
               </DialogTitle>
-              <p className="text-muted-foreground text-lg">Choose how you'd like to continue</p>
+              <p className="text-muted-foreground text-lg">Pick one to keep going</p>
             </DialogHeader>
 
             <AnimatePresence mode="wait">
@@ -163,8 +163,8 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                           <Zap className="w-6 h-6 text-primary-foreground" />
                         </div>
                         <div className="text-left">
-                          <h3 className="text-xl font-bold text-foreground">Buy More Credits</h3>
-                          <p className="text-sm text-muted-foreground">Top-up to keep generating campaigns</p>
+                          <h3 className="text-xl font-bold text-foreground">Top-up</h3>
+                          <p className="text-sm text-muted-foreground">Buy credits to keep creating</p>
                         </div>
                       </div>
                     </Button>
@@ -186,8 +186,8 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                           <Crown className="w-6 h-6 text-primary-foreground" />
                         </div>
                         <div className="text-left">
-                          <h3 className="text-xl font-bold text-foreground">Upgrade Your Plan</h3>
-                          <p className="text-sm text-muted-foreground">Unlock monthly credits + advanced features</p>
+                          <h3 className="text-xl font-bold text-foreground">Upgrade</h3>
+                          <p className="text-sm text-muted-foreground">Monthly credits + features</p>
                         </div>
                       </div>
                     </Button>
@@ -199,7 +199,7 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                     transition={{ delay: 0.3 }}
                     className="text-center text-sm text-muted-foreground pt-4"
                   >
-                    Not sure what to choose? Start with a small top-up.
+                    Not sure? Start small with a top-up.
                   </motion.p>
                 </motion.div>
               )}

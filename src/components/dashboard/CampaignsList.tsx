@@ -109,17 +109,17 @@ const CampaignsList = ({ userId }: CampaignsListProps) => {
 
   if (campaigns.length === 0) {
     return (
-      <Card className="glass-card p-12 text-center hover-lift">
+      <Card className="glass-card p-12 text-center">
         <div className="max-w-md mx-auto">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mx-auto mb-4">
-            <ExternalLink className="w-8 h-8 text-primary" />
+          <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+            <ExternalLink className="w-7 h-7 text-primary" />
           </div>
-          <h3 className="text-xl font-semibold mb-2">No campaigns yet ✨</h3>
-          <p className="text-muted-foreground mb-6 leading-relaxed">
-            Let's create your first magic — generate professional email campaigns in minutes
+          <h3 className="text-xl font-semibold mb-2">Nothing here yet</h3>
+          <p className="text-muted-foreground mb-6">
+            Create your first campaign to get started
           </p>
-          <Button onClick={() => navigate("/create-campaign")} className="btn-premium shadow-lg">
-            Create First Campaign
+          <Button onClick={() => navigate("/create-campaign")} className="btn-premium">
+            Create campaign
           </Button>
         </div>
       </Card>
@@ -141,7 +141,10 @@ const CampaignsList = ({ userId }: CampaignsListProps) => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6 tracking-tight">Your Campaigns</h2>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-2xl font-bold tracking-tight">Campaigns</h2>
+        <span className="text-sm text-muted-foreground">{campaigns.length} total</span>
+      </div>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {campaigns.map((campaign, i) => (
           <motion.div
@@ -194,18 +197,18 @@ const CampaignsList = ({ userId }: CampaignsListProps) => {
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Delete this masterpiece? Really?</AlertDialogTitle>
+                      <AlertDialogTitle>Delete campaign?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This campaign is about to go *poof* 💨 Like, forever gone. No ctrl+Z, no "just kidding", no digital afterlife. Are you absolutely, positively, 100% sure about this?
+                        This will permanently delete this campaign and all its emails. This can't be undone.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Nah, I'll keep it</AlertDialogCancel>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={() => handleDelete(campaign.id)}
                         className="bg-destructive hover:bg-destructive/90"
                       >
-                        Yes, delete
+                        Delete
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
