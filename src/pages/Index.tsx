@@ -67,7 +67,7 @@ const Index = () => {
             
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-[1.05] tracking-tight">
               Stop writing.<br/>
-              Start <span className="text-primary">launching</span>.
+              Start <span className="text-primary">selling</span>.
             </h1>
             
             <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed max-w-xl">
@@ -128,7 +128,6 @@ const Index = () => {
         <div className="container mx-auto max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <p className="text-sm uppercase tracking-wider text-muted-foreground mb-4">Used by 800+ founders</p>
               <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight">
                 Your landing page already has the copy.<br/>
                 We just turn it into emails.

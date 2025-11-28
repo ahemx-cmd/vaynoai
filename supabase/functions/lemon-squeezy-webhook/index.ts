@@ -175,16 +175,16 @@ async function handleSubscriptionCreated(supabase: any, payload: any, userId: st
 
   if (productName?.toLowerCase().includes('lifetime') || variantName?.toLowerCase().includes('lifetime')) {
     plan = 'lifetime';
-    generationsLimit = 120;
-    console.log('Detected lifetime plan - 120 credits');
+    generationsLimit = 150;
+    console.log('Detected lifetime plan - 150 credits');
   } else if (productName?.toLowerCase().includes('pro') || variantName?.toLowerCase().includes('pro')) {
     plan = 'pro';
     generationsLimit = 500;
     console.log('Detected pro plan - 500 credits');
   } else if (productName?.toLowerCase().includes('starter') || variantName?.toLowerCase().includes('starter')) {
     plan = 'starter';
-    generationsLimit = 120;
-    console.log('Detected starter plan - 120 credits');
+    generationsLimit = 150;
+    console.log('Detected starter plan - 150 credits');
   }
 
   console.log(`Updating user ${userId} to plan: ${plan} with ${generationsLimit} credits`);
