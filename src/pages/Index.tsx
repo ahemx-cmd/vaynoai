@@ -1,26 +1,44 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Zap, FileText, Download } from "lucide-react";
+import { ArrowRight, Zap, FileText, Sparkles, Code2, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import PricingSection from "@/components/pricing/PricingSection";
+import FeaturesGrid from "@/components/landing/FeaturesGrid";
+import HowItWorks from "@/components/landing/HowItWorks";
 import vaynoIcon from "@/assets/vayno-icon.png";
 import dashboardPreview from "@/assets/dashboard-preview.png";
 import { trackButtonClick } from "@/lib/analytics";
+import { useRef } from "react";
 
 const Index = () => {
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"]
+  });
+
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Navigation - Minimal */}
-      <nav className="fixed top-0 w-full z-50 bg-background/60 backdrop-blur-2xl border-b border-border/20">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Ambient background effects */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-primary/3 rounded-full blur-[100px]" />
+      </div>
+
+      {/* Navigation - Premium Glass */}
+      <nav className="fixed top-0 w-full z-50 glass-card border-b border-border/50">
         <div className="container mx-auto px-6 lg:px-12 py-5">
           <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2.5 group">
+            <Link to="/" className="flex items-center gap-3 group">
               <img 
                 src={vaynoIcon} 
                 alt="Vayno" 
-                className="w-9 h-9 transition-transform duration-200 group-hover:scale-105" 
+                className="w-10 h-10 transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_12px_rgba(35,255,128,0.5)]" 
               />
-              <span className="font-semibold text-xl tracking-tight text-foreground">
+              <span className="font-bold text-2xl tracking-tight text-foreground">
                 Vayno
               </span>
             </Link>
@@ -29,14 +47,14 @@ const Index = () => {
                 variant="ghost" 
                 asChild 
                 size="sm" 
-                className="text-sm font-medium hover:text-foreground"
+                className="text-sm font-medium hover:text-primary transition-colors"
                 onClick={() => trackButtonClick('Sign In', 'nav-bar')}
               >
                 <Link to="/auth">Sign in</Link>
               </Button>
               <Button 
                 asChild 
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-lg shadow-primary/20" 
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all" 
                 size="sm"
                 onClick={() => trackButtonClick('Try Free', 'nav-bar')}
               >
@@ -47,229 +65,340 @@ const Index = () => {
         </div>
       </nav>
 
-      {/* Hero - Asymmetric, Bold */}
-      <section className="relative pt-40 pb-24 px-6 lg:px-12 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/3" />
-        <div className="absolute top-40 right-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        
-        <div className="container mx-auto relative z-10 max-w-7xl">
-          <div className="grid lg:grid-cols-12 gap-16 items-start">
-            {/* Left: Hero Content - 7 cols */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="lg:col-span-7 pt-8"
-            >
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-primary/30 bg-primary/8 mb-8">
-                <span className="text-xs font-medium text-primary uppercase tracking-wide">Launch-ready sequences</span>
-              </div>
-              
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-8 leading-[1.05] tracking-tight">
-                Stop writing.<br/>
-                Start <span className="text-primary">selling</span>.
-              </h1>
-              
-              <p className="text-lg md:text-xl mb-10 leading-relaxed max-w-xl" style={{ color: 'hsl(215 15% 60%)' }}>
-                Drop your product URL. Get a complete email drip sequence in 30 seconds. 
-                No prompts, no edits—just campaigns that convert.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 mb-10">
-                <Button 
-                  size="lg" 
-                  asChild 
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium h-14 px-8 shadow-lg shadow-primary/25 group"
-                  onClick={() => trackButtonClick('Try Free', 'hero-section')}
+      {/* Hero Section - Premium with Animations */}
+      <section ref={heroRef} className="relative pt-48 pb-32 px-6 lg:px-12 overflow-hidden">
+        {/* Orbit ring behind hero */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] opacity-20">
+          <div className="orbit absolute inset-0 rounded-full border border-primary/20" 
+               style={{ boxShadow: '0 0 60px rgba(35,255,128,0.1)' }} />
+        </div>
+
+        {/* Floating elements */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1, duration: 1 }}
+          className="absolute top-40 right-20 hidden lg:block"
+        >
+          <div className="float glass-card rounded-2xl p-4 border-primary/30">
+            <div className="flex items-center gap-2 text-sm">
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-muted-foreground">+4 sequences created</span>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 1.2, duration: 1 }}
+          className="absolute top-60 left-16 hidden lg:block"
+        >
+          <div className="float glass-card rounded-xl p-3 border-primary/20" style={{ animationDelay: '1s' }}>
+            <Mail className="w-5 h-5 text-primary" />
+          </div>
+        </motion.div>
+
+        <motion.div 
+          style={{ opacity: heroOpacity, scale: heroScale }}
+          className="container mx-auto relative z-10 max-w-7xl"
+        >
+          <div className="grid lg:grid-cols-2 gap-20 items-center">
+            {/* Left: Hero Content */}
+            <div>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+              >
+                <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full glass-card border-primary/30 mb-10">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-semibold text-primary uppercase tracking-wider">Launch-ready sequences</span>
+                </div>
+                
+                <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold mb-10 leading-[0.95] tracking-tighter">
+                  Stop writing.<br/>
+                  Start <span className="gradient-text">selling</span>.
+                </h1>
+                
+                <p className="text-xl md:text-2xl mb-12 leading-relaxed text-muted-foreground max-w-xl">
+                  Drop your product URL. Get a complete email drip sequence in 30 seconds. 
+                  No prompts, no edits—just campaigns that convert.
+                </p>
+                
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.8 }}
+                  className="mb-8"
                 >
-                  <Link to="/guest-flow" className="flex items-center gap-2">
-                    Create your first campaign
-                    <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </Button>
-              </div>
+                  <Button 
+                    size="lg" 
+                    asChild 
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-16 px-10 text-lg rounded-2xl shadow-[0_0_40px_rgba(35,255,128,0.4)] hover:shadow-[0_0_60px_rgba(35,255,128,0.6)] transition-all group"
+                    onClick={() => trackButtonClick('Try Free', 'hero-section')}
+                  >
+                    <Link to="/guest-flow" className="flex items-center gap-3">
+                      Create your first campaign
+                      <ArrowRight className="w-6 h-6 transition-transform group-hover:translate-x-1" />
+                    </Link>
+                  </Button>
+                </motion.div>
 
-              <p className="text-sm" style={{ color: 'hsl(215 15% 50%)' }}>
-                Free campaign · No signup required
-              </p>
-            </motion.div>
+                <p className="text-sm text-muted-foreground">
+                  Free campaign · No signup required
+                </p>
+              </motion.div>
+            </div>
 
-            {/* Right: Dashboard Preview - 5 cols, offset */}
+            {/* Right: AI Transformation Animation */}
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
+              initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className="lg:col-span-5 mt-16 lg:mt-0"
+              transition={{ duration: 1, delay: 0.4 }}
+              className="relative"
             >
-              <div className="rounded-3xl overflow-hidden border border-border/30 shadow-2xl">
-                <img 
-                  src={dashboardPreview} 
-                  alt="Vayno Dashboard" 
-                  className="w-full h-auto"
-                />
+              {/* Dashboard preview with scan effect */}
+              <div className="relative">
+                <div className="glass-card rounded-3xl overflow-hidden border-primary/30 glow-soft hover-lift">
+                  <img 
+                    src={dashboardPreview} 
+                    alt="Vayno Dashboard" 
+                    className="w-full h-auto"
+                  />
+                  {/* Scan line effect */}
+                  <motion.div
+                    initial={{ y: '-100%', opacity: 0 }}
+                    animate={{ y: ['0%', '200%'], opacity: [0, 1, 0] }}
+                    transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
+                    className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/30 to-transparent pointer-events-none"
+                    style={{ height: '100px' }}
+                  />
+                </div>
+
+                {/* Floating email cards */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8, x: 20, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
+                  transition={{ delay: 1.5, duration: 0.8 }}
+                  className="absolute -right-8 -bottom-8 glass-card rounded-2xl p-4 border-primary/30 shadow-[0_0_30px_rgba(35,255,128,0.3)]"
+                >
+                  <div className="flex items-start gap-3">
+                    <FileText className="w-5 h-5 text-primary mt-1" />
+                    <div>
+                      <p className="font-semibold text-sm mb-1">Welcome Email</p>
+                      <p className="text-xs text-muted-foreground">Day 0 · 180 words</p>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8, x: -20, y: 40 }}
+                  animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
+                  transition={{ delay: 1.8, duration: 0.8 }}
+                  className="absolute -left-8 top-20 glass-card rounded-2xl p-4 border-primary/30 shadow-[0_0_30px_rgba(35,255,128,0.3)]"
+                >
+                  <div className="flex items-start gap-3">
+                    <Zap className="w-5 h-5 text-primary mt-1" />
+                    <div>
+                      <p className="font-semibold text-sm mb-1">Value Prop</p>
+                      <p className="text-xs text-muted-foreground">Day 2 · 220 words</p>
+                    </div>
+                  </div>
+                </motion.div>
               </div>
             </motion.div>
           </div>
+        </motion.div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-32 px-6 lg:px-12 relative">
+        <div className="container mx-auto max-w-7xl">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-20"
+          >
+            <h2 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">
+              Your landing page already has the copy.
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              We read your product page and write emails that sound like you wrote them.
+            </p>
+          </motion.div>
+
+          <FeaturesGrid />
         </div>
       </section>
 
-      {/* Value Prop - Offset Grid */}
-      <section className="py-32 px-6 lg:px-12 bg-gradient-to-b from-transparent to-card/20">
-        <div className="container mx-auto max-w-7xl">
-          <div className="grid lg:grid-cols-5 gap-20 items-center">
-            {/* Left: Visual - 2 cols */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="lg:col-span-2"
-            >
-              <div className="bg-card/40 backdrop-blur-xl rounded-3xl p-10 border border-border/30">
-                <div className="space-y-6">
-                  <div className="w-12 h-12 rounded-2xl bg-primary/15 flex items-center justify-center">
-                    <Zap className="w-6 h-6 text-primary" />
+      {/* Why Vayno Works - AI Logic Visual */}
+      <section className="py-32 px-6 lg:px-12 relative">
+        <div className="container mx-auto max-w-5xl">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">
+              Engineered for conversion
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              AI-powered extraction of your product's DNA
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="glass-card rounded-3xl p-10 border-primary/30 font-mono text-sm hover-lift"
+          >
+            <div className="space-y-4">
+              <div className="flex items-start gap-4">
+                <Code2 className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                <div className="space-y-3 flex-1">
+                  <div className="flex items-center gap-3">
+                    <span className="text-primary">headline:</span>
+                    <span className="text-muted-foreground">"Revolutionary AI tool for marketers"</span>
                   </div>
-                  <div className="space-y-3">
-                    <div className="h-3 bg-muted rounded-full w-full" />
-                    <div className="h-3 bg-muted rounded-full w-5/6" />
-                    <div className="h-3 bg-muted rounded-full w-4/6" />
+                  <div className="flex items-center gap-3">
+                    <span className="text-primary">tone:</span>
+                    <span className="text-muted-foreground">"Professional, confident, results-driven"</span>
                   </div>
-                  <div className="pt-4 flex gap-2">
-                    <div className="h-20 bg-primary/10 rounded-2xl flex-1 border border-primary/20" />
-                    <div className="h-20 bg-primary/10 rounded-2xl flex-1 border border-primary/20" />
+                  <div className="flex items-start gap-3">
+                    <span className="text-primary whitespace-nowrap">features:</span>
+                    <span className="text-muted-foreground">["instant generation", "no prompts needed", "ESP-ready export"]</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-primary whitespace-nowrap">value_props:</span>
+                    <span className="text-muted-foreground">["save hours", "boost conversions", "zero learning curve"]</span>
+                  </div>
+                  <div className="pt-4 border-t border-border/30">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                      <span className="text-primary">Generating 7-email sequence...</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </motion.div>
-
-            {/* Right: Content - 3 cols */}
-            <div className="lg:col-span-3">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                viewport={{ once: true }}
-              >
-                <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight max-w-2xl">
-                  Your landing page already has the copy.
-                </h2>
-                <p className="text-lg mb-8 leading-relaxed max-w-xl" style={{ color: 'hsl(215 15% 58%)' }}>
-                  We read your product page and write emails that sound like you wrote them. 
-                  No brainstorming. No writer's block. No endless revisions.
-                </p>
-                <div className="space-y-4">
-                  {[
-                    "4–12 emails per sequence",
-                    "Export as ESP-ready HTML",
-                    "Improve any email in one click"
-                  ].map((point, i) => (
-                    <motion.div
-                      key={point}
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.1 }}
-                      viewport={{ once: true }}
-                      className="flex items-center gap-3"
-                    >
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                      <span className="text-base" style={{ color: 'hsl(215 15% 60%)' }}>{point}</span>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
             </div>
-          </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-32 px-6 lg:px-12">
+        <div className="container mx-auto max-w-7xl">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-20"
+          >
+            <h2 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">
+              How it works
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Three steps to launch-ready campaigns
+            </p>
+          </motion.div>
+
+          <HowItWorks />
         </div>
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-28 px-6 lg:px-12">
+      <section id="pricing" className="py-32 px-6 lg:px-12 relative">
         <div className="container mx-auto max-w-7xl">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Pricing</h2>
-            <p className="text-lg" style={{ color: 'hsl(215 15% 58%)' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-20"
+          >
+            <h2 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">Pricing</h2>
+            <p className="text-xl text-muted-foreground">
               Pick a plan. Start shipping campaigns.
             </p>
-          </div>
+          </motion.div>
           <PricingSection />
         </div>
       </section>
 
-      {/* Final CTA - Bold, Centered */}
-      <section className="py-32 px-6 lg:px-12 bg-gradient-to-b from-card/10 to-transparent">
-        <div className="container mx-auto max-w-4xl text-center">
+      {/* Final CTA */}
+      <section className="py-40 px-6 lg:px-12 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
+        <div className="container mx-auto max-w-4xl text-center relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight leading-tight">
+            <h2 className="text-6xl md:text-7xl font-bold mb-8 tracking-tight leading-tight">
               Try it now.<br/>Free.
             </h2>
-            <p className="text-xl mb-12 max-w-2xl mx-auto" style={{ color: 'hsl(215 15% 58%)' }}>
+            <p className="text-2xl mb-16 text-muted-foreground max-w-2xl mx-auto">
               One URL. One minute. One complete email sequence.
             </p>
             <Button 
               size="lg" 
               asChild 
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium h-16 px-10 text-base shadow-2xl shadow-primary/30"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-20 px-12 text-xl rounded-2xl shadow-[0_0_60px_rgba(35,255,128,0.5)] hover:shadow-[0_0_80px_rgba(35,255,128,0.7)] transition-all"
               onClick={() => trackButtonClick('Try Free', 'final-cta')}
             >
-              <Link to="/guest-flow" className="flex items-center gap-3">
+              <Link to="/guest-flow" className="flex items-center gap-4">
                 Create your first campaign
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className="w-7 h-7" />
               </Link>
             </Button>
           </motion.div>
         </div>
       </section>
 
-      {/* Footer - Minimal */}
-      <footer className="border-t border-border/20 py-12">
+      {/* Footer */}
+      <footer className="border-t border-border/50 py-16 relative glass-card">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-3">
               <img 
                 src={vaynoIcon} 
                 alt="Vayno" 
-                className="w-7 h-7" 
+                className="w-8 h-8" 
               />
-              <span className="font-semibold text-base">Vayno</span>
+              <span className="font-bold text-xl">Vayno</span>
             </div>
             
-            <div className="flex flex-wrap items-center justify-center gap-8 text-sm">
+            <div className="flex flex-wrap items-center justify-center gap-10 text-sm">
               <a 
                 href="mailto:teamvaynosupport@gmail.com" 
-                className="transition-colors duration-200"
-                style={{ color: 'hsl(215 15% 55%)' }}
-                onMouseEnter={(e) => e.currentTarget.style.color = 'hsl(158 100% 45%)'}
-                onMouseLeave={(e) => e.currentTarget.style.color = 'hsl(215 15% 55%)'}
+                className="text-muted-foreground hover:text-primary transition-colors"
               >
                 Support
               </a>
               <a 
                 href="/terms" 
-                className="transition-colors duration-200"
-                style={{ color: 'hsl(215 15% 55%)' }}
-                onMouseEnter={(e) => e.currentTarget.style.color = 'hsl(158 100% 45%)'}
-                onMouseLeave={(e) => e.currentTarget.style.color = 'hsl(215 15% 55%)'}
+                className="text-muted-foreground hover:text-primary transition-colors"
               >
                 Terms
               </a>
               <a 
                 href="/privacy" 
-                className="transition-colors duration-200"
-                style={{ color: 'hsl(215 15% 55%)' }}
-                onMouseEnter={(e) => e.currentTarget.style.color = 'hsl(158 100% 45%)'}
-                onMouseLeave={(e) => e.currentTarget.style.color = 'hsl(215 15% 55%)'}
+                className="text-muted-foreground hover:text-primary transition-colors"
               >
                 Privacy
               </a>
             </div>
             
-            <p className="text-xs" style={{ color: 'hsl(215 15% 50%)' }}>
+            <p className="text-sm text-muted-foreground">
               © 2025 Vayno
             </p>
           </div>
