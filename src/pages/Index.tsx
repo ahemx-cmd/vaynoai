@@ -4,8 +4,6 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import PricingSection from "@/components/pricing/PricingSection";
 import vaynoIcon from "@/assets/vayno-icon.png";
-import dashboardScreenshot from "@/assets/dashboard-screenshot.png";
-import campaignCreationScreenshot from "@/assets/campaign-creation-screenshot.png";
 import { trackButtonClick } from "@/lib/analytics";
 
 const Index = () => {
@@ -100,24 +98,38 @@ const Index = () => {
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="lg:col-span-5 mt-16 lg:mt-0 space-y-6"
+              className="lg:col-span-5 mt-16 lg:mt-0"
             >
-              {/* Dashboard Screenshot */}
-              <div className="bg-card/40 backdrop-blur-xl rounded-3xl p-4 border border-border/30 shadow-2xl overflow-hidden">
-                <img 
-                  src={dashboardScreenshot} 
-                  alt="Vayno Dashboard" 
-                  className="w-full h-auto rounded-xl"
-                />
-              </div>
-              
-              {/* Campaign Creation Screenshot */}
-              <div className="bg-card/40 backdrop-blur-xl rounded-3xl p-4 border border-border/30 shadow-2xl overflow-hidden">
-                <img 
-                  src={campaignCreationScreenshot} 
-                  alt="Campaign Creation Flow" 
-                  className="w-full h-auto rounded-xl"
-                />
+              <div className="bg-card/40 backdrop-blur-xl rounded-3xl p-8 border border-border/30 shadow-2xl">
+                <div className="space-y-5">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" />
+                    <span className="text-xs font-medium uppercase tracking-wide" style={{ color: 'hsl(215 15% 55%)' }}>Generated in 28s</span>
+                  </div>
+                  
+                  {[
+                    { title: "Welcome Email", day: "Day 0", words: "180 words" },
+                    { title: "Value Prop", day: "Day 2", words: "220 words" },
+                    { title: "Social Proof", day: "Day 5", words: "195 words" },
+                    { title: "Closing", day: "Day 7", words: "160 words" }
+                  ].map((email, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 + i * 0.1 }}
+                      className="bg-background/60 rounded-xl p-5 border border-border/40"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <p className="font-medium text-foreground">{email.title}</p>
+                        <FileText className="w-4 h-4 text-primary" />
+                      </div>
+                      <p className="text-sm" style={{ color: 'hsl(215 15% 55%)' }}>
+                        {email.day} · {email.words}
+                      </p>
+                    </motion.div>
+                  ))}
+                </div>
               </div>
             </motion.div>
           </div>
