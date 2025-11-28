@@ -7,6 +7,9 @@ import FeaturesGrid from "@/components/landing/FeaturesGrid";
 import Testimonials from "@/components/landing/Testimonials";
 import AnimatedText from "@/components/landing/AnimatedText";
 import vaynoIcon from "@/assets/vayno-icon.png";
+import productDashboard from "@/assets/product-dashboard.png";
+import productCampaign from "@/assets/product-campaign-view.png";
+import productEmail from "@/assets/product-email-preview.png";
 import { trackButtonClick } from "@/lib/analytics";
 
 const Index = () => {
@@ -94,101 +97,108 @@ const Index = () => {
             </p>
           </motion.div>
 
-          {/* Visual proof - offset to the right */}
+          {/* Product preview - offset to the right */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="absolute right-0 top-1/2 -translate-y-1/2 w-1/2 hidden lg:block"
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="absolute right-0 top-1/2 -translate-y-1/2 w-[55%] hidden lg:block"
           >
-            <div className="glass-card rounded-2xl p-4 backdrop-blur-xl border-primary/10">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                  <span>Generated in 28s</span>
-                </div>
-                <div className="bg-card/50 rounded-lg p-3 space-y-2">
-                  <div className="h-2 bg-muted-foreground/20 rounded w-3/4" />
-                  <div className="h-2 bg-muted-foreground/20 rounded w-full" />
-                  <div className="h-2 bg-muted-foreground/20 rounded w-2/3" />
-                </div>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="h-16 bg-primary/10 rounded flex-1 border border-primary/20" />
-                  ))}
-                </div>
+            <div className="relative">
+              <img 
+                src={productDashboard} 
+                alt="Vayno Dashboard" 
+                className="rounded-xl border border-primary/20 shadow-2xl"
+              />
+              <div className="absolute -bottom-4 -right-4 text-xs text-muted-foreground bg-card/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-border/50">
+                Real product, no mockups
               </div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Social proof + value prop - asymmetric */}
-      <section className="py-24 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight">
+      {/* Product showcase section */}
+      <section className="py-32 px-4 bg-gradient-to-b from-background to-primary/5">
+        <div className="container mx-auto max-w-7xl">
+          {/* Main feature with large screenshot */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="mb-20"
+          >
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
                 Your landing page already has the copy.<br/>
                 We just turn it into emails.
               </h2>
-              <p className="text-lg text-muted-foreground mb-8">
-                No brainstorming. No writer's block. No endless revisions. 
-                Vayno reads your product page and writes emails that sound like you wrote them.
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                No brainstorming. No writer's block. No endless revisions.
               </p>
-              <div className="space-y-4">
+            </div>
+            <div className="relative">
+              <img 
+                src={productCampaign} 
+                alt="Campaign email sequence view" 
+                className="rounded-2xl border border-primary/20 shadow-2xl w-full"
+              />
+            </div>
+          </motion.div>
+
+          {/* Two-column grid with smaller screenshots */}
+          <div className="grid md:grid-cols-2 gap-12 items-start">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              viewport={{ once: true }}
+            >
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold mb-3">Built for speed</h3>
+                <p className="text-muted-foreground">
+                  Drop your URL, get a complete sequence in 30 seconds. No templates. No prompts.
+                </p>
+              </div>
+              <div className="space-y-3 mb-8">
                 {[
                   "4-12 emails per sequence",
                   "Export as ESP-ready HTML",
                   "Improve any email in one click"
                 ].map((point, i) => (
-                  <motion.div
-                    key={point}
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    viewport={{ once: true }}
-                    className="flex items-center gap-3"
-                  >
+                  <div key={point} className="flex items-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
                     <span className="text-foreground">{point}</span>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
-            </div>
-            <div className="relative">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                viewport={{ once: true }}
-                className="glass-card p-6 rounded-2xl"
-              >
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3 p-4 bg-card rounded-lg border border-border/50">
-                    <FileText className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
-                    <div className="flex-1">
-                      <p className="font-medium mb-1">Welcome Email</p>
-                      <p className="text-sm text-muted-foreground">Day 0 · 180 words</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-4 bg-card rounded-lg border border-border/50">
-                    <FileText className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
-                    <div className="flex-1">
-                      <p className="font-medium mb-1">Value Email</p>
-                      <p className="text-sm text-muted-foreground">Day 2 · 220 words</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-4 bg-card rounded-lg border border-border/50">
-                    <FileText className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
-                    <div className="flex-1">
-                      <p className="font-medium mb-1">Social Proof</p>
-                      <p className="text-sm text-muted-foreground">Day 5 · 190 words</p>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
+              <img 
+                src={productDashboard} 
+                alt="Campaign dashboard" 
+                className="rounded-xl border border-primary/20 shadow-lg w-full"
+              />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="md:pt-16"
+            >
+              <img 
+                src={productEmail} 
+                alt="Email preview interface" 
+                className="rounded-xl border border-primary/20 shadow-lg w-full mb-6"
+              />
+              <div className="mt-6">
+                <h3 className="text-2xl font-bold mb-3">Ready to send</h3>
+                <p className="text-muted-foreground">
+                  Every email exports as clean HTML. Upload to your ESP and you're live.
+                </p>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
