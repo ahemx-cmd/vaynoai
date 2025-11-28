@@ -81,7 +81,7 @@ const PricingSection = () => {
         </motion.div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-8 justify-center items-stretch max-w-5xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
         {plans.map((plan, i) => (
           <motion.div
             key={plan.name}
@@ -99,26 +99,26 @@ const PricingSection = () => {
                 </span>
               </div>
             )}
-            <Card className={`p-8 h-full glass-card hover-lift ${plan.popular ? 'border-primary shadow-lg ring-2 ring-primary/20' : ''}`}>
-              <div className="mb-6">
-                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                <p className="text-sm text-muted-foreground mb-4">{plan.description}</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-5xl font-bold">{plan.price}</span>
-                  {plan.period && <span className="text-muted-foreground">/ {plan.period}</span>}
+            <Card className={`p-6 md:p-8 h-full glass-card hover-lift ${plan.popular ? 'border-primary shadow-lg ring-2 ring-primary/20' : ''}`}>
+              <div className="mb-4 md:mb-6">
+                <h3 className="text-xl md:text-2xl font-bold mb-2">{plan.name}</h3>
+                <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">{plan.description}</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-4xl md:text-5xl font-bold">{plan.price}</span>
+                  {plan.period && <span className="text-sm md:text-base text-muted-foreground">/ {plan.period}</span>}
                 </div>
               </div>
 
               {plan.showToggle && (
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50 mb-6">
-                  <span className={!isLifetime ? 'font-medium text-sm' : 'text-muted-foreground text-sm'}>Monthly</span>
+                <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3 rounded-xl bg-secondary/50 mb-4 md:mb-6">
+                  <span className={!isLifetime ? 'font-medium text-xs md:text-sm' : 'text-muted-foreground text-xs md:text-sm'}>Monthly</span>
                   <Switch checked={isLifetime} onCheckedChange={setIsLifetime} />
-                  <span className={isLifetime ? 'font-medium text-sm' : 'text-muted-foreground text-sm'}>Lifetime</span>
+                  <span className={isLifetime ? 'font-medium text-xs md:text-sm' : 'text-muted-foreground text-xs md:text-sm'}>Lifetime</span>
                 </div>
               )}
 
               <Button 
-                className={`w-full mb-6 ${plan.popular ? 'btn-premium shadow-lg' : ''}`} 
+                className={`w-full mb-4 md:mb-6 h-10 md:h-auto text-sm md:text-base ${plan.popular ? 'btn-premium shadow-lg' : ''}`} 
                 variant={plan.popular ? "default" : "outline"}
                 onClick={() => {
                   const price = plan.name === "Starter" ? (isLifetime ? 59 : 11) : 29;
@@ -128,13 +128,13 @@ const PricingSection = () => {
                 {plan.cta}
               </Button>
 
-              <div className="space-y-3">
+              <div className="space-y-2 md:space-y-3">
                 {plan.features.map((feature) => (
-                  <div key={feature} className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                      <Check className="w-3 h-3 text-primary" />
+                  <div key={feature} className="flex items-start gap-2 md:gap-3">
+                    <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                      <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-primary" />
                     </div>
-                    <span className="text-sm leading-relaxed">{feature}</span>
+                    <span className="text-xs md:text-sm leading-relaxed">{feature}</span>
                   </div>
                 ))}
               </div>

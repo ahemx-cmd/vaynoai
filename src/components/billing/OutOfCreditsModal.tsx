@@ -109,7 +109,7 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl border-0 bg-background/10 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] p-0 rounded-[28px] border border-white/10">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto border-0 bg-background/10 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] p-0 rounded-[28px] border border-white/10">
         <div className="relative overflow-hidden">
           {/* Soft animated background glow */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 animate-pulse opacity-50" />
@@ -223,15 +223,15 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                   </Button>
 
                   {/* Carousel for Credit Packs */}
-                  <div className="relative px-16">
+                  <div className="relative px-2 md:px-16">
                     <Carousel 
                       className="w-full" 
                       opts={{ align: "center", loop: false, startIndex: 1 }}
                       setApi={setApi}
                     >
-                      <CarouselContent className="-ml-4">
+                      <CarouselContent className="-ml-2 md:-ml-4">
                         {creditPacks.map((pack, index) => (
-                          <CarouselItem key={pack.id} className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
+                          <CarouselItem key={pack.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/2 lg:basis-1/3">
                             <motion.div
                               onClick={() => {
                                 api?.scrollTo(index);
@@ -241,10 +241,10 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                               transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             >
                               <Card className={`
-                                h-full p-6 rounded-[24px] transition-all duration-500
+                                h-full p-4 md:p-6 rounded-[24px] transition-all duration-500
                                 ${selectedPack === index 
                                   ? 'bg-background/80 backdrop-blur-lg border-primary/50 shadow-[0_8px_32px_rgba(0,0,0,0.2)] opacity-100 scale-100' 
-                                  : 'bg-background/30 backdrop-blur-md border-white/10 opacity-60 scale-95 blur-[2px]'
+                                  : 'bg-background/30 backdrop-blur-md border-white/10 opacity-60 scale-95 blur-[1px] md:blur-[2px]'
                                 }
                               `}>
                                 {pack.popular && selectedPack === index && (
@@ -257,17 +257,17 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                                       Most Popular
                                     </span>
                                   </motion.div>
-                                )}
-                                <div className="text-center space-y-3">
-                                  <h4 className="font-bold text-lg text-foreground">{pack.name}</h4>
-                                  <div>
-                                    <span className="text-4xl font-bold text-foreground">${pack.price}</span>
-                                  </div>
-                                  <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                                    <Zap className="w-4 h-4 text-primary" />
-                                    <span className="text-lg font-semibold">{pack.credits} credits</span>
-                                  </div>
-                                </div>
+                                 )}
+                                 <div className="text-center space-y-2 md:space-y-3">
+                                   <h4 className="font-bold text-base md:text-lg text-foreground">{pack.name}</h4>
+                                   <div>
+                                     <span className="text-3xl md:text-4xl font-bold text-foreground">${pack.price}</span>
+                                   </div>
+                                   <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                                     <Zap className="w-4 h-4 text-primary" />
+                                     <span className="text-base md:text-lg font-semibold">{pack.credits} credits</span>
+                                   </div>
+                                 </div>
                               </Card>
                             </motion.div>
                           </CarouselItem>
@@ -311,7 +311,7 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                     Back
                   </Button>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[60vh] md:max-h-none overflow-y-auto">
                     {plans.map((plan, index) => {
                       const Icon = plan.icon;
                       return (
@@ -329,7 +329,7 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                           }}
                           className="h-full"
                         >
-                          <Card className={`p-6 rounded-[24px] bg-background/40 backdrop-blur-lg border-white/20 hover:bg-background/60 transition-all duration-300 shadow-[0_4px_16px_rgba(0,0,0,0.1)] h-[380px] flex flex-col relative ${(plan as any).popular ? 'border-primary/50' : ''}`}>
+                          <Card className={`p-4 md:p-6 rounded-[24px] bg-background/40 backdrop-blur-lg border-white/20 hover:bg-background/60 transition-all duration-300 shadow-[0_4px_16px_rgba(0,0,0,0.1)] min-h-[360px] md:h-[380px] flex flex-col relative ${(plan as any).popular ? 'border-primary/50' : ''}`}>
                             {(plan as any).popular && (
                               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                                 <span className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground text-xs font-semibold shadow-md">
@@ -337,31 +337,31 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                                 </span>
                               </div>
                             )}
-                            <div className="flex flex-col items-center text-center space-y-4 flex-1">
-                              <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${plan.color} flex items-center justify-center shadow-lg`}>
-                                <Icon className="w-8 h-8 text-primary-foreground" />
+                            <div className="flex flex-col items-center text-center space-y-3 md:space-y-4 flex-1">
+                              <div className={`w-12 h-12 md:w-16 md:h-16 rounded-full bg-gradient-to-br ${plan.color} flex items-center justify-center shadow-lg`}>
+                                <Icon className="w-6 h-6 md:w-8 md:h-8 text-primary-foreground" />
                               </div>
                               <div>
-                                <h4 className="font-bold text-2xl text-foreground mb-1">{plan.name}</h4>
-                                <p className="text-sm text-muted-foreground mb-2">{(plan as any).description}</p>
-                                <p className="text-3xl font-bold text-foreground">
+                                <h4 className="font-bold text-xl md:text-2xl text-foreground mb-1">{plan.name}</h4>
+                                <p className="text-xs md:text-sm text-muted-foreground mb-2">{(plan as any).description}</p>
+                                <p className="text-2xl md:text-3xl font-bold text-foreground">
                                   ${plan.price}
                                   <span className="text-sm font-normal text-muted-foreground">
                                     {(plan as any).isLifetime ? ' / one-time' : ' / per month'}
                                   </span>
                                 </p>
                               </div>
-                              <ul className="space-y-2 flex-1 w-full px-4">
+                              <ul className="space-y-1.5 md:space-y-2 flex-1 w-full px-2 md:px-4">
                                 {plan.features.map((feature, idx) => (
-                                  <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
-                                    <span className="text-primary mt-0.5">✓</span>
+                                  <li key={idx} className="text-xs md:text-sm text-muted-foreground flex items-start gap-2">
+                                    <span className="text-primary mt-0.5 text-sm md:text-base">✓</span>
                                     <span>{feature}</span>
                                   </li>
                                 ))}
                               </ul>
                               <Button
                                 onClick={() => handleUpgrade(plan.checkoutUrl)}
-                                className="w-full h-12 rounded-[16px] bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity text-primary-foreground shadow-md font-semibold mt-auto"
+                                className="w-full h-10 md:h-12 rounded-[16px] bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity text-primary-foreground shadow-md font-semibold mt-auto text-sm md:text-base"
                               >
                                 {(plan as any).isLifetime ? 'Get Lifetime' : 'Upgrade'}
                               </Button>
