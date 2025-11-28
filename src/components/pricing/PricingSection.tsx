@@ -99,7 +99,7 @@ const PricingSection = () => {
                 </span>
               </div>
             )}
-            <Card className={`p-6 md:p-8 h-full glass-card hover-lift ${plan.popular ? 'border-primary shadow-lg ring-2 ring-primary/20' : ''}`}>
+            <Card className={`p-6 md:p-8 h-full glass-card hover-lift border-primary/20 ${plan.popular ? 'border-primary/40 shadow-lg shadow-primary/20 ring-2 ring-primary/30' : ''}`}>
               <div className="mb-4 md:mb-6">
                 <h3 className="text-xl md:text-2xl font-bold mb-2">{plan.name}</h3>
                 <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">{plan.description}</p>
