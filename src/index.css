@@ -8,26 +8,26 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Leadverse-inspired dark theme - Tech-forward with neon green */
+    /* Refined dark theme with better contrast */
     --background: 217 33% 7%;
-    --foreground: 0 0% 98%;
+    --foreground: 0 0% 88%;
 
     --card: 217 33% 10%;
-    --card-foreground: 0 0% 98%;
+    --card-foreground: 0 0% 88%;
 
     --popover: 217 33% 10%;
-    --popover-foreground: 0 0% 98%;
+    --popover-foreground: 0 0% 88%;
 
-    /* Neon green primary */
-    --primary: 158 100% 50%;
+    /* Softer neon green primary */
+    --primary: 158 100% 45%;
     --primary-foreground: 217 33% 7%;
-    --primary-glow: 158 100% 60%;
+    --primary-glow: 158 100% 55%;
 
     --secondary: 217 33% 15%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary-foreground: 0 0% 88%;
 
     --muted: 217 33% 15%;
-    --muted-foreground: 215 20% 65%;
+    --muted-foreground: 215 15% 55%;
 
     --accent: 158 100% 50%;
     --accent-foreground: 217 33% 7%;
@@ -64,22 +64,22 @@ All colors MUST be HSL.
   .dark {
     /* Even darker variant for explicit dark mode */
     --background: 217 33% 4%;
-    --foreground: 0 0% 98%;
+    --foreground: 0 0% 88%;
 
     --card: 217 33% 8%;
-    --card-foreground: 0 0% 98%;
+    --card-foreground: 0 0% 88%;
 
     --popover: 217 33% 8%;
-    --popover-foreground: 0 0% 98%;
+    --popover-foreground: 0 0% 88%;
 
-    --primary: 158 100% 50%;
+    --primary: 158 100% 45%;
     --primary-foreground: 217 33% 4%;
 
     --secondary: 217 33% 12%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary-foreground: 0 0% 88%;
 
     --muted: 217 33% 12%;
-    --muted-foreground: 215 20% 65%;
+    --muted-foreground: 215 15% 55%;
 
     --accent: 158 100% 50%;
     --accent-foreground: 217 33% 4%;
@@ -103,10 +103,17 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    font-feature-settings: 'ss01' on, 'ss02' on, 'cv01' on, 'cv03' on;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.011em;
+  }
+
+  /* Unique typography scale */
+  h1, h2, h3 {
+    color: hsl(0 0% 92%);
+    letter-spacing: -0.025em;
+    font-weight: 600;
   }
 
   /* Premium card effect */
