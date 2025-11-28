@@ -130,14 +130,17 @@ All colors MUST be HSL.
     box-shadow: var(--shadow-glow);
   }
 
-  /* Hover lift effect */
+  /* Hover lift effect - subtle */
   .hover-lift {
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .hover-lift:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-1px);
+  }
+  
+  .hover-lift:active {
+    transform: translateY(0);
   }
 
   /* Smooth transitions */
@@ -145,34 +148,21 @@ All colors MUST be HSL.
     transition: var(--transition-smooth);
   }
 
-  /* Premium button with refined hover */
+  /* Premium button - clean and intentional */
   .btn-premium {
     position: relative;
-    overflow: hidden;
-    box-shadow: 0 0 20px hsl(158 100% 50% / 0.2);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .btn-premium::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, transparent, hsl(158 100% 60% / 0.2));
-    opacity: 0;
-    transition: opacity 0.3s;
+    box-shadow: 0 0 20px hsl(158 100% 50% / 0.15);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .btn-premium:hover {
-    box-shadow: 0 0 30px hsl(158 100% 50% / 0.4), 0 0 60px hsl(158 100% 50% / 0.2);
-    transform: translateY(-2px);
-  }
-
-  .btn-premium:hover::before {
-    opacity: 1;
+    box-shadow: 0 0 25px hsl(158 100% 50% / 0.25);
+    transform: translateY(-1px);
   }
 
   .btn-premium:active {
     transform: translateY(0);
+    box-shadow: 0 0 15px hsl(158 100% 50% / 0.2);
   }
 
   /* Icon pulse animation */

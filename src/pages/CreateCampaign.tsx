@@ -246,73 +246,72 @@ const CreateCampaign = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="mb-8 glass-card p-6 border-primary/30 rounded-2xl text-center"
+              className="glass-card p-6 border-primary/20 rounded-2xl"
             >
-              <Sparkles className="w-8 h-8 text-primary mx-auto mb-3" />
-              <h2 className="text-2xl font-bold mb-2">Create Your Account</h2>
-              <p className="text-muted-foreground mb-4">
-                Sign up now to generate powerful, high-converting email campaigns powered by AI.
-              </p>
-              <Button
-                onClick={() => navigate("/auth")}
-                className="btn-premium"
-              >
-                Sign Up to Get Started
-              </Button>
+              <div className="flex items-start gap-4">
+                <Sparkles className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">This one's on us</h3>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    Try your first campaign completely free. No signup. No card. Just results.
+                  </p>
+                  <Button
+                    onClick={() => navigate("/auth")}
+                    variant="outline"
+                    size="sm"
+                  >
+                    Want more? Create an account
+                  </Button>
+                </div>
+              </div>
             </motion.div>
           )}
           
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <Sparkles className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-4xl font-bold mb-3 tracking-tight">
-              {isGuest ? "Try Your First Campaign" : "Create New Campaign"}
+          <div className="max-w-2xl mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight">
+              {isGuest ? "Let's create your first sequence" : "New campaign"}
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Enter your product URL and we'll analyze it to generate a complete email sequence
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Drop your product URL. We'll handle the rest.
             </p>
           </div>
 
-          <Card className="glass-card p-8 hover-lift mb-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <Card className="glass-card p-8 mb-8">
+            <form onSubmit={handleSubmit} className="space-y-7">
               <div>
-                <Label htmlFor="name" className="text-base">Campaign Name</Label>
+                <Label htmlFor="name" className="text-base font-medium">What should we call this?</Label>
                 <Input
                   id="name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Summer Product Launch"
+                  placeholder="Summer launch, new product, etc."
                   required
                   className="mt-2 h-12"
                 />
-                <p className="text-sm text-muted-foreground mt-2">
-                  Give your campaign a memorable name
-                </p>
               </div>
 
               <div>
-                <Label htmlFor="url" className="text-base">Product Landing Page URL</Label>
+                <Label htmlFor="url" className="text-base font-medium">Your product URL</Label>
                 <Input
                   id="url"
                   type="url"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  placeholder="https://example.com/product"
+                  placeholder="https://yoursite.com/product"
                   required
                   className="mt-2 h-12"
                 />
                 <p className="text-sm text-muted-foreground mt-2">
-                  The URL will be analyzed to extract product details and generate emails
+                  We'll read your page and write emails that match your voice
                 </p>
               </div>
 
               <div>
-                <Label htmlFor="sequence-type" className="text-base">Sequence Type</Label>
+                <Label htmlFor="sequence-type" className="text-base font-medium">What's the goal?</Label>
                 <Select value={sequenceType} onValueChange={setSequenceType}>
                   <SelectTrigger className="mt-2 h-12">
-                    <SelectValue placeholder="Choose your email sequence purpose" />
+                    <SelectValue placeholder="Pick what you're trying to do" />
                   </SelectTrigger>
                   <SelectContent className="max-h-[300px]">
                     {getSequenceTypes(userPlatform).map((type) => (
@@ -325,16 +324,13 @@ const CreateCampaign = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Select the goal of your email sequence
-                </p>
               </div>
 
               <div>
-                <Label htmlFor="drip-duration" className="text-base">Drip Duration</Label>
+                <Label htmlFor="drip-duration" className="text-base font-medium">How long should it run?</Label>
                 <Select value={dripDuration} onValueChange={setDripDuration}>
                   <SelectTrigger className="mt-2 h-12">
-                    <SelectValue placeholder="Choose sequence pacing" />
+                    <SelectValue placeholder="Pick your sequence length" />
                   </SelectTrigger>
                   <SelectContent>
                     {dripDurations.map((duration) => (
@@ -347,9 +343,6 @@ const CreateCampaign = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Define the pacing and length of your sequence
-                </p>
               </div>
 
               {dripDuration === "custom" && (
@@ -392,7 +385,7 @@ const CreateCampaign = () => {
               )}
 
               <div>
-                <Label htmlFor="words-per-email" className="text-base">Words Per Email</Label>
+                <Label htmlFor="words-per-email" className="text-base font-medium">Email length (words)</Label>
                 <Input
                   id="words-per-email"
                   type="number"
@@ -405,7 +398,7 @@ const CreateCampaign = () => {
                   className="mt-2 h-12"
                 />
                 <p className="text-sm text-muted-foreground mt-2">
-                  Choose between 50-500 words per email
+                  Between 50-500 words
                 </p>
               </div>
 
@@ -484,13 +477,10 @@ const CreateCampaign = () => {
                   {loading ? (
                     <>
                       <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Creating Campaign...
+                      Building your sequence...
                     </>
                   ) : (
-                    <>
-                      <Sparkles className="w-5 h-5 mr-2" />
-                      Analyze & Generate Emails
-                    </>
+                    "Generate my emails"
                   )}
                 </Button>
                 {dripDuration && (
@@ -505,25 +495,26 @@ const CreateCampaign = () => {
             </form>
           </Card>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-4 mt-8">
             {[
-              { icon: LinkIcon, title: "We'll scan your page", desc: "AI extracts product info and brand voice" },
-              { icon: FileText, title: "Generate 3-5 emails", desc: "Professional copy matching your style" },
-              { icon: Download, title: "Export & send", desc: "Ready-to-upload HTML format" }
+              { icon: LinkIcon, title: "Scan", desc: "We read your landing page" },
+              { icon: FileText, title: "Write", desc: "Generate campaign in 30s" },
+              { icon: Download, title: "Ship", desc: "Export HTML, send emails" }
             ].map((step, i) => (
               <motion.div
                 key={step.title}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 + i * 0.1 }}
+                transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
+                className="flex items-start gap-3 p-4 rounded-lg bg-card/50"
               >
-                <Card className="glass-card p-6 text-center">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mx-auto mb-3">
-                    <step.icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <h3 className="font-semibold mb-2">{step.title}</h3>
-                  <p className="text-sm text-muted-foreground">{step.desc}</p>
-                </Card>
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <step.icon className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <h4 className="font-medium text-sm mb-0.5">{step.title}</h4>
+                  <p className="text-xs text-muted-foreground">{step.desc}</p>
+                </div>
               </motion.div>
             ))}
           </div>
