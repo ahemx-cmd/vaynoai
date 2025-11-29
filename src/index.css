@@ -125,12 +125,7 @@ All colors MUST be HSL.
     transition: var(--transition-smooth);
   }
 
-  .glass-card:hover {
-    background: var(--glass-bg-strong);
-    border-color: var(--glass-border-strong);
-    transform: translateY(-4px);
-    box-shadow: var(--glow-soft), var(--glow-primary);
-  }
+  /* Removed aggressive hover effect - now only applies when explicitly added */
 
   /* Gradient text */
   .gradient-text {
@@ -149,18 +144,7 @@ All colors MUST be HSL.
     box-shadow: var(--glow-primary-strong);
   }
 
-  /* Hover lift effect - premium */
-  .hover-lift {
-    transition: var(--transition-smooth);
-  }
-
-  .hover-lift:hover {
-    transform: translateY(-4px) scale(1.02);
-  }
-  
-  .hover-lift:active {
-    transform: translateY(-2px) scale(1.01);
-  }
+  /* Removed hover-lift - was too aggressive for non-clickable elements */
 
   /* Smooth transitions */
   .transition-smooth {

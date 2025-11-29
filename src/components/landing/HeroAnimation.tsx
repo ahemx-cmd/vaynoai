@@ -258,16 +258,12 @@ Stop writing. Start selling.
                   transformPerspective: 1000,
                   zIndex: emailCards.length - index,
                 }}
-                className="glass-card rounded-2xl p-5 border-primary/30 hover:border-primary/50 transition-all cursor-pointer group"
+                className="glass-card rounded-2xl p-5 border-primary/30 transition-all cursor-pointer group hover:border-primary/40"
                 whileHover={{ 
-                  scale: 1.05,
-                  boxShadow: '0 0 40px rgba(35,255,128,0.3)'
+                  scale: 1.02,
                 }}
                 onClick={() => setSelectedEmail(index)}
               >
-                {/* Glow effect */}
-                <div className="absolute inset-0 rounded-2xl bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
-                
                 <div className="relative z-10">
                   {/* Icon and day badge */}
                   <div className="flex items-center justify-between mb-3">
@@ -306,16 +302,6 @@ Stop writing. Start selling.
                     />
                   </div>
                 </div>
-
-                {/* Card edge glow */}
-                <motion.div
-                  className="absolute inset-0 rounded-2xl pointer-events-none"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(35,255,128,0.1), transparent)',
-                    opacity: 0,
-                  }}
-                  whileHover={{ opacity: 1 }}
-                />
               </motion.div>
             );
           })}

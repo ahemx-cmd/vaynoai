@@ -44,10 +44,9 @@ const FeaturesGrid = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: index * 0.1 }}
           viewport={{ once: true }}
-          className="glass-card rounded-3xl p-8 border-primary/20 hover-lift group"
+          className="glass-card rounded-3xl p-8 border-primary/20"
         >
           <div className="mb-6 relative">
-            <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative w-14 h-14 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center">
               <feature.icon className="w-7 h-7 text-primary" strokeWidth={1.5} />
             </div>
