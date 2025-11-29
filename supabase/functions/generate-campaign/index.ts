@@ -1227,28 +1227,30 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
 
     const fullPrompt = `${systemPrompt}\n\n${userPrompt}`;
     
-    // Use Groq AI with Llama 3.3 70B - with strict word count enforcement
-    const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
-    if (!GROQ_API_KEY) {
-      console.error("GROQ_API_KEY not configured");
+    // Use Lovable AI with Google Gemini 2.5 Pro - most powerful model for complex copywriting
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      console.error("LOVABLE_API_KEY not configured");
       return new Response(
         JSON.stringify({ error: "AI service not configured. Please contact support." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log("Calling Groq AI with mixtral-8x7b-32768");
-    const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    console.log(`Generating ${numEmails} emails with ${wordsPerEmail} words each using Lovable AI (google/gemini-2.5-pro)`);
+    console.log(`Sequence type: ${sequenceType}`);
+    
+    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${GROQ_API_KEY}`,
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "mixtral-8x7b-32768",
+        model: "google/gemini-2.5-pro",
         messages: [
-          { role: "system", content: "You are an expert email copywriter. You MUST follow word count requirements exactly. Each email must be the exact word count specified. DO NOT write short 2-3 line emails. Count every word carefully." },
-          { role: "user", content: fullPrompt }
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
         ],
         temperature: 0.9,
       }),
@@ -1256,32 +1258,38 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
 
     if (!resp.ok) {
       const errorText = await resp.text();
-      console.error("Groq AI error:", resp.status, errorText);
+      console.error("Lovable AI error:", resp.status, errorText);
       
       if (resp.status === 402) {
         return new Response(
-          JSON.stringify({ error: "AI credits depleted. Please add credits to your Groq account." }),
+          JSON.stringify({ 
+            error: "AI credits depleted", 
+            details: "Please add credits to your Lovable workspace to continue generating campaigns. Visit Settings → Workspace → Usage to top up." 
+          }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       if (resp.status === 429) {
         return new Response(
-          JSON.stringify({ error: "Rate limited (500 free requests/day). Please wait and retry or upgrade your Groq plan." }),
+          JSON.stringify({ 
+            error: "Rate limit exceeded", 
+            details: "Too many requests. Please wait a moment and try again. If this persists, contact support@lovable.dev to increase your rate limit." 
+          }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       
       return new Response(
-        JSON.stringify({ error: "AI service temporarily unavailable. Please try again." }),
+        JSON.stringify({ error: "AI service temporarily unavailable. Please try again in a moment." }),
         { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const aiData = await resp.json();
 
-    console.log("Successfully called Groq AI");
+    console.log("✅ Successfully called Lovable AI");
 
-    // Groq returns OpenAI-compatible format
+    // Lovable AI returns OpenAI-compatible format
     if (!aiData.choices?.[0]?.message?.content) {
       console.error("Invalid AI response format:", aiData);
       throw new Error("Invalid AI response format");
