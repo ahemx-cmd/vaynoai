@@ -109,8 +109,8 @@ serve(async (req) => {
     
     console.log("Authorization check passed - proceeding with generation");
 
-    // Check credit balance for authenticated users
-    if (user) {
+    // Check credit balance ONLY for authenticated users with owned campaigns (not guest campaigns)
+    if (user && campaign.user_id) {
       console.log("Checking credit balance for user:", user.id);
       const { data: usageData, error: usageError } = await serviceClient
         .from("user_usage")
@@ -141,6 +141,8 @@ serve(async (req) => {
           { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+    } else if (!campaign.user_id) {
+      console.log("Guest campaign detected - skipping credit check");
     }
 
     console.log("Starting campaign generation for:", campaignId);
@@ -842,8 +844,8 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
 
     console.log("Campaign generation completed successfully");
 
-    // Increment user credits for authenticated users - CHARGE PER EMAIL
-    if (user) {
+    // Increment user credits ONLY for owned campaigns (not guest campaigns) - CHARGE PER EMAIL
+    if (user && campaign.user_id) {
       const emailCount = emailsData.emails.length;
       console.log(`Deducting ${emailCount} credits for user: ${user.id} (1 credit per email)`);
       
@@ -860,6 +862,8 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
       }
       
       console.log(`Successfully deducted ${emailCount} credits for user: ${user.id}`);
+    } else if (!campaign.user_id) {
+      console.log("Guest campaign - no credits deducted");
     }
 
     return new Response(JSON.stringify({ success: true }), {
