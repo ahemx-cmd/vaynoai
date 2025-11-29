@@ -332,7 +332,7 @@ Please try a different URL or ensure the website is publicly accessible.`;
     // Determine number of emails based on drip duration from campaign
     const { data: campaignDetails } = await serviceClient
       .from("campaigns")
-      .select("drip_duration, words_per_email, include_cta, cta_link")
+      .select("drip_duration, words_per_email, include_cta, cta_link, sequence_type")
       .eq("id", campaignId)
       .single();
     
@@ -340,6 +340,7 @@ Please try a different URL or ensure the website is publicly accessible.`;
     const wordsPerEmail = campaignDetails?.words_per_email || 250;
     const includeCTA = campaignDetails?.include_cta ?? true;
     const ctaLink = campaignDetails?.cta_link || null;
+    const sequenceType = campaignDetails?.sequence_type || "welcome";
     
     if (campaignDetails?.drip_duration) {
       switch (campaignDetails.drip_duration) {
@@ -355,13 +356,261 @@ Please try a different URL or ensure the website is publicly accessible.`;
       }
     }
     
-    console.log(`Generating ${numEmails} emails for ${campaignDetails?.drip_duration || 'default'} drip with ${wordsPerEmail} words per email`);
+    console.log(`Generating ${numEmails} emails for ${campaignDetails?.drip_duration || 'default'} drip with ${wordsPerEmail} words per email, sequence type: ${sequenceType}`);
     
     const ctaInstructions = includeCTA 
       ? (ctaLink 
           ? `- Include clear Call-to-Action buttons that link to: ${ctaLink}`
           : `- Include Call-to-Action text (not as clickable buttons, just compelling text encouraging action)`)
       : `- DO NOT include any Call-to-Action buttons or CTA text in the emails`;
+    
+    // Map sequence types to specific campaign goals and structure
+    const sequenceTypeInstructions: Record<string, string> = {
+      // SELLER SEQUENCE TYPES
+      "welcome": `🎯 SEQUENCE TYPE: WELCOME SERIES
+      
+GOAL: Say hi, offer a first-time purchase incentive, showcase top products.
+
+STRUCTURE:
+• Email 1: Warm welcome, set expectations, introduce brand story
+• Email 2: Showcase hero product or bestsellers with social proof
+• Email 3: Share exclusive welcome discount or first-purchase incentive
+• Email 4+: Build trust with testimonials, address objections, create urgency
+
+TONE: Warm, welcoming, build excitement about being part of the brand community.`,
+
+      "abandoned-cart": `🎯 SEQUENCE TYPE: ABANDONED CART RECOVERY
+      
+GOAL: Remind customers about items left in their cart and motivate purchase completion.
+
+STRUCTURE:
+• Email 1 (1 hour later): Friendly reminder "You left something behind" - show cart items
+• Email 2 (24 hours): Add social proof, urgency, or discount incentive
+• Email 3 (48 hours): Last chance - create FOMO, testimonials, guarantee
+• Email 4+ (optional): Final reminder with strong incentive or scarcity
+
+TONE: Helpful reminder (not pushy), address objections, remove friction.`,
+
+      "browse-abandonment": `🎯 SEQUENCE TYPE: BROWSE ABANDONMENT
+      
+GOAL: Target users who browsed but didn't add anything to cart.
+
+STRUCTURE:
+• Email 1: "Still thinking about [product]?" - show what they viewed
+• Email 2: Address objections, provide more details about products they viewed
+• Email 3: Offer help or incentive to complete purchase
+• Email 4+: Showcase similar items or alternatives, limited-time offer
+
+TONE: Non-pushy, helpful, show you remember their interest.`,
+
+      "checkout-abandonment": `🎯 SEQUENCE TYPE: CHECKOUT ABANDONMENT
+      
+GOAL: Recover users who started checkout but didn't complete payment.
+
+STRUCTURE:
+• Email 1 (immediate): "Almost there!" - direct link to complete checkout
+• Email 2 (6 hours): Address payment concerns, show security badges, offer support
+• Email 3 (24 hours): Add incentive (free shipping, discount) + urgency
+• Email 4 (48 hours): Last chance with strong incentive and social proof
+
+TONE: Helpful, remove friction, address payment concerns, build trust.`,
+
+      "post-purchase": `🎯 SEQUENCE TYPE: POST-PURCHASE THANK-YOU / ORDER FOLLOW-UP
+      
+GOAL: Confirm order, say thanks, build relationship, cross-sell naturally.
+
+STRUCTURE:
+• Email 1: Order confirmation + genuine thank you + shipping details
+• Email 2: Product tips, how to get most value, care instructions
+• Email 3: Request review/feedback (after delivery)
+• Email 4+: Cross-sell complementary products, build community
+
+TONE: Grateful, helpful, relationship-building (not immediately salesy).`,
+
+      "review-request": `🎯 SEQUENCE TYPE: REVIEW REQUEST SERIES
+      
+GOAL: Ask for reviews and feedback after purchase or delivery.
+
+STRUCTURE:
+• Email 1 (7 days after delivery): "How's [product]?" - friendly check-in
+• Email 2: Direct review request with easy 1-click link
+• Email 3: Incentivize with discount on next purchase for leaving review
+• Email 4: Final gentle reminder with social proof of others who reviewed
+
+TONE: Friendly ask, make it easy, show how reviews help other customers.`,
+
+      "upsell": `🎯 SEQUENCE TYPE: UPSELL / CROSS-SELL SERIES
+      
+GOAL: Promote complementary products or premium versions to existing customers.
+
+STRUCTURE:
+• Email 1: "You might also love..." - show complementary products
+• Email 2: Explain how products work together, bundle benefits
+• Email 3: Limited-time bundle offer or upgrade discount
+• Email 4+: Final chance with strong incentive and testimonials
+
+TONE: Helpful recommendations (like a friend), show genuine value add.`,
+
+      "re-engagement": `🎯 SEQUENCE TYPE: RE-ENGAGEMENT / WIN-BACK
+      
+GOAL: Reconnect with customers who haven't bought in a while.
+
+STRUCTURE:
+• Email 1: "We miss you!" - acknowledge absence, tease new products
+• Email 2: Show what they've missed (new products, features, improvements)
+• Email 3: Exclusive "come back" offer or discount
+• Email 4: Last chance with strong incentive and FOMO
+
+TONE: "We miss you" (genuine), make them feel valued, create excitement.`,
+
+      "vip-loyalty": `🎯 SEQUENCE TYPE: VIP / LOYALTY SEQUENCE
+      
+GOAL: Reward repeat customers and make them feel special.
+
+STRUCTURE:
+• Email 1: "You're a VIP!" - thank them for loyalty, introduce program
+• Email 2: Exclusive perks preview (early access, special discounts)
+• Email 3: VIP-only offer or product launch
+• Email 4+: Ongoing VIP benefits, insider updates, make them feel special
+
+TONE: Exclusive, insider, make them feel truly valued and special.`,
+
+      "back-in-stock": `🎯 SEQUENCE TYPE: BACK-IN-STOCK / PRICE-DROP ALERT
+      
+GOAL: Notify customers when products they liked or wishlisted return or go on sale.
+
+STRUCTURE:
+• Email 1: "It's back!" or "Price dropped!" - create urgency
+• Email 2: Show limited stock or time-sensitive offer
+• Email 3: Add social proof, testimonials, "selling fast" urgency
+• Email 4: Final chance before it's gone again
+
+TONE: Exciting news, create urgency (authentic scarcity), help them not miss out.`,
+
+      // FOUNDER SEQUENCE TYPES
+      "welcome-onboarding": `🎯 SEQUENCE TYPE: WELCOME / ONBOARDING SEQUENCE
+      
+GOAL: Introduce the product, highlight 'aha' moments, set expectations.
+
+STRUCTURE:
+• Email 1: Welcome! Set expectations, introduce core value
+• Email 2: First "aha" moment - one key feature/benefit
+• Email 3: Second key feature, how it solves their problem
+• Email 4+: Build habit, share tips, guide to success
+
+TONE: Warm welcome, guide them to success (not just feature dump).`,
+
+      "trial-upgrade": `🎯 SEQUENCE TYPE: TRIAL → PAID UPGRADE FLOW
+      
+GOAL: Guide trial users toward conversion with reminders and value nudges.
+
+STRUCTURE:
+• Email 1: Welcome to trial! Show most valuable features first
+• Email 2: "Here's what most successful users do..." (activation tips)
+• Email 3: Mid-trial check-in, case study, value reminder
+• Email 4: Trial ending soon - upgrade CTA with urgency and benefits
+• Email 5+: Final reminder, address objections, offer help/demo
+
+TONE: Helpful guide, show value, create urgency as trial ends.`,
+
+      "activation": `🎯 SEQUENCE TYPE: ACTIVATION / FEATURE EDUCATION FLOW
+      
+GOAL: Teach users how to use key features and drive adoption.
+
+STRUCTURE:
+• Email 1: "Let's get you set up" - first critical action
+• Email 2: One key feature deep dive with how-to
+• Email 3: Next important feature, show advanced use case
+• Email 4+: Pro tips, shortcuts, make them power users
+
+TONE: Educational, empower them, celebrate progress.`,
+
+      "feature-announcement": `🎯 SEQUENCE TYPE: FEATURE ANNOUNCEMENT / PRODUCT LAUNCH
+      
+GOAL: Announce new features, explain why they matter, get people excited.
+
+STRUCTURE:
+• Email 1: Tease the announcement, build curiosity
+• Email 2: Full reveal - what it is, why it matters, how it helps
+• Email 3: Deep dive - use cases, examples, early user results
+• Email 4: Launch offer or early access, create urgency
+
+TONE: Exciting, show why this matters to THEM, build anticipation.`,
+
+      "educational-nurture": `🎯 SEQUENCE TYPE: EDUCATIONAL / NURTURE DRIP
+      
+GOAL: Share value-driven content, tips, or best practices.
+
+STRUCTURE:
+• Email 1: Framework or mental model (foundational insight)
+• Email 2: Tactical tip or how-to (actionable)
+• Email 3: Case study or example (social proof)
+• Email 4+: Deep dive or advanced technique
+
+TONE: Teaching, genuinely helpful, position as expert guide.`,
+
+      "churn-recovery": `🎯 SEQUENCE TYPE: CHURN RECOVERY / WIN-BACK
+      
+GOAL: Re-engage inactive or churned users.
+
+STRUCTURE:
+• Email 1: "We miss you" - acknowledge absence, ask for feedback
+• Email 2: Show what they've missed (new features, improvements)
+• Email 3: Exclusive "come back" offer (discount, extended trial)
+• Email 4: Final chance, address why they might have left
+
+TONE: Understand why they left, show you've improved, genuine incentive.`,
+
+      "expansion-upgrade": `🎯 SEQUENCE TYPE: EXPANSION / UPGRADE FLOW
+      
+GOAL: For existing users - upsell to higher tiers, promote add-ons.
+
+STRUCTURE:
+• Email 1: "Ready to level up?" - tease premium benefits
+• Email 2: Show what they're missing (premium features, use cases)
+• Email 3: Case study of successful upgraded user
+• Email 4: Limited-time upgrade offer with incentive
+
+TONE: Show they've outgrown current plan, upgrade is natural next step.`,
+
+      "customer-success": `🎯 SEQUENCE TYPE: CUSTOMER SUCCESS / ADOPTION SEQUENCE
+      
+GOAL: Help customers get more value, reduce support friction.
+
+STRUCTURE:
+• Email 1: Check-in - "How's it going?" + offer help
+• Email 2: Share most common questions/tips
+• Email 3: Advanced use cases or hidden features
+• Email 4+: Ongoing success tips, community invite
+
+TONE: Helpful partner, invested in their success, proactive support.`,
+
+      "founder-story": `🎯 SEQUENCE TYPE: FOUNDER STORY / BRAND STORY
+      
+GOAL: Humanize the brand, build trust through the founder's journey.
+
+STRUCTURE:
+• Email 1: Origin story - why we started this
+• Email 2: The problem we faced that led to solution
+• Email 3: Early challenges, what we learned
+• Email 4+: Where we're going, invite them into the journey
+
+TONE: Personal, vulnerable, authentic, build emotional connection.`,
+
+      "newsletter": `🎯 SEQUENCE TYPE: WEEKLY NEWSLETTER / REGULAR CONTENT
+      
+GOAL: Keep users engaged with updates, insights, content, or news.
+
+STRUCTURE:
+• Email 1: Welcome to newsletter, set expectations (frequency, value)
+• Email 2: First value-packed newsletter (insights, tips, updates)
+• Email 3: Continue pattern - mix of education, product updates, community
+• Email 4+: Maintain consistent value delivery, build habit
+
+TONE: Regular friend checking in, mix of valuable content and updates.`,
+    };
+    
+    const sequenceInstructions = sequenceTypeInstructions[sequenceType] || sequenceTypeInstructions["welcome"];
     
     const systemPrompt = `You are an elite email strategist and conversion copywriter with 15+ years of experience crafting campaigns for brands like Apple, Stripe, and Notion. You write like a real human, not an AI. Your campaigns consistently achieve 40%+ open rates and 15%+ click-through rates.
 
@@ -732,6 +981,14 @@ If any answer is "no" or "maybe", revise until it's "absolutely yes."`;
 🎯 TARGET: ${url}
 📧 EMAILS: ${numEmails} emails
 📝 LENGTH: ${wordsPerEmail} words per email (range: ${Math.max(100, wordsPerEmail - 30)}-${Math.min(500, wordsPerEmail + 30)})
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 SEQUENCE TYPE & CAMPAIGN GOAL (CRITICAL):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${sequenceInstructions}
+
+⚠️ CRITICAL: Follow this sequence type structure EXACTLY. This is NOT a generic welcome series - structure emails according to the specific sequence type above!
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📄 LANDING PAGE CONTENT:
