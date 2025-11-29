@@ -114,7 +114,7 @@ Return ONLY valid JSON (no markdown, no code blocks):
           "X-Title": "Vayno Campaign Translation"
         },
         body: JSON.stringify({
-          model: "anthropic/claude-sonnet-4-20250514",
+          model: "anthropic/claude-sonnet-4",
           messages: [
             { role: "user", content: prompt }
           ],
