@@ -707,25 +707,25 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
 
     const fullPrompt = `${systemPrompt}\n\n${userPrompt}`;
     
-    // Use Lovable AI with google/gemini-2.5-flash
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY not configured");
+    // Use Groq AI with Llama 3.3 70B
+    const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
+    if (!GROQ_API_KEY) {
+      console.error("GROQ_API_KEY not configured");
       return new Response(
         JSON.stringify({ error: "AI service not configured. Please contact support." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log("Calling Lovable AI with google/gemini-2.5-flash");
-    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    console.log("Calling Groq AI with llama-3.3-70b-versatile");
+    const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "Authorization": `Bearer ${GROQ_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "llama-3.3-70b-versatile",
         messages: [
           { role: "user", content: fullPrompt }
         ],
@@ -734,17 +734,17 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
 
     if (!resp.ok) {
       const errorText = await resp.text();
-      console.error("Lovable AI error:", resp.status, errorText);
+      console.error("Groq AI error:", resp.status, errorText);
       
       if (resp.status === 402) {
         return new Response(
-          JSON.stringify({ error: "AI credits depleted. Please add credits to your Lovable workspace." }),
+          JSON.stringify({ error: "AI credits depleted. Please add credits to your Groq account." }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       if (resp.status === 429) {
         return new Response(
-          JSON.stringify({ error: "Rate limited. Please wait a moment and retry." }),
+          JSON.stringify({ error: "Rate limited (500 free requests/day). Please wait and retry or upgrade your Groq plan." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -757,9 +757,9 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
 
     const aiData = await resp.json();
 
-    console.log("Successfully called Lovable AI");
+    console.log("Successfully called Groq AI");
 
-    // Lovable AI returns OpenAI-compatible format
+    // Groq returns OpenAI-compatible format
     if (!aiData.choices?.[0]?.message?.content) {
       console.error("Invalid AI response format:", aiData);
       throw new Error("Invalid AI response format");

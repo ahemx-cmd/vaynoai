@@ -68,25 +68,25 @@ serve(async (req) => {
 
     const prompt = `Improve this email to be more compelling and high-converting while keeping the same length and structure: ${currentContent}`;
     
-    // Use Lovable AI
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY not configured");
+    // Use Groq AI
+    const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
+    if (!GROQ_API_KEY) {
+      console.error("GROQ_API_KEY not configured");
       return new Response(
         JSON.stringify({ error: "AI service not configured. Please contact support." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log("Calling Lovable AI to improve email");
-    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    console.log("Calling Groq AI (Llama 3.3 70B) to improve email");
+    const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "Authorization": `Bearer ${GROQ_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "llama-3.3-70b-versatile",
         messages: [
           { role: "user", content: prompt }
         ],
@@ -95,17 +95,17 @@ serve(async (req) => {
 
     if (!resp.ok) {
       const errorText = await resp.text();
-      console.error("Lovable AI error:", resp.status, errorText);
+      console.error("Groq AI error:", resp.status, errorText);
       
       if (resp.status === 402) {
         return new Response(
-          JSON.stringify({ error: "AI credits depleted. Please add credits to your Lovable workspace." }),
+          JSON.stringify({ error: "AI credits depleted. Please add credits to your Groq account." }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       if (resp.status === 429) {
         return new Response(
-          JSON.stringify({ error: "Rate limited. Please wait a moment and retry." }),
+          JSON.stringify({ error: "Rate limited (500 free requests/day). Please wait and retry or upgrade your Groq plan." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -118,7 +118,7 @@ serve(async (req) => {
 
     const aiData = await resp.json();
 
-    // Lovable AI returns OpenAI-compatible format
+    // Groq returns OpenAI-compatible format
     if (!aiData.choices?.[0]?.message?.content) {
       console.error("Invalid AI response format:", aiData);
       throw new Error("Invalid AI response format");
