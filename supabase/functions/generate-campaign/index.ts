@@ -717,7 +717,7 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
       );
     }
 
-    console.log("Calling OpenRouter with anthropic/claude-sonnet-4-20250514");
+    console.log("Calling OpenRouter with anthropic/claude-sonnet-4");
     const resp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -727,7 +727,7 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
         "X-Title": "Vayno Email Campaign Generator"
       },
       body: JSON.stringify({
-        model: "anthropic/claude-sonnet-4-20250514",
+        model: "anthropic/claude-sonnet-4",
         messages: [
           { role: "user", content: fullPrompt }
         ],
