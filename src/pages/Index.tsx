@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Code2 } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import PricingSection from "@/components/pricing/PricingSection";
@@ -183,64 +183,6 @@ const Index = () => {
           </motion.div>
 
           <FeaturesGrid />
-        </div>
-      </section>
-
-      {/* Why Vayno Works - AI Logic Visual */}
-      <section className="py-32 px-6 lg:px-12 relative">
-        <div className="container mx-auto max-w-5xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">
-              Engineered for conversion
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              AI-powered extraction of your product's DNA
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="glass-card rounded-3xl p-10 border-primary/30 font-mono text-sm hover-lift"
-          >
-            <div className="space-y-4">
-              <div className="flex items-start gap-4">
-                <Code2 className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
-                <div className="space-y-3 flex-1">
-                  <div className="flex items-center gap-3">
-                    <span className="text-primary">headline:</span>
-                    <span className="text-muted-foreground">"Revolutionary AI tool for marketers"</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-primary">tone:</span>
-                    <span className="text-muted-foreground">"Professional, confident, results-driven"</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <span className="text-primary whitespace-nowrap">features:</span>
-                    <span className="text-muted-foreground">["instant generation", "no prompts needed", "ESP-ready export"]</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <span className="text-primary whitespace-nowrap">value_props:</span>
-                    <span className="text-muted-foreground">["save hours", "boost conversions", "zero learning curve"]</span>
-                  </div>
-                  <div className="pt-4 border-t border-border/30">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                      <span className="text-primary">Generating 7-email sequence...</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
         </div>
       </section>
 
