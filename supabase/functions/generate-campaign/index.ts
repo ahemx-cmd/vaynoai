@@ -1237,7 +1237,7 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
       );
     }
 
-    console.log("Calling Groq AI with llama-3.3-70b-versatile");
+    console.log("Calling Groq AI with mixtral-8x7b-32768");
     const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -1245,7 +1245,7 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "mixtral-8x7b-32768",
         messages: [
           { role: "system", content: "You are an expert email copywriter. You MUST follow word count requirements exactly. Each email must be the exact word count specified. DO NOT write short 2-3 line emails. Count every word carefully." },
           { role: "user", content: fullPrompt }
