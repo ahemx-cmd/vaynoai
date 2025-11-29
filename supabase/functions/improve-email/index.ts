@@ -68,27 +68,25 @@ serve(async (req) => {
 
     const prompt = `Improve this email to be more compelling and high-converting while keeping the same length and structure: ${currentContent}`;
     
-    // Use OpenRouter with Claude Sonnet 4
-    const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
-    if (!OPENROUTER_API_KEY) {
-      console.error("OPENROUTER_API_KEY not configured");
+    // Use Lovable AI
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      console.error("LOVABLE_API_KEY not configured");
       return new Response(
         JSON.stringify({ error: "AI service not configured. Please contact support." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log("Calling OpenRouter to improve email");
-    const resp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    console.log("Calling Lovable AI to improve email");
+    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://vayno.app",
-        "X-Title": "Vayno Email Improvement"
       },
       body: JSON.stringify({
-        model: "anthropic/claude-sonnet-4",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "user", content: prompt }
         ],
@@ -97,11 +95,11 @@ serve(async (req) => {
 
     if (!resp.ok) {
       const errorText = await resp.text();
-      console.error("OpenRouter API error:", resp.status, errorText);
+      console.error("Lovable AI error:", resp.status, errorText);
       
       if (resp.status === 402) {
         return new Response(
-          JSON.stringify({ error: "AI credits depleted. Please add credits to your OpenRouter account." }),
+          JSON.stringify({ error: "AI credits depleted. Please add credits to your Lovable workspace." }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -120,7 +118,7 @@ serve(async (req) => {
 
     const aiData = await resp.json();
 
-    // OpenRouter returns OpenAI-compatible format
+    // Lovable AI returns OpenAI-compatible format
     if (!aiData.choices?.[0]?.message?.content) {
       console.error("Invalid AI response format:", aiData);
       throw new Error("Invalid AI response format");
