@@ -157,18 +157,15 @@ All colors MUST be HSL.
     background: var(--glass-bg-strong);
     backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border-strong);
-    box-shadow: var(--glow-primary);
     transition: var(--transition-smooth);
   }
 
   .btn-premium:hover {
-    box-shadow: var(--glow-primary-strong);
-    transform: translateY(-2px);
-    border-color: hsl(152 100% 56% / 0.5);
+    opacity: 0.9;
   }
 
   .btn-premium:active {
-    transform: translateY(0);
+    opacity: 0.8;
   }
 
   /* Floating animation */
