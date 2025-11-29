@@ -94,25 +94,27 @@ Return ONLY valid JSON (no markdown, no code blocks):
   "html": "translated HTML content"
 }`;
 
-      // Use Lovable AI
-      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-      if (!LOVABLE_API_KEY) {
-        console.error("LOVABLE_API_KEY not configured");
+      // Use OpenRouter with Claude Sonnet 4
+      const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
+      if (!OPENROUTER_API_KEY) {
+        console.error("OPENROUTER_API_KEY not configured");
         return new Response(
           JSON.stringify({ error: "AI service not configured. Please contact support." }),
           { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
-      console.log(`Translating email ${email.sequence_number} with Lovable AI`);
-      const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      console.log(`Translating email ${email.sequence_number} with OpenRouter`);
+      const resp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+          "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
+          "HTTP-Referer": "https://vayno.app",
+          "X-Title": "Vayno Campaign Translation"
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
+          model: "anthropic/claude-sonnet-4-20250514",
           messages: [
             { role: "user", content: prompt }
           ],
@@ -121,11 +123,11 @@ Return ONLY valid JSON (no markdown, no code blocks):
 
       if (!resp.ok) {
         const errorText = await resp.text();
-        console.error("Lovable AI error:", resp.status, errorText);
+        console.error("OpenRouter API error:", resp.status, errorText);
         
         if (resp.status === 402) {
           return new Response(
-            JSON.stringify({ error: "AI credits depleted. Please add credits to your Lovable workspace." }),
+            JSON.stringify({ error: "AI credits depleted. Please add credits to your OpenRouter account." }),
             { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
@@ -144,7 +146,7 @@ Return ONLY valid JSON (no markdown, no code blocks):
 
       const aiData = await resp.json();
 
-      // Lovable AI returns OpenAI-compatible format
+      // OpenRouter returns OpenAI-compatible format
       if (!aiData.choices?.[0]?.message?.content) {
         throw new Error("Invalid AI response format");
       }
