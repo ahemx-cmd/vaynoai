@@ -975,12 +975,23 @@ Before finalizing each email, verify:
 
 If any answer is "no" or "maybe", revise until it's "absolutely yes."`;
 
-    const userPrompt = `CAMPAIGN BRIEF:
+    const userPrompt = `🚨 CRITICAL REQUIREMENTS - READ FIRST:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+YOU MUST GENERATE EXACTLY ${numEmails} EMAILS.
+EACH EMAIL MUST BE **EXACTLY ${wordsPerEmail} WORDS** (minimum ${Math.max(100, wordsPerEmail - 20)} words, maximum ${wordsPerEmail + 50} words).
+
+❌ DO NOT GENERATE SHORT 2-3 LINE EMAILS. 
+❌ DO NOT IGNORE WORD COUNT.
+✅ COUNT EVERY WORD. AIM FOR ${wordsPerEmail} WORDS PER EMAIL.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 CAMPAIGN BRIEF:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🎯 TARGET: ${url}
 📧 EMAILS: ${numEmails} emails
-📝 LENGTH: ${wordsPerEmail} words per email (range: ${Math.max(100, wordsPerEmail - 30)}-${Math.min(500, wordsPerEmail + 30)})
+📝 LENGTH PER EMAIL: **${wordsPerEmail} WORDS** (strict requirement)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🎯 SEQUENCE TYPE & CAMPAIGN GOAL (CRITICAL):
@@ -1162,7 +1173,8 @@ Before submitting, verify:
 ✓ STORY ARC: Emails build on each other, reference previous ones
 ✓ NO AI PHRASES: Zero robotic language or generic marketing speak
 ✓ SUBTLE IMPERFECTIONS: Casual grammar, fragments, starts with "And/But/So"
-✓ Word count: ${Math.max(100, wordsPerEmail - 30)}-${Math.min(500, wordsPerEmail + 30)} words per email
+✓ **WORD COUNT: EACH EMAIL MUST BE ${wordsPerEmail} WORDS (±20 words max)**
+✓ **DO NOT WRITE SHORT 2-3 LINE EMAILS - WRITE FULL ${wordsPerEmail}-WORD EMAILS**
 ✓ Subject lines: 40-50 characters, curiosity-driven
 ✓ ALL IN ENGLISH
 
@@ -1195,35 +1207,37 @@ Return ONLY valid JSON (no markdown, no code blocks, no explanations):
     {
       "type": "welcome",
       "subject": "Human-sounding subject (40-50 chars)",
-      "content": "Plain text body in English (~${wordsPerEmail} words, natural formatting)",
-      "html": "HTML version in English (~${wordsPerEmail} words, styled properly)"
+      "content": "Plain text body in English (**MUST BE ${wordsPerEmail} WORDS**, natural formatting, NO SHORT 2-3 LINE EMAILS)",
+      "html": "HTML version in English (**MUST BE ${wordsPerEmail} WORDS**, styled properly, NO SHORT 2-3 LINE EMAILS)"
     }
   ]
 }
+
+🚨 REMINDER: Each email must be **${wordsPerEmail} WORDS**. Count carefully. Do not submit short emails.
 
 NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`;
 
     const fullPrompt = `${systemPrompt}\n\n${userPrompt}`;
     
-    // Use Groq AI with Llama 3.3 70B
-    const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
-    if (!GROQ_API_KEY) {
-      console.error("GROQ_API_KEY not configured");
+    // Use Lovable AI with Google Gemini 2.5 Flash for better instruction following
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      console.error("LOVABLE_API_KEY not configured");
       return new Response(
         JSON.stringify({ error: "AI service not configured. Please contact support." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log("Calling Groq AI with llama-3.3-70b-versatile");
-    const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    console.log("Calling Lovable AI with google/gemini-2.5-flash");
+    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${GROQ_API_KEY}`,
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "user", content: fullPrompt }
         ],
@@ -1232,17 +1246,17 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
 
     if (!resp.ok) {
       const errorText = await resp.text();
-      console.error("Groq AI error:", resp.status, errorText);
+      console.error("Lovable AI error:", resp.status, errorText);
       
       if (resp.status === 402) {
         return new Response(
-          JSON.stringify({ error: "AI credits depleted. Please add credits to your Groq account." }),
+          JSON.stringify({ error: "AI credits depleted. Please add credits to your Lovable workspace." }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       if (resp.status === 429) {
         return new Response(
-          JSON.stringify({ error: "Rate limited (500 free requests/day). Please wait and retry or upgrade your Groq plan." }),
+          JSON.stringify({ error: "Rate limited. Please wait and retry or contact support." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -1255,7 +1269,7 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
 
     const aiData = await resp.json();
 
-    console.log("Successfully called Groq AI");
+    console.log("Successfully called Lovable AI");
 
     // Groq returns OpenAI-compatible format
     if (!aiData.choices?.[0]?.message?.content) {
