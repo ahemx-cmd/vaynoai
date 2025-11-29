@@ -975,15 +975,23 @@ Before finalizing each email, verify:
 
 If any answer is "no" or "maybe", revise until it's "absolutely yes."`;
 
-    const userPrompt = `🚨 CRITICAL REQUIREMENTS - READ FIRST:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    const userPrompt = `🚨🚨🚨 CRITICAL REQUIREMENTS - MUST FOLLOW EXACTLY 🚨🚨🚨
 
-YOU MUST GENERATE EXACTLY ${numEmails} EMAILS.
-EACH EMAIL MUST BE **EXACTLY ${wordsPerEmail} WORDS** (minimum ${Math.max(100, wordsPerEmail - 20)} words, maximum ${wordsPerEmail + 50} words).
+YOU WILL BE REJECTED IF YOU FAIL ANY OF THESE:
 
-❌ DO NOT GENERATE SHORT 2-3 LINE EMAILS. 
-❌ DO NOT IGNORE WORD COUNT.
-✅ COUNT EVERY WORD. AIM FOR ${wordsPerEmail} WORDS PER EMAIL.
+1. GENERATE EXACTLY ${numEmails} EMAILS (not ${numEmails - 1}, not ${numEmails + 1})
+2. EACH EMAIL MUST BE ${wordsPerEmail} WORDS (±30 words acceptable, but aim for ${wordsPerEmail})
+3. ❌ FORBIDDEN: Writing 2-3 line emails like "Welcome! Here's your discount code. Click here."
+4. ❌ FORBIDDEN: Ignoring word count and writing whatever length you want
+5. ✅ REQUIRED: Count words as you write. Write full paragraphs to reach ${wordsPerEmail} words.
+
+EXAMPLE OF WHAT NOT TO DO (TOO SHORT):
+"Hey {{first_name}}, welcome to our store! Here's 10% off. Use code WELCOME10. Happy shopping!"
+^ THIS IS ONLY 16 WORDS. REJECTED. ❌
+
+EXAMPLE OF CORRECT LENGTH (for 150 words):
+"Hey {{first_name}}, welcome to [Brand]! I'm so excited you're here. Let me tell you why thousands of customers love what we do... [continues for 140+ more words with value, benefits, story, social proof, etc.]"
+^ THIS REACHES 150+ WORDS. APPROVED. ✅
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📋 CAMPAIGN BRIEF:
@@ -1219,44 +1227,46 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
 
     const fullPrompt = `${systemPrompt}\n\n${userPrompt}`;
     
-    // Use Lovable AI with Google Gemini 2.5 Flash for better instruction following
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY not configured");
+    // Use Groq AI with Llama 3.3 70B - with strict word count enforcement
+    const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
+    if (!GROQ_API_KEY) {
+      console.error("GROQ_API_KEY not configured");
       return new Response(
         JSON.stringify({ error: "AI service not configured. Please contact support." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log("Calling Lovable AI with google/gemini-2.5-flash");
-    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    console.log("Calling Groq AI with llama-3.3-70b-versatile");
+    const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "Authorization": `Bearer ${GROQ_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "llama-3.3-70b-versatile",
         messages: [
+          { role: "system", content: "You are an expert email copywriter. You MUST follow word count requirements exactly. Each email must be the exact word count specified. DO NOT write short 2-3 line emails. Count every word carefully." },
           { role: "user", content: fullPrompt }
         ],
+        temperature: 0.9,
       }),
     });
 
     if (!resp.ok) {
       const errorText = await resp.text();
-      console.error("Lovable AI error:", resp.status, errorText);
+      console.error("Groq AI error:", resp.status, errorText);
       
       if (resp.status === 402) {
         return new Response(
-          JSON.stringify({ error: "AI credits depleted. Please add credits to your Lovable workspace." }),
+          JSON.stringify({ error: "AI credits depleted. Please add credits to your Groq account." }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       if (resp.status === 429) {
         return new Response(
-          JSON.stringify({ error: "Rate limited. Please wait and retry or contact support." }),
+          JSON.stringify({ error: "Rate limited (500 free requests/day). Please wait and retry or upgrade your Groq plan." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -1269,7 +1279,7 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
 
     const aiData = await resp.json();
 
-    console.log("Successfully called Lovable AI");
+    console.log("Successfully called Groq AI");
 
     // Groq returns OpenAI-compatible format
     if (!aiData.choices?.[0]?.message?.content) {
