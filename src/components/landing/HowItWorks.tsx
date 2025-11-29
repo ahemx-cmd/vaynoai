@@ -48,23 +48,18 @@ const HowItWorks = () => {
               </div>
             )}
 
-            <div className="glass-card rounded-3xl p-10 border-primary/20 hover-lift h-full">
+            <div className="glass-card rounded-3xl p-10 border-primary/20 h-full">
               {/* Step number badge */}
               <div className="absolute -top-4 -right-4 w-16 h-16 rounded-2xl bg-primary/20 border-2 border-primary/40 flex items-center justify-center backdrop-blur-xl shadow-[0_0_30px_rgba(35,255,128,0.3)]">
                 <span className="text-2xl font-bold gradient-text">{step.number}</span>
               </div>
 
               {/* Icon */}
-              <motion.div 
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                transition={{ type: "spring", stiffness: 300 }}
-                className="relative mb-8"
-              >
-                <div className="absolute inset-0 bg-primary/30 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative mb-8">
                 <div className="relative w-16 h-16 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center">
                   <step.icon className="w-8 h-8 text-primary" strokeWidth={1.5} />
                 </div>
-              </motion.div>
+              </div>
               
               <h3 className="text-2xl font-bold mb-4">{step.title}</h3>
               <p className="text-muted-foreground text-lg leading-relaxed">{step.description}</p>
