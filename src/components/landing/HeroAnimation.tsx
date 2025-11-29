@@ -258,10 +258,7 @@ Stop writing. Start selling.
                   transformPerspective: 1000,
                   zIndex: emailCards.length - index,
                 }}
-                className="glass-card rounded-2xl p-5 border-primary/30 transition-all cursor-pointer group hover:border-primary/40"
-                whileHover={{ 
-                  scale: 1.02,
-                }}
+                className="glass-card rounded-2xl p-5 border-primary/30 cursor-pointer"
                 onClick={() => setSelectedEmail(index)}
               >
                 <div className="relative z-10">
