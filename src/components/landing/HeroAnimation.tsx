@@ -1,6 +1,7 @@
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { FileText, Mail, Zap, Send } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const HeroAnimation = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -12,6 +13,7 @@ const HeroAnimation = () => {
   const y = useSpring(mouseY, springConfig);
 
   const [isHovering, setIsHovering] = useState(false);
+  const [selectedEmail, setSelectedEmail] = useState<number | null>(null);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -30,32 +32,116 @@ const HeroAnimation = () => {
 
   const emailCards = [
     {
-      subject: "Welcome to [Product Name]",
-      preview: "Thanks for signing up! Here's what to expect...",
+      subject: "Welcome to Vayno",
+      preview: "Stop writing emails. Start shipping campaigns.",
       day: "Day 0",
       icon: Mail,
       delay: 2,
+      fullContent: `Hey there,
+
+Welcome to Vayno.
+
+You just got access to something most founders spend weeks doing manually: complete email sequences that actually convert.
+
+Here's what happens next:
+
+→ Paste your product URL
+→ Wait 30 seconds
+→ Get a campaign ready to launch
+
+No prompts. No edits. No overthinking.
+
+Just campaigns that sell.
+
+Ready to create your first sequence?
+
+— The Vayno Team`,
     },
     {
-      subject: "Here's how [Product] solves your problem",
-      preview: "Let me show you the key features that make...",
+      subject: "This is how Vayno works",
+      preview: "Your landing page already has the copy you need.",
       day: "Day 2",
       icon: Zap,
       delay: 2.3,
+      fullContent: `The secret is simple:
+
+Your landing page already tells us everything we need.
+
+Features. Benefits. Tone. Value props.
+
+Vayno reads it, understands it, and writes emails that sound like you wrote them.
+
+Most founders waste hours:
+❌ Staring at blank email templates
+❌ Rewriting the same value props
+❌ Tweaking subject lines endlessly
+
+Vayno removes all of that.
+
+One URL → One complete sequence.
+
+That's it.
+
+Try it now. You'll see.
+
+— The Vayno Team`,
     },
     {
-      subject: "Real results from customers like you",
-      preview: "Don't just take our word for it. See how...",
+      subject: "Founders are shipping faster with Vayno",
+      preview: "See what happens when you stop writing and start selling.",
       day: "Day 5",
       icon: FileText,
       delay: 2.6,
+      fullContent: `Real results from people like you:
+
+"I spent 6 hours writing a drip sequence. Vayno did it in 30 seconds."
+— Sarah K., SaaS Founder
+
+"The emails sound exactly like my brand. I barely edited them."
+— Marcus T., Product Lead
+
+"Finally, a tool that just works. No learning curve."
+— Emily R., Marketing Director
+
+This isn't magic.
+
+It's engineered AI that understands your product, your audience, and your voice.
+
+And it takes 30 seconds.
+
+Ready to see it for yourself?
+
+— The Vayno Team`,
     },
     {
-      subject: "Ready to get started?",
-      preview: "You've seen what we can do. Let's make it happen...",
+      subject: "Your first campaign is waiting",
+      preview: "One URL. One minute. One complete sequence.",
       day: "Day 7",
       icon: Send,
       delay: 2.9,
+      fullContent: `Let's be honest:
+
+You've been thinking about building email sequences.
+
+But you haven't started.
+
+Because it takes too long. Because you're not a copywriter. Because you have 100 other priorities.
+
+Here's the truth:
+
+With Vayno, you're 60 seconds away from a complete campaign.
+
+No templates.
+No prompts.
+No overthinking.
+
+Just results.
+
+Create your first sequence now — it's free, no signup required.
+
+Stop writing. Start selling.
+
+— The Vayno Team`,
     },
   ];
 
@@ -177,6 +263,7 @@ const HeroAnimation = () => {
                   scale: 1.05,
                   boxShadow: '0 0 40px rgba(35,255,128,0.3)'
                 }}
+                onClick={() => setSelectedEmail(index)}
               >
                 {/* Glow effect */}
                 <div className="absolute inset-0 rounded-2xl bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
@@ -290,6 +377,33 @@ const HeroAnimation = () => {
           }}
         />
       ))}
+
+      {/* Email Content Modal */}
+      <Dialog open={selectedEmail !== null} onOpenChange={() => setSelectedEmail(null)}>
+        <DialogContent className="glass-card border-primary/30 max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold mb-2">
+              {selectedEmail !== null && emailCards[selectedEmail]?.subject}
+            </DialogTitle>
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-xs font-mono text-primary px-3 py-1 rounded-full bg-primary/10 border border-primary/30">
+                {selectedEmail !== null && emailCards[selectedEmail]?.day}
+              </span>
+            </div>
+          </DialogHeader>
+          
+          <div className="mt-6">
+            <div className="prose prose-invert max-w-none">
+              <pre className="whitespace-pre-wrap font-sans text-base leading-relaxed text-foreground">
+                {selectedEmail !== null && emailCards[selectedEmail]?.fullContent}
+              </pre>
+            </div>
+          </div>
+
+          {/* Neon glow effect */}
+          <div className="absolute inset-0 rounded-lg bg-primary/5 blur-2xl pointer-events-none -z-10" />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
