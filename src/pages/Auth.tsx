@@ -12,6 +12,7 @@ import { Sparkles, Loader2, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
 import { trackFormSubmission, trackFunnelStep, trackConversion } from "@/lib/analytics";
+import vaynoIcon from "@/assets/vayno-icon.png";
 
 const emailSchema = z.string().email("Invalid email address");
 const passwordSchema = z.string().min(8, "Password must be at least 8 characters");
@@ -364,24 +365,14 @@ const Auth = () => {
       >
         <Card className="glass-card p-8">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-            </div>
-            <h1 className="text-3xl font-bold mb-2 tracking-tight">Welcome to Vayno</h1>
-            <p className="text-muted-foreground">Create campaigns that convert</p>
+            <img src={vaynoIcon} alt="Vayno" className="w-12 h-12 mx-auto mb-4" />
+            <h1 className="text-3xl font-bold mb-2 tracking-tight">Sign in</h1>
+            <p className="text-muted-foreground">Welcome back</p>
           </div>
 
-          <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="signin">
-              {!resetMode ? (
-                <form onSubmit={handleSignIn} className="space-y-4">
+          <div className="w-full">
+            {!resetMode ? (
+              <form onSubmit={handleSignIn} className="space-y-4">
                   <div>
                     <Label htmlFor="email">Email</Label>
                     <Input
@@ -415,19 +406,29 @@ const Auth = () => {
                       Forgot password?
                     </button>
                   </div>
-                  <Button type="submit" className="w-full btn-premium shadow-lg" disabled={loading}>
-                    {loading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Signing in...
-                      </>
-                    ) : (
-                      "Sign In"
-                    )}
-                  </Button>
-                </form>
-              ) : resetEmailSent ? (
-                <div className="space-y-4 text-center">
+                <Button type="submit" className="w-full btn-premium shadow-lg" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Signing in...
+                    </>
+                  ) : (
+                    "Sign In"
+                  )}
+                </Button>
+                <p className="text-center text-sm text-muted-foreground mt-4">
+                  Don't have an account?{" "}
+                  <button
+                    type="button"
+                    onClick={() => navigate("/auth?view=signup")}
+                    className="text-primary hover:underline"
+                  >
+                    Sign up
+                  </button>
+                </p>
+              </form>
+            ) : resetEmailSent ? (
+              <div className="space-y-4 text-center">
                   <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
                     <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -440,19 +441,19 @@ const Auth = () => {
                   <p className="text-sm text-muted-foreground">
                     Click the link in the email to reset your password.
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setResetMode(false);
-                      setResetEmailSent(false);
-                    }}
-                    className="w-full text-sm text-primary hover:underline mt-4"
-                  >
-                    Back to sign in
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={handlePasswordReset} className="space-y-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setResetMode(false);
+                    setResetEmailSent(false);
+                  }}
+                  className="w-full text-sm text-primary hover:underline mt-4"
+                >
+                  Back to sign in
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handlePasswordReset} className="space-y-4">
                   <div>
                     <Label htmlFor="reset-email">Email</Label>
                     <Input
@@ -478,69 +479,16 @@ const Auth = () => {
                       "Send Reset Link"
                     )}
                   </Button>
-                  <button
-                    type="button"
-                    onClick={() => setResetMode(false)}
-                    className="w-full text-sm text-muted-foreground hover:text-primary"
-                  >
-                    Back to sign in
-                  </button>
-                </form>
-              )}
-            </TabsContent>
-
-            <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div>
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input
-                    id="name"
-                    type="text"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="John Doe"
-                    required
-                    className="mt-1.5"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    required
-                    className="mt-1.5"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="signup-password">Password</Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    required
-                    className="mt-1.5"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">At least 8 characters</p>
-                </div>
-                <Button type="submit" className="w-full btn-premium shadow-lg" disabled={loading}>
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Creating account...
-                    </>
-                  ) : (
-                    "Create Account"
-                  )}
-                </Button>
+                <button
+                  type="button"
+                  onClick={() => setResetMode(false)}
+                  className="w-full text-sm text-muted-foreground hover:text-primary"
+                >
+                  Back to sign in
+                </button>
               </form>
-            </TabsContent>
-          </Tabs>
+            )}
+          </div>
         </Card>
 
         <p className="text-center text-sm text-muted-foreground mt-6">
@@ -550,5 +498,6 @@ const Auth = () => {
     </div>
   );
 };
+
 
 export default Auth;

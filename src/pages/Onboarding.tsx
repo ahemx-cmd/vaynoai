@@ -103,27 +103,15 @@ const Onboarding = () => {
         className="w-full max-w-2xl"
       >
         <Card className="p-8 space-y-6">
-          {/* Progress indicator */}
-          <div className="flex justify-between items-center mb-8">
+          {/* Progress dots (subtle) */}
+          <div className="flex justify-center gap-2 mb-8">
             {[1, 2, 3].map((s) => (
-              <div key={s} className="flex items-center flex-1">
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
-                    s <= step
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  {s}
-                </div>
-                {s < 3 && (
-                  <div
-                    className={`flex-1 h-1 mx-2 transition-all ${
-                      s < step ? "bg-primary" : "bg-muted"
-                    }`}
-                  />
-                )}
-              </div>
+              <div
+                key={s}
+                className={`h-1.5 rounded-full transition-all ${
+                  s === step ? "w-8 bg-primary" : "w-1.5 bg-muted"
+                }`}
+              />
             ))}
           </div>
 
@@ -135,9 +123,9 @@ const Onboarding = () => {
               className="space-y-6"
             >
               <div>
-                <h2 className="text-3xl font-bold mb-2">What best describes you?</h2>
+                <h2 className="text-3xl font-bold mb-2">First up—who are you?</h2>
                 <p className="text-muted-foreground">
-                  This helps us personalize your experience
+                  No wrong answers here
                 </p>
               </div>
 
@@ -199,9 +187,9 @@ const Onboarding = () => {
               className="space-y-6"
             >
               <div>
-                <h2 className="text-3xl font-bold mb-2">What brings you to Vayno today?</h2>
+                <h2 className="text-3xl font-bold mb-2">What's the mission?</h2>
                 <p className="text-muted-foreground">
-                  Help us understand your goals
+                  We'll keep this between us
                 </p>
               </div>
 
@@ -239,9 +227,9 @@ const Onboarding = () => {
               className="space-y-6"
             >
               <div>
-                <h2 className="text-3xl font-bold mb-2">What's your experience with email marketing?</h2>
+                <h2 className="text-3xl font-bold mb-2">One last thing...</h2>
                 <p className="text-muted-foreground">
-                  This helps us tailor the experience for you
+                  How comfortable are you with email?
                 </p>
               </div>
 

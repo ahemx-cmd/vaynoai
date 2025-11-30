@@ -241,7 +241,7 @@ const Billing = () => {
 
             {/* Available Plans */}
             <div>
-              <h2 className="text-2xl font-bold mb-6">Available Plans</h2>
+              <h2 className="text-2xl font-bold mb-6">Choose your plan</h2>
               <div className="grid gap-6 md:grid-cols-3">
                 {plans.map((planItem, index) => {
                   const Icon = planItem.icon;
@@ -254,10 +254,10 @@ const Billing = () => {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
                     >
-                      <Card className={`glass-card p-6 border-primary/20 relative overflow-hidden ${planItem.popular ? 'ring-2 ring-primary' : ''}`}>
+                       <Card className={`glass-card p-6 border-primary/20 relative overflow-hidden ${planItem.popular ? 'ring-2 ring-primary' : ''}`}>
                         {planItem.popular && (
                           <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs font-medium px-3 py-1 rounded-bl-lg">
-                            POPULAR
+                            BEST VALUE
                           </div>
                         )}
 
@@ -318,7 +318,7 @@ const Billing = () => {
             <Card className="glass-card p-6 border-primary/20">
               <h2 className="text-xl font-semibold mb-4">Billing History</h2>
               <p className="text-sm text-muted-foreground">
-                Your payment history and invoices will appear here once you upgrade to a paid plan.
+                Your invoices will appear here. Questions? teamvayno@gmail.com
               </p>
             </Card>
 

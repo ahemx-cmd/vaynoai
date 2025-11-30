@@ -114,7 +114,7 @@ const CampaignsList = ({ userId }: CampaignsListProps) => {
           <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
             <ExternalLink className="w-7 h-7 text-primary" />
           </div>
-          <h3 className="text-xl font-semibold mb-2">Nothing here yet</h3>
+          <h3 className="text-xl font-semibold mb-2">Ready when you are</h3>
           <p className="text-muted-foreground mb-6">
             Create your first campaign to get started
           </p>
@@ -153,7 +153,7 @@ const CampaignsList = ({ userId }: CampaignsListProps) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: i * 0.1 }}
           >
-            <Card className="glass-card p-6 hover-lift h-full flex flex-col">
+            <Card className="glass-card p-6 h-full flex flex-col">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
                   <h3 className="font-semibold text-lg mb-2 truncate">
@@ -178,7 +178,7 @@ const CampaignsList = ({ userId }: CampaignsListProps) => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex-1 hover-lift"
+                  className="flex-1"
                   onClick={() => navigate(`/campaign/${campaign.id}`)}
                   disabled={campaign.status !== "completed"}
                 >

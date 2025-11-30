@@ -136,7 +136,7 @@ const Dashboard = () => {
                   <span className="hidden sm:inline">New</span>
                 </Button>
                 <Avatar 
-                  className="cursor-pointer hover-lift h-9 w-9 sm:h-10 sm:w-10"
+                  className="cursor-pointer transition-opacity hover:opacity-80 h-9 w-9 sm:h-10 sm:w-10"
                   onClick={() => navigate("/profile")}
                 >
                   <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-semibold text-sm">

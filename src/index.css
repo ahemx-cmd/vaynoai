@@ -144,7 +144,14 @@ All colors MUST be HSL.
     box-shadow: var(--glow-primary-strong);
   }
 
-  /* Removed hover-lift - was too aggressive for non-clickable elements */
+  /* Optional hover-lift utility - only use on intentionally clickable elements */
+  .hover-lift {
+    transition: transform 0.2s ease;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
 
   /* Smooth transitions */
   .transition-smooth {
