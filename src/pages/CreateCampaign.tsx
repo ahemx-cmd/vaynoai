@@ -218,10 +218,10 @@ const CreateCampaign = () => {
           <Button
             variant="ghost"
             onClick={() => navigate("/dashboard")}
-            className="mb-6 hover-lift"
+            className="mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
+            Back
           </Button>
         )}
 
@@ -229,10 +229,10 @@ const CreateCampaign = () => {
           <Button
             variant="ghost"
             onClick={() => navigate("/")}
-            className="mb-6 hover-lift"
+            className="mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Home
+            Back
           </Button>
         )}
 
@@ -269,10 +269,10 @@ const CreateCampaign = () => {
           
           <div className="max-w-2xl mb-8">
             <h1 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight">
-              {isGuest ? "Let's create your first sequence" : "New campaign"}
+              {isGuest ? "Let's write some emails" : "New campaign"}
             </h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Drop your product URL. We'll handle the rest.
+              Paste your URL. We'll do the rest.
             </p>
           </div>
 

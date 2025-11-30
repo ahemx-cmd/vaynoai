@@ -17,11 +17,10 @@ const DashboardSidebar = () => {
   };
 
   const navItems = [
-    { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
     { icon: FolderKanban, label: "Campaigns", path: "/dashboard" },
     { icon: CreditCard, label: "Billing", path: "/billing" },
     { icon: User, label: "Profile", path: "/profile" },
-    { icon: HelpCircle, label: "Help", path: "/help" },
+    { icon: HelpCircle, label: "Support", path: "/help" },
   ];
 
   return (

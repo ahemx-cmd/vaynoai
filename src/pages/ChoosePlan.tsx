@@ -105,9 +105,9 @@ const ChoosePlan = () => {
               <Sparkles className="w-6 h-6 text-white" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold mb-4 tracking-tight">Choose Your Plan to Continue</h1>
+          <h1 className="text-4xl font-bold mb-4 tracking-tight">Pick a plan</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Unlock the full power of AI-driven email campaigns
+            Choose what works for you
           </p>
         </motion.div>
 
@@ -159,11 +159,11 @@ const ChoosePlan = () => {
               transition={{ duration: 0.5, delay: 0.4 + i * 0.1 }}
               className="relative"
             >
-              {plan.popular && (
+              {(plan as any).popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
                   <span className="inline-flex items-center gap-1 bg-gradient-to-r from-primary to-accent text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-lg">
                     <Sparkles className="w-3 h-3" />
-                    Most Popular
+                    Best Value
                   </span>
                 </div>
               )}
@@ -175,7 +175,7 @@ const ChoosePlan = () => {
                   </span>
                 </div>
               )}
-              <Card className={`p-8 h-full glass-card hover-lift ${(plan.popular || (isLifetime && plan.name === "Starter")) ? 'border-primary shadow-lg ring-2 ring-primary/20' : ''}`}>
+              <Card className={`p-8 h-full glass-card ${(plan.popular || (isLifetime && plan.name === "Starter")) ? 'border-primary shadow-lg ring-2 ring-primary/20' : ''}`}>
                 <div className="mb-6">
                   <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
                   <p className="text-sm text-muted-foreground mb-4">{plan.description}</p>
@@ -225,8 +225,11 @@ const ChoosePlan = () => {
             onClick={handleSkipToFree}
             className="text-muted-foreground hover:text-primary transition-colors underline text-sm"
           >
-            Let me try it first with the free plan
+            Let me try it first
           </button>
+          <p className="text-xs text-muted-foreground mt-4">
+            Questions? teamvayno@gmail.com
+          </p>
         </motion.div>
       </div>
     </div>

@@ -148,50 +148,38 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                   className="space-y-4"
                 >
                   {/* Buy Credits Button */}
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  <Button
+                    onClick={() => setView('credits')}
+                    className="w-full h-24 rounded-[24px] bg-gradient-to-r from-primary/20 to-accent/20 hover:from-primary/30 hover:to-accent/30 backdrop-blur-md border border-white/20 shadow-[0_8px_16px_rgba(0,0,0,0.1)] transition-all duration-300"
+                    variant="outline"
                   >
-                    <Button
-                      onClick={() => setView('credits')}
-                      className="w-full h-24 rounded-[24px] bg-gradient-to-r from-primary/20 to-accent/20 hover:from-primary/30 hover:to-accent/30 backdrop-blur-md border border-white/20 shadow-[0_8px_16px_rgba(0,0,0,0.1)] transition-all duration-300"
-                      variant="outline"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
-                          <Zap className="w-6 h-6 text-primary-foreground" />
-                        </div>
-                        <div className="text-left">
-                          <h3 className="text-xl font-bold text-foreground">Top-up</h3>
-                          <p className="text-sm text-muted-foreground">Buy credits to keep creating</p>
-                        </div>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
+                        <Zap className="w-6 h-6 text-primary-foreground" />
                       </div>
-                    </Button>
-                  </motion.div>
+                      <div className="text-left">
+                        <h3 className="text-xl font-bold text-foreground">Top-up</h3>
+                        <p className="text-sm text-muted-foreground">Buy credits to keep creating</p>
+                      </div>
+                    </div>
+                  </Button>
 
                   {/* Upgrade Plan Button */}
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  <Button
+                    onClick={() => setView('plans')}
+                    className="w-full h-24 rounded-[24px] bg-gradient-to-r from-accent/20 to-primary/20 hover:from-accent/30 hover:to-primary/30 backdrop-blur-md border border-white/20 shadow-[0_8px_16px_rgba(0,0,0,0.1)] transition-all duration-300"
+                    variant="outline"
                   >
-                    <Button
-                      onClick={() => setView('plans')}
-                      className="w-full h-24 rounded-[24px] bg-gradient-to-r from-accent/20 to-primary/20 hover:from-accent/30 hover:to-primary/30 backdrop-blur-md border border-white/20 shadow-[0_8px_16px_rgba(0,0,0,0.1)] transition-all duration-300"
-                      variant="outline"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center shadow-lg">
-                          <Crown className="w-6 h-6 text-primary-foreground" />
-                        </div>
-                        <div className="text-left">
-                          <h3 className="text-xl font-bold text-foreground">Upgrade</h3>
-                          <p className="text-sm text-muted-foreground">Monthly credits + features</p>
-                        </div>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center shadow-lg">
+                        <Crown className="w-6 h-6 text-primary-foreground" />
                       </div>
-                    </Button>
-                  </motion.div>
+                      <div className="text-left">
+                        <h3 className="text-xl font-bold text-foreground">Upgrade</h3>
+                        <p className="text-sm text-muted-foreground">Monthly credits + features</p>
+                      </div>
+                    </div>
+                  </Button>
 
                   <motion.p
                     initial={{ opacity: 0 }}
@@ -232,14 +220,13 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                       <CarouselContent className="-ml-2 md:-ml-4">
                         {creditPacks.map((pack, index) => (
                           <CarouselItem key={pack.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/2 lg:basis-1/3">
-                            <motion.div
+                             <div
                               onClick={() => {
                                 api?.scrollTo(index);
                                 setSelectedPack(index);
                               }}
                               className="cursor-pointer h-full"
-                              transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                            >
+                             >
                               <Card className={`
                                 h-full p-4 md:p-6 rounded-[24px] transition-all duration-500
                                 ${selectedPack === index 
@@ -268,8 +255,8 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                                      <span className="text-base md:text-lg font-semibold">{pack.credits} credits</span>
                                    </div>
                                  </div>
-                              </Card>
-                            </motion.div>
+                               </Card>
+                             </div>
                           </CarouselItem>
                         ))}
                       </CarouselContent>
@@ -315,18 +302,8 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                     {plans.map((plan, index) => {
                       const Icon = plan.icon;
                       return (
-                        <motion.div
+                        <div
                           key={plan.name}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ 
-                            delay: index * 0.1,
-                            type: "spring", 
-                            stiffness: 400, 
-                            damping: 17 
-                          }}
                           className="h-full"
                         >
                           <Card className={`p-4 md:p-6 rounded-[24px] bg-background/40 backdrop-blur-lg border-white/20 hover:bg-background/60 transition-all duration-300 shadow-[0_4px_16px_rgba(0,0,0,0.1)] min-h-[360px] md:h-[380px] flex flex-col relative ${(plan as any).popular ? 'border-primary/50' : ''}`}>
@@ -367,7 +344,7 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                               </Button>
                             </div>
                           </Card>
-                        </motion.div>
+                        </div>
                       );
                     })}
                   </div>
