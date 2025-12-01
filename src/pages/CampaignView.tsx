@@ -203,7 +203,7 @@ const CampaignView = () => {
                   onClick={handleCopyAllEmails}
                 >
                   {copiedAll ? (
-                    <Check className="w-4 h-4 mr-2 text-green-500" />
+                    <Check className="w-4 h-4 mr-2 text-primary" />
                   ) : (
                     <Copy className="w-4 h-4 mr-2" />
                   )}
@@ -233,7 +233,7 @@ const CampaignView = () => {
                   <ExternalLink className="w-4 h-4" />
                 </a>
               </div>
-              <Badge className="bg-green-500/20 text-green-400">
+              <Badge className="bg-primary/20 text-primary">
                 {campaign.status}
               </Badge>
             </div>

@@ -128,11 +128,11 @@ const CampaignsList = ({ userId }: CampaignsListProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return "bg-green-500/20 text-green-400";
+        return "bg-primary/20 text-primary";
       case "pending":
-        return "bg-yellow-500/20 text-yellow-400";
+        return "bg-muted/30 text-muted-foreground";
       case "analyzing":
-        return "bg-blue-500/20 text-blue-400";
+        return "bg-accent/20 text-accent-foreground";
       default:
         return "bg-muted text-muted-foreground";
     }

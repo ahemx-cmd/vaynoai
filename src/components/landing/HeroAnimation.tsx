@@ -163,7 +163,7 @@ Stop writing. Start selling.
           animate={{ rotate: 360 }}
           transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
           className="w-[500px] h-[500px] rounded-full border border-primary/20"
-          style={{ boxShadow: '0 0 40px rgba(35,255,128,0.1)' }}
+          style={{ boxShadow: '0 0 40px rgba(0,0,0,0.1)' }}
         />
       </motion.div>
 
@@ -206,7 +206,7 @@ Stop writing. Start selling.
           className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/40 to-transparent pointer-events-none"
           style={{ 
             height: '80px',
-            boxShadow: '0 0 30px rgba(35,255,128,0.5)'
+            boxShadow: '0 0 30px rgba(0,0,0,0.3)'
           }}
         />
 
@@ -312,7 +312,7 @@ Stop writing. Start selling.
       >
         <motion.path
           d="M 280 300 Q 400 300 450 200"
-          stroke="hsl(152 100% 56% / 0.3)"
+          stroke="hsl(0 0% 61% / 0.3)"
           strokeWidth="2"
           fill="none"
           initial={{ pathLength: 0, opacity: 0 }}
@@ -321,7 +321,7 @@ Stop writing. Start selling.
         />
         <motion.path
           d="M 280 300 Q 400 300 450 300"
-          stroke="hsl(152 100% 56% / 0.3)"
+          stroke="hsl(0 0% 61% / 0.3)"
           strokeWidth="2"
           fill="none"
           initial={{ pathLength: 0, opacity: 0 }}
@@ -330,7 +330,7 @@ Stop writing. Start selling.
         />
         <motion.path
           d="M 280 300 Q 400 300 450 400"
-          stroke="hsl(152 100% 56% / 0.3)"
+          stroke="hsl(0 0% 61% / 0.3)"
           strokeWidth="2"
           fill="none"
           initial={{ pathLength: 0, opacity: 0 }}

@@ -66,15 +66,15 @@ const EmailCard = ({ email, index, campaignId, dripDuration, totalEmails }: Emai
   const getTypeColor = (type: string) => {
     switch (type.toLowerCase()) {
       case "welcome":
-        return "bg-blue-500/20 text-blue-400";
+        return "bg-primary/20 text-primary";
       case "nurture":
       case "value":
-        return "bg-green-500/20 text-green-400";
+        return "bg-secondary/20 text-secondary";
       case "sales":
       case "conversion":
-        return "bg-purple-500/20 text-purple-400";
+        return "bg-accent/20 text-accent-foreground";
       case "re-engagement":
-        return "bg-orange-500/20 text-orange-400";
+        return "bg-muted/30 text-muted-foreground";
       default:
         return "bg-muted text-muted-foreground";
     }
