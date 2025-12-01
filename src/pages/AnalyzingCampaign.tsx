@@ -276,7 +276,7 @@ if (!data || !data.success) {
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 15 }}
             >
-              <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
+              <CheckCircle2 className="w-16 h-16 text-primary mx-auto mb-4" />
               <p className="text-muted-foreground">Redirecting to your campaign...</p>
             </motion.div>
           ) : (

@@ -166,7 +166,7 @@ const Profile = () => {
                       <p className="text-sm text-muted-foreground">{email}</p>
                     </div>
                   </div>
-                  <div className="px-3 py-1 rounded-full bg-green-500/10 text-green-500 text-xs font-medium">
+                  <div className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
                     Verified
                   </div>
                 </div>
