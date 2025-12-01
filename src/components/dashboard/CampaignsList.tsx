@@ -4,8 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Eye, Trash2, ExternalLink } from "lucide-react";
+import { Eye, Trash2, ExternalLink, Calendar } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -145,45 +144,45 @@ const CampaignsList = ({ userId }: CampaignsListProps) => {
         <h2 className="text-2xl font-bold tracking-tight">Campaigns</h2>
         <span className="text-sm text-muted-foreground">{campaigns.length} total</span>
       </div>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {campaigns.map((campaign, i) => (
-          <motion.div
-            key={campaign.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: i * 0.1 }}
-          >
-            <Card className="glass-card p-6 h-full flex flex-col">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-2 truncate">
-                    {campaign.name}
-                  </h3>
-                  <Badge className={getStatusColor(campaign.status)}>
-                    {campaign.status}
-                  </Badge>
-                </div>
+      
+      {/* List view instead of grid */}
+      <div className="space-y-3">
+        {campaigns.map((campaign) => (
+          <Card key={campaign.id} className="glass-card border-border/50">
+            <div className="p-5 flex items-center gap-6">
+              {/* Status indicator */}
+              <div className="flex-shrink-0">
+                <Badge className={getStatusColor(campaign.status)}>
+                  {campaign.status}
+                </Badge>
               </div>
 
-              <div className="space-y-2 mb-4 flex-1">
+              {/* Campaign info */}
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-base mb-1 truncate">
+                  {campaign.name}
+                </h3>
                 <p className="text-sm text-muted-foreground truncate">
                   {campaign.url}
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  Created {format(new Date(campaign.created_at), "MMM d, yyyy")}
-                </p>
               </div>
 
-              <div className="flex gap-2">
+              {/* Date */}
+              <div className="flex-shrink-0 hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
+                <Calendar className="w-4 h-4" />
+                {format(new Date(campaign.created_at), "MMM d")}
+              </div>
+
+              {/* Actions */}
+              <div className="flex-shrink-0 flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex-1"
                   onClick={() => navigate(`/campaign/${campaign.id}`)}
                   disabled={campaign.status !== "completed"}
                 >
-                  <Eye className="w-4 h-4 mr-2" />
-                  View
+                  <Eye className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">View</span>
                 </Button>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
@@ -214,8 +213,8 @@ const CampaignsList = ({ userId }: CampaignsListProps) => {
                   </AlertDialogContent>
                 </AlertDialog>
               </div>
-            </Card>
-          </motion.div>
+            </div>
+          </Card>
         ))}
       </div>
     </div>

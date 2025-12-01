@@ -3,7 +3,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { motion } from "framer-motion";
 import { Wand2, Check, X, ChevronDown, ChevronUp, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -86,117 +85,105 @@ const EmailCard = ({ email, index, campaignId, dripDuration, totalEmails }: Emai
     : null;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-    >
-      <Card className="glass-card overflow-hidden border-primary/20">
-        <div
-          className="p-6 cursor-pointer hover:bg-muted/50 transition-smooth"
-          onClick={() => !isEditing && setIsExpanded(!isExpanded)}
-        >
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2 flex-wrap">
-                <Badge variant="outline">Email {email.sequence_number}</Badge>
-                <Badge className={getTypeColor(email.email_type)}>
-                  {email.email_type}
+    <Card className="glass-card overflow-hidden border-primary/20">
+      <div
+        className="p-6 cursor-pointer hover:bg-muted/30 transition-colors"
+        onClick={() => !isEditing && setIsExpanded(!isExpanded)}
+      >
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-2 flex-wrap">
+              <Badge variant="outline">Email {email.sequence_number}</Badge>
+              <Badge className={getTypeColor(email.email_type)}>
+                {email.email_type}
+              </Badge>
+              {sendDay && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  <Calendar className="w-3 h-3" />
+                  Day {sendDay}
                 </Badge>
-                {sendDay && (
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
-                    Day {sendDay}
-                  </Badge>
-                )}
-              </div>
-              <h3 className="text-xl font-semibold mb-1">{email.subject}</h3>
-              <p className="text-sm text-muted-foreground">
-                ~{email.content.split(" ").length} words
-              </p>
-            </div>
-            <Button variant="ghost" size="icon" onClick={(e) => {
-              e.stopPropagation();
-              setIsExpanded(!isExpanded);
-            }}>
-              {isExpanded ? (
-                <ChevronUp className="w-5 h-5" />
-              ) : (
-                <ChevronDown className="w-5 h-5" />
               )}
-            </Button>
+            </div>
+            <h3 className="text-xl font-semibold mb-1">{email.subject}</h3>
+            <p className="text-sm text-muted-foreground">
+              ~{email.content.split(" ").length} words
+            </p>
+          </div>
+          <Button variant="ghost" size="icon" onClick={(e) => {
+            e.stopPropagation();
+            setIsExpanded(!isExpanded);
+          }}>
+            {isExpanded ? (
+              <ChevronUp className="w-5 h-5" />
+            ) : (
+              <ChevronDown className="w-5 h-5" />
+            )}
+          </Button>
+        </div>
+      </div>
+
+      {isExpanded && (
+        <div className="border-t border-border/50">
+          <div className="p-6 space-y-4">
+            {isEditing ? (
+              <>
+                <Textarea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  rows={12}
+                  className="font-mono text-sm"
+                />
+                <div className="flex gap-2">
+                  <Button onClick={handleSave} size="sm">
+                    <Check className="w-4 h-4 mr-2" />
+                    Save Changes
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setContent(email.content);
+                      setIsEditing(false);
+                    }}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    Cancel
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="prose prose-invert max-w-none">
+                  <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">
+                    {content}
+                  </pre>
+                </div>
+                {isTrial && <VaynoWatermark />}
+                <div className="flex flex-wrap gap-2 pt-4 border-t border-border/50">
+                  <SmartPreview 
+                    subject={email.subject}
+                    content={content}
+                    htmlContent={email.html_content}
+                  />
+                  <Button
+                    onClick={handleImprove}
+                    variant="outline"
+                    size="sm"
+                    disabled={improving}
+                  >
+                    <Wand2 className="w-4 h-4 mr-2" />
+                    {improving ? "Improving..." : "One-Click Improve"}
+                  </Button>
+                  <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
+                    Edit Manually
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </div>
-
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="border-t border-border/50"
-          >
-            <div className="p-6 space-y-4">
-              {isEditing ? (
-                <>
-                  <Textarea
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    rows={12}
-                    className="font-mono text-sm"
-                  />
-                  <div className="flex gap-2">
-                    <Button onClick={handleSave} size="sm">
-                      <Check className="w-4 h-4 mr-2" />
-                      Save Changes
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        setContent(email.content);
-                        setIsEditing(false);
-                      }}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <X className="w-4 h-4 mr-2" />
-                      Cancel
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="prose prose-invert max-w-none">
-                    <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">
-                      {content}
-                    </pre>
-                  </div>
-                  {isTrial && <VaynoWatermark />}
-                  <div className="flex flex-wrap gap-2 pt-4 border-t border-border/50">
-                    <SmartPreview 
-                      subject={email.subject}
-                      content={content}
-                      htmlContent={email.html_content}
-                    />
-                    <Button
-                      onClick={handleImprove}
-                      variant="outline"
-                      size="sm"
-                      disabled={improving}
-                    >
-                      <Wand2 className="w-4 h-4 mr-2" />
-                      {improving ? "Improving..." : "One-Click Improve"}
-                    </Button>
-                    <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
-                      Edit Manually
-                    </Button>
-                  </div>
-                </>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </Card>
-    </motion.div>
+      )}
+    </Card>
   );
 };
 
