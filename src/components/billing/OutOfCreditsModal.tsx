@@ -1,8 +1,9 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Zap, Sparkles } from "lucide-react";
-import { motion } from "framer-motion";
+import { Zap, Sparkles, CreditCard, TrendingUp } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface OutOfCreditsModalProps {
   open: boolean;
@@ -11,7 +12,9 @@ interface OutOfCreditsModalProps {
 }
 
 const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) => {
+  const [view, setView] = useState<'choice' | 'topup'>('choice');
   const [selectedPack, setSelectedPack] = useState(1); // Growth Pack default
+  const navigate = useNavigate();
   
   const creditPacks = [
     {
@@ -45,6 +48,15 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
     window.open(urlWithUserId, '_blank');
   };
 
+  const handleUpgrade = () => {
+    onClose();
+    navigate('/billing');
+  };
+
+  const handleBack = () => {
+    setView('choice');
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl border-0 bg-background/95 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] p-8 rounded-2xl border border-border">
@@ -62,80 +74,144 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
           <DialogTitle className="text-3xl font-bold text-foreground">
             Out of credits
           </DialogTitle>
-          <p className="text-muted-foreground">Choose your credit pack</p>
+          <p className="text-muted-foreground">
+            {view === 'choice' ? 'Choose how to continue' : 'Choose your credit pack'}
+          </p>
         </DialogHeader>
 
-        <div className="space-y-8">
-          {/* Linear credit selector */}
-          <div className="relative py-8">
-            {/* The line */}
-            <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-border" />
-            
-            {/* Credit stops */}
-            <div className="relative flex justify-between items-center">
-              {creditPacks.map((pack, index) => (
-                <motion.button
-                  key={pack.id}
-                  onClick={() => setSelectedPack(index)}
-                  className="relative flex flex-col items-center gap-2 group"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {/* Stop circle */}
-                  <motion.div
-                    className={`w-6 h-6 rounded-full border-2 transition-colors ${
-                      selectedPack === index
-                        ? 'bg-primary border-primary'
-                        : 'bg-background border-border group-hover:border-primary/50'
-                    }`}
-                    animate={{
-                      scale: selectedPack === index ? [1, 1.2, 1] : 1,
-                    }}
-                    transition={{ duration: 0.3 }}
-                  />
-                  
-                  {/* Credit amount */}
-                  <div className="text-center">
-                    <div className={`text-sm font-semibold transition-colors ${
-                      selectedPack === index ? 'text-foreground' : 'text-muted-foreground'
-                    }`}>
-                      {pack.credits}
-                    </div>
-                    <div className="text-xs text-muted-foreground">credits</div>
-                  </div>
-                </motion.button>
-              ))}
-            </div>
-          </div>
-
-          {/* Selected pack details and button */}
-          <motion.div
-            key={selectedPack}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center space-y-4"
-          >
-            <div className="space-y-1">
-              <div className="flex items-center justify-center gap-2">
-                <Zap className="w-5 h-5 text-primary" />
-                <span className="text-3xl font-bold text-foreground">
-                  {creditPacks[selectedPack].credits} credits
-                </span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                One-time purchase, never expires
-              </p>
-            </div>
-
-            <Button
-              onClick={() => handleBuyCredits(creditPacks[selectedPack].checkoutUrl)}
-              className="w-full h-14 text-lg font-semibold"
-              size="lg"
+        <AnimatePresence mode="wait">
+          {view === 'choice' ? (
+            <motion.div
+              key="choice"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="grid grid-cols-2 gap-6"
             >
-              ${creditPacks[selectedPack].price} • Buy
-            </Button>
-          </motion.div>
-        </div>
+              {/* Top Up Option */}
+              <button
+                onClick={() => setView('topup')}
+                className="group relative p-8 rounded-xl border-2 border-border bg-background/50 hover:border-primary/50 transition-colors text-left"
+              >
+                <div className="space-y-4">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <CreditCard className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-foreground mb-2">Top Up</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Buy credits as you need them. One-time purchase, never expires.
+                    </p>
+                  </div>
+                </div>
+              </button>
+
+              {/* Upgrade Option */}
+              <button
+                onClick={handleUpgrade}
+                className="group relative p-8 rounded-xl border-2 border-border bg-background/50 hover:border-primary/50 transition-colors text-left"
+              >
+                <div className="space-y-4">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <TrendingUp className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-foreground mb-2">Upgrade Plan</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Get monthly credits and unlock premium features with a subscription.
+                    </p>
+                  </div>
+                </div>
+              </button>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="topup"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-8"
+            >
+              {/* Linear credit selector */}
+              <div className="relative py-8">
+                {/* The line */}
+                <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-border" />
+                
+                {/* Credit stops */}
+                <div className="relative flex justify-between items-center">
+                  {creditPacks.map((pack, index) => (
+                    <motion.button
+                      key={pack.id}
+                      onClick={() => setSelectedPack(index)}
+                      className="relative flex flex-col items-center gap-2 group"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      {/* Stop circle */}
+                      <motion.div
+                        className={`w-6 h-6 rounded-full border-2 transition-colors ${
+                          selectedPack === index
+                            ? 'bg-primary border-primary'
+                            : 'bg-background border-border group-hover:border-primary/50'
+                        }`}
+                        animate={{
+                          scale: selectedPack === index ? [1, 1.2, 1] : 1,
+                        }}
+                        transition={{ duration: 0.3 }}
+                      />
+                      
+                      {/* Credit amount */}
+                      <div className="text-center">
+                        <div className={`text-sm font-semibold transition-colors ${
+                          selectedPack === index ? 'text-foreground' : 'text-muted-foreground'
+                        }`}>
+                          {pack.credits}
+                        </div>
+                        <div className="text-xs text-muted-foreground">credits</div>
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Selected pack details and button */}
+              <motion.div
+                key={selectedPack}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center space-y-4"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center justify-center gap-2">
+                    <Zap className="w-5 h-5 text-primary" />
+                    <span className="text-3xl font-bold text-foreground">
+                      {creditPacks[selectedPack].credits} credits
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    One-time purchase, never expires
+                  </p>
+                </div>
+
+                <div className="flex gap-3 justify-center">
+                  <Button
+                    onClick={handleBack}
+                    variant="outline"
+                    className="h-14 px-8 text-lg font-semibold"
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    onClick={() => handleBuyCredits(creditPacks[selectedPack].checkoutUrl)}
+                    className="h-14 px-8 text-lg font-semibold"
+                  >
+                    ${creditPacks[selectedPack].price} • Buy
+                  </Button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </DialogContent>
     </Dialog>
   );
