@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
 import { ArrowLeft, Download, Sparkles, ExternalLink, Copy, Check } from "lucide-react";
 import EmailCard from "@/components/campaign/EmailCard";
 import { useUserPlan } from "@/hooks/useUserPlan";
@@ -219,11 +218,7 @@ const CampaignView = () => {
           </div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
+        <div>
           <Card className="glass-card p-8 mb-8 border-primary/20">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
@@ -232,7 +227,7 @@ const CampaignView = () => {
                   href={campaign.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-primary transition-smooth flex items-center gap-2"
+                  className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
                 >
                   {campaign.url}
                   <ExternalLink className="w-4 h-4" />
@@ -303,7 +298,7 @@ const CampaignView = () => {
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
