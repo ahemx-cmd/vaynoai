@@ -8,53 +8,53 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Warm brown-red palette */
-    --background: 0 54% 90%;
-    --foreground: 11 100% 8%;
+    /* Strict neutral grayscale palette */
+    --background: 0 0% 96%;
+    --foreground: 0 0% 6%;
 
-    --card: 0 54% 88%;
-    --card-foreground: 11 100% 8%;
+    --card: 0 0% 94%;
+    --card-foreground: 0 0% 6%;
 
-    --popover: 0 54% 88%;
-    --popover-foreground: 11 100% 8%;
+    --popover: 0 0% 94%;
+    --popover-foreground: 0 0% 6%;
 
-    /* Primary brand black */
-    --primary: 11 100% 8%;
-    --primary-foreground: 0 54% 90%;
-    --primary-glow: 11 100% 15%;
+    /* Primary black */
+    --primary: 0 0% 6%;
+    --primary-foreground: 0 0% 96%;
+    --primary-glow: 0 0% 12%;
 
-    --secondary: 15 27% 37%;
-    --secondary-foreground: 0 54% 90%;
+    --secondary: 0 0% 29%;
+    --secondary-foreground: 0 0% 96%;
 
-    --muted: 10 15% 70%;
-    --muted-foreground: 15 27% 37%;
+    --muted: 0 0% 82%;
+    --muted-foreground: 0 0% 29%;
 
-    --accent: 9 28% 66%;
-    --accent-foreground: 11 100% 8%;
+    --accent: 0 0% 61%;
+    --accent-foreground: 0 0% 6%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 54% 90%;
+    --destructive-foreground: 0 0% 96%;
 
-    --border: 9 28% 66%;
-    --input: 10 15% 70%;
-    --ring: 11 100% 8%;
+    --border: 0 0% 61%;
+    --input: 0 0% 82%;
+    --ring: 0 0% 6%;
 
     --radius: 1rem;
 
-    /* Warm glass morphism */
-    --glass-bg: hsl(0 54% 88% / 0.6);
-    --glass-bg-strong: hsl(10 15% 70% / 0.8);
-    --glass-border: hsl(9 28% 66% / 0.4);
-    --glass-border-strong: hsl(9 28% 66% / 0.6);
+    /* Neutral glass morphism */
+    --glass-bg: hsl(0 0% 94% / 0.6);
+    --glass-bg-strong: hsl(0 0% 82% / 0.8);
+    --glass-border: hsl(0 0% 61% / 0.4);
+    --glass-border-strong: hsl(0 0% 61% / 0.6);
 
-    /* Warm glow effects */
-    --glow-primary: 0 0 40px hsl(11 100% 8% / 0.3), 0 0 80px hsl(11 100% 8% / 0.15);
-    --glow-primary-strong: 0 0 60px hsl(11 100% 8% / 0.4), 0 0 120px hsl(11 100% 8% / 0.2);
-    --glow-soft: 0 8px 32px hsl(11 50% 10% / 0.3);
+    /* Neutral glow effects */
+    --glow-primary: 0 0 40px hsl(0 0% 0% / 0.3), 0 0 80px hsl(0 0% 0% / 0.15);
+    --glow-primary-strong: 0 0 60px hsl(0 0% 0% / 0.4), 0 0 120px hsl(0 0% 0% / 0.2);
+    --glow-soft: 0 8px 32px hsl(0 0% 0% / 0.3);
 
-    /* Warm gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(11 100% 8%), hsl(15 27% 37%));
-    --gradient-radial: radial-gradient(circle at center, hsl(9 28% 66% / 0.2), transparent 70%);
+    /* Neutral gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(0 0% 6%), hsl(0 0% 29%));
+    --gradient-radial: radial-gradient(circle at center, hsl(0 0% 61% / 0.2), transparent 70%);
     
     /* Animations */
     --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -62,37 +62,37 @@ All colors MUST be HSL.
   }
 
   .dark {
-    /* Darker warm variant for explicit dark mode */
-    --background: 11 100% 8%;
-    --foreground: 0 54% 90%;
+    /* Darker neutral variant for explicit dark mode */
+    --background: 0 0% 6%;
+    --foreground: 0 0% 96%;
 
-    --card: 15 27% 37%;
-    --card-foreground: 0 54% 90%;
+    --card: 0 0% 29%;
+    --card-foreground: 0 0% 96%;
 
-    --popover: 15 27% 37%;
-    --popover-foreground: 0 54% 90%;
+    --popover: 0 0% 29%;
+    --popover-foreground: 0 0% 96%;
 
-    --primary: 0 54% 90%;
-    --primary-foreground: 11 100% 8%;
+    --primary: 0 0% 96%;
+    --primary-foreground: 0 0% 6%;
 
-    --secondary: 15 27% 37%;
-    --secondary-foreground: 0 54% 90%;
+    --secondary: 0 0% 29%;
+    --secondary-foreground: 0 0% 96%;
 
-    --muted: 9 28% 66%;
-    --muted-foreground: 10 15% 70%;
+    --muted: 0 0% 61%;
+    --muted-foreground: 0 0% 82%;
 
-    --accent: 9 28% 66%;
-    --accent-foreground: 11 100% 8%;
+    --accent: 0 0% 61%;
+    --accent-foreground: 0 0% 6%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 54% 90%;
+    --destructive-foreground: 0 0% 96%;
 
-    --border: 15 27% 37%;
-    --input: 15 27% 37%;
-    --ring: 0 54% 90%;
+    --border: 0 0% 29%;
+    --input: 0 0% 29%;
+    --ring: 0 0% 96%;
 
-    --glass-bg: hsl(15 27% 37% / 0.6);
-    --glass-border: hsl(9 28% 66% / 0.3);
+    --glass-bg: hsl(0 0% 29% / 0.6);
+    --glass-border: hsl(0 0% 61% / 0.3);
   }
 }
 
@@ -111,7 +111,7 @@ All colors MUST be HSL.
 
   /* Unique typography scale */
   h1, h2, h3 {
-    color: hsl(11 100% 8%);
+    color: hsl(0 0% 6%);
     letter-spacing: -0.025em;
     font-weight: 600;
   }
