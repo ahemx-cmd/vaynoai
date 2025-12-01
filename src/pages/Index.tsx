@@ -36,7 +36,7 @@ const Index = () => {
               <img 
                 src={vaynoIcon} 
                 alt="Vayno" 
-                className="w-10 h-10 transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_12px_rgba(35,255,128,0.5)]" 
+                className="w-10 h-10 transition-transform duration-300 group-hover:scale-110" 
               />
               <span className="font-bold text-2xl tracking-tight text-foreground">
                 Vayno
@@ -69,8 +69,7 @@ const Index = () => {
       <section ref={heroRef} className="relative pt-48 pb-32 px-6 lg:px-12 overflow-hidden">
         {/* Orbit ring behind hero */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] opacity-20">
-          <div className="orbit absolute inset-0 rounded-full border border-primary/20" 
-               style={{ boxShadow: '0 0 60px rgba(35,255,128,0.1)' }} />
+          <div className="orbit absolute inset-0 rounded-full border border-primary/20" />
         </div>
 
         {/* Floating elements */}
@@ -135,7 +134,7 @@ const Index = () => {
                   <Button 
                     size="lg" 
                     asChild 
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-16 px-10 text-lg rounded-2xl shadow-[0_0_40px_rgba(35,255,128,0.4)] hover:shadow-[0_0_60px_rgba(35,255,128,0.6)] transition-all group"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-16 px-10 text-lg rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.15)] hover:shadow-[0_0_60px_rgba(0,0,0,0.2)] transition-colors group"
                     onClick={() => trackButtonClick('Try Free', 'hero-section')}
                   >
                     <Link to="/guest-flow" className="flex items-center gap-3">
@@ -246,7 +245,7 @@ const Index = () => {
             <Button 
               size="lg" 
               asChild 
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-20 px-12 text-xl rounded-2xl shadow-[0_0_60px_rgba(35,255,128,0.5)] hover:shadow-[0_0_80px_rgba(35,255,128,0.7)] transition-all"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-20 px-12 text-xl rounded-2xl shadow-[0_0_60px_rgba(0,0,0,0.2)] hover:shadow-[0_0_80px_rgba(0,0,0,0.25)] transition-colors"
               onClick={() => trackButtonClick('Try Free', 'final-cta')}
             >
               <Link to="/guest-flow" className="flex items-center gap-4">
