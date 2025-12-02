@@ -74,10 +74,10 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
     {
       name: "Lifetime",
       price: 59,
-      credits: 120,
+      credits: 150,
       description: "One-time payment, forever access",
       checkoutUrl: "https://vayno.lemonsqueezy.com/buy/b9b0bdea-ddc5-42b8-8abc-aee080f88fae?logo=0",
-      features: ["120 credits/month", "All sequence types", "Email export", "Priority support", "Lifetime updates"],
+      features: ["150 credits/month", "All sequence types", "Email export", "Priority support"],
       isLifetime: true
     }
   ];
