@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Zap, Sparkles, CreditCard, TrendingUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 interface OutOfCreditsModalProps {
   open: boolean;
@@ -12,9 +11,8 @@ interface OutOfCreditsModalProps {
 }
 
 const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) => {
-  const [view, setView] = useState<'choice' | 'topup'>('choice');
+  const [view, setView] = useState<'choice' | 'topup' | 'plans'>('choice');
   const [selectedPack, setSelectedPack] = useState(1); // Growth Pack default
-  const navigate = useNavigate();
   
   const creditPacks = [
     {
@@ -49,12 +47,44 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
   };
 
   const handleUpgrade = () => {
-    onClose();
-    navigate('/billing');
+    setView('plans');
   };
 
   const handleBack = () => {
     setView('choice');
+  };
+
+  const plans = [
+    {
+      name: "Starter",
+      price: 11,
+      credits: 150,
+      description: "Perfect for getting started",
+      checkoutUrl: "https://vayno.lemonsqueezy.com/buy/b1c6e286-36a9-4b48-bc80-9b03182d3b83?logo=0",
+      features: ["150 credits/month", "All sequence types", "Email export", "Priority support"]
+    },
+    {
+      name: "Pro",
+      price: 29,
+      credits: 500,
+      description: "For growing businesses",
+      checkoutUrl: "https://vayno.lemonsqueezy.com/buy/b8a3207d-80e9-4092-8cfc-5f15c00511b1?logo=0",
+      features: ["500 credits/month", "All sequence types", "Email export", "Priority support", "Advanced analytics"]
+    },
+    {
+      name: "Lifetime",
+      price: 59,
+      credits: 120,
+      description: "One-time payment, forever access",
+      checkoutUrl: "https://vayno.lemonsqueezy.com/buy/b9b0bdea-ddc5-42b8-8abc-aee080f88fae?logo=0",
+      features: ["120 credits/month", "All sequence types", "Email export", "Priority support", "Lifetime updates"],
+      isLifetime: true
+    }
+  ];
+
+  const handlePlanCheckout = (checkoutUrl: string) => {
+    const urlWithUserId = `${checkoutUrl}&checkout[custom][user_id]=${userId}`;
+    window.open(urlWithUserId, '_blank');
   };
 
   return (
@@ -75,7 +105,7 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
             Out of credits
           </DialogTitle>
           <p className="text-muted-foreground">
-            {view === 'choice' ? 'Choose how to continue' : 'Choose your credit pack'}
+            {view === 'choice' ? 'Choose how to continue' : view === 'topup' ? 'Choose your credit pack' : 'Choose your plan'}
           </p>
         </DialogHeader>
 
@@ -124,7 +154,7 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                 </div>
               </button>
             </motion.div>
-          ) : (
+          ) : view === 'topup' ? (
             <motion.div
               key="topup"
               initial={{ opacity: 0, x: 20 }}
@@ -209,6 +239,75 @@ const OutOfCreditsModal = ({ open, onClose, userId }: OutOfCreditsModalProps) =>
                   </Button>
                 </div>
               </motion.div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="plans"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
+            >
+              {/* Pricing plans grid */}
+              <div className="grid grid-cols-3 gap-4">
+                {plans.map((plan) => (
+                  <div
+                    key={plan.name}
+                    className="relative p-6 rounded-xl border-2 border-border bg-background/50 flex flex-col"
+                  >
+                    <div className="space-y-4 flex-1">
+                      <div>
+                        <h3 className="text-xl font-semibold text-foreground mb-1">
+                          {plan.name}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {plan.description}
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-3xl font-bold text-foreground">
+                            ${plan.price}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {plan.isLifetime ? 'one-time' : '/month'}
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {plan.credits} credits/month
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        {plan.features.map((feature, idx) => (
+                          <div key={idx} className="flex items-start gap-2 text-sm">
+                            <div className="w-1 h-1 rounded-full bg-foreground mt-2" />
+                            <span className="text-muted-foreground">{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <Button
+                      onClick={() => handlePlanCheckout(plan.checkoutUrl)}
+                      className="w-full mt-6"
+                    >
+                      Get {plan.name}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-center">
+                <Button
+                  onClick={handleBack}
+                  variant="outline"
+                  className="px-8"
+                >
+                  Back
+                </Button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
