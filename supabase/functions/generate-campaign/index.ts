@@ -1227,7 +1227,10 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
 
     const fullPrompt = `${systemPrompt}\n\n${userPrompt}`;
     
-    // Use Lovable AI with Google Gemini 2.5 Pro - most powerful model for complex copywriting
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // TWO-STEP AI WORKFLOW: Draft (GPT-5) → Polish (Gemini Pro)
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       console.error("LOVABLE_API_KEY not configured");
@@ -1237,30 +1240,35 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
       );
     }
 
-    console.log(`Generating ${numEmails} emails with ${wordsPerEmail} words each using Lovable AI (google/gemini-2.5-pro)`);
-    console.log(`Sequence type: ${sequenceType}`);
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // STEP 1: DRAFT GENERATION (GPT-5)
+    // Creative, persuasive, brand-aligned drafts
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     
-    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    console.log(`📝 STEP 1: Generating ${numEmails} email drafts with GPT-5...`);
+    console.log(`Sequence type: ${sequenceType}, Words per email: ${wordsPerEmail}`);
+    
+    const draftResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "openai/gpt-5",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
-        temperature: 0.9,
+        max_completion_tokens: 16000,
       }),
     });
 
-    if (!resp.ok) {
-      const errorText = await resp.text();
-      console.error("Lovable AI error:", resp.status, errorText);
+    if (!draftResp.ok) {
+      const errorText = await draftResp.text();
+      console.error("GPT-5 draft error:", draftResp.status, errorText);
       
-      if (resp.status === 402) {
+      if (draftResp.status === 402) {
         return new Response(
           JSON.stringify({ 
             error: "AI credits depleted", 
@@ -1269,83 +1277,249 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (resp.status === 429) {
+      if (draftResp.status === 429) {
         return new Response(
           JSON.stringify({ 
             error: "Rate limit exceeded", 
-            details: "Too many requests. Please wait a moment and try again. If this persists, contact support@lovable.dev to increase your rate limit." 
+            details: "Too many requests. Please wait a moment and try again." 
           }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       
       return new Response(
-        JSON.stringify({ error: "AI service temporarily unavailable. Please try again in a moment." }),
+        JSON.stringify({ error: "AI service temporarily unavailable. Please try again." }),
         { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const aiData = await resp.json();
+    const draftData = await draftResp.json();
+    console.log("✅ STEP 1 Complete: GPT-5 draft generated");
 
-    console.log("✅ Successfully called Lovable AI");
-
-    // Lovable AI returns OpenAI-compatible format
-    if (!aiData.choices?.[0]?.message?.content) {
-      console.error("Invalid AI response format:", aiData);
-      throw new Error("Invalid AI response format");
+    if (!draftData.choices?.[0]?.message?.content) {
+      console.error("Invalid draft response:", draftData);
+      throw new Error("Invalid AI draft response");
     }
 
-    let contentText = aiData.choices[0].message.content.trim();
+    let draftContent = draftData.choices[0].message.content.trim();
     
-    // Extract JSON from markdown code blocks if present
-    const jsonBlockMatch = contentText.match(/```json\s*([\s\S]*?)\s*```/);
-    if (jsonBlockMatch) {
-      contentText = jsonBlockMatch[1].trim();
+    // Extract JSON from draft
+    const draftJsonMatch = draftContent.match(/```json\s*([\s\S]*?)\s*```/);
+    if (draftJsonMatch) {
+      draftContent = draftJsonMatch[1].trim();
     } else {
-      const codeBlockMatch = contentText.match(/```\s*([\s\S]*?)\s*```/);
+      const codeBlockMatch = draftContent.match(/```\s*([\s\S]*?)\s*```/);
       if (codeBlockMatch) {
-        contentText = codeBlockMatch[1].trim();
+        draftContent = codeBlockMatch[1].trim();
       }
     }
     
-    console.log("Extracted content length:", contentText.length);
-    
-    let emailsData;
+    let draftEmails;
     try {
-      emailsData = JSON.parse(contentText);
+      draftEmails = JSON.parse(draftContent);
     } catch (parseError) {
-      console.error("JSON parse error:", parseError);
-      console.error("Content preview:", contentText.substring(0, 500));
+      console.error("Draft JSON parse error:", parseError);
+      const start = draftContent.indexOf("{");
+      const end = draftContent.lastIndexOf("}");
+      if (start !== -1 && end !== -1) {
+        draftEmails = JSON.parse(draftContent.slice(start, end + 1));
+      } else {
+        throw new Error("Failed to parse draft emails");
+      }
+    }
+    
+    if (!draftEmails.emails || !Array.isArray(draftEmails.emails)) {
+      throw new Error("Draft missing emails array");
+    }
+    
+    console.log(`📧 Draft contains ${draftEmails.emails.length} emails`);
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // STEP 2: POLISHING (Gemini 2.5 Pro)
+    // Refine tone, style, consistency, flow
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    
+    console.log("✨ STEP 2: Polishing emails with Gemini 2.5 Pro...");
+    
+    const polishSystemPrompt = `You are a world-class email editor and brand voice specialist. Your job is to take email drafts and polish them to perfection — making them feel like they were handcrafted by a master copywriter.
+
+YOUR MISSION: Transform good drafts into exceptional, human-sounding emails that feel professionally polished yet naturally authentic.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+POLISHING PRIORITIES (in order):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. VOICE CONSISTENCY CHECK:
+   • All emails must sound like the SAME person wrote them
+   • Maintain consistent rhythm, vocabulary, and personality across the sequence
+   • If one email uses casual tone, ALL should match
+   • Keep signature phrases and verbal patterns consistent
+
+2. HUMAN AUTHENTICITY LAYER:
+   • Remove ANY remaining AI-sounding phrases
+   • Add natural imperfections: varied sentence lengths, occasional fragments
+   • Use conversational connectors: "Here's the thing...", "And honestly...", "Look,"
+   • Ensure sign-offs feel personal and consistent
+   • Remove overly perfect grammar where natural speech would differ
+
+3. FLOW & RHYTHM REFINEMENT:
+   • Smooth transitions between paragraphs
+   • Vary sentence structure for natural reading rhythm
+   • Break up long sentences into punchier ones where needed
+   • Ensure each email has clear opening, body, close
+
+4. BRAND VOICE ALIGNMENT:
+   • Match the exact tone extracted from the landing page
+   • Mirror vocabulary sophistication level
+   • Align emotional tone (formal/casual/playful/serious)
+   • Ensure CTAs match brand personality
+
+5. NARRATIVE THREAD STRENGTHENING:
+   • Add callbacks to previous emails: "Remember when I mentioned..."
+   • Build continuity: "Yesterday we talked about... Today let's dive into..."
+   • Create story progression across the sequence
+   • Make readers feel they're on a journey
+
+6. CONVERSION OPTIMIZATION:
+   • Strengthen CTAs without being pushy
+   • Address objections naturally
+   • Build urgency authentically
+   • Ensure clear value proposition in each email
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ABSOLUTE DON'Ts:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ DON'T change the core message or structure
+❌ DON'T add new features/benefits not in the original
+❌ DON'T make emails longer or shorter (preserve word count)
+❌ DON'T use: "revolutionize", "game-changer", "cutting-edge", "leverage"
+❌ DON'T use: "I'm excited to", "I'm thrilled to", "Don't hesitate to"
+❌ DON'T make sudden tone shifts between emails
+❌ DON'T add fake enthusiasm or over-the-top language
+❌ DON'T remove personalization tags like {{first_name}}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OUTPUT FORMAT:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Return the SAME JSON structure with polished content:
+{
+  "emails": [
+    {
+      "type": "same as input",
+      "subject": "Polished subject line",
+      "content": "Polished plain text (same word count)",
+      "html": "Polished HTML (same word count)"
+    }
+  ]
+}
+
+Return ONLY valid JSON. No explanations.`;
+
+    const polishUserPrompt = `POLISH THESE EMAIL DRAFTS:
+
+CONTEXT:
+• Brand URL: ${url}
+• Sequence type: ${sequenceType}
+• Target word count per email: ${wordsPerEmail} words
+• Brand tone extracted from landing page (mirror this exactly)
+
+LANDING PAGE EXCERPT (for brand voice reference):
+${pageContent.substring(0, 3000)}
+
+${brandGuidelines ? `BRAND GUIDELINES:
+${brandGuidelines.substring(0, 2000)}` : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DRAFT EMAILS TO POLISH:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${JSON.stringify(draftEmails, null, 2)}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+YOUR TASK:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Review all ${draftEmails.emails.length} emails for voice consistency
+2. Add human authenticity touches (natural phrasing, conversational flow)
+3. Strengthen narrative callbacks between emails
+4. Polish subject lines for curiosity and click-worthiness
+5. Ensure CTAs match brand personality
+6. Remove any remaining AI-sounding language
+7. Maintain word count (do not add/remove significant content)
+
+Return the polished sequence as JSON. Make it feel like a senior copywriter spent hours perfecting every word.`;
+
+    const polishResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-pro",
+        messages: [
+          { role: "system", content: polishSystemPrompt },
+          { role: "user", content: polishUserPrompt }
+        ],
+        temperature: 0.7,
+      }),
+    });
+
+    let emailsData;
+    
+    if (!polishResp.ok) {
+      console.warn("⚠️ Polishing step failed, using draft emails:", polishResp.status);
+      // Fallback to draft if polishing fails
+      emailsData = draftEmails;
+    } else {
+      const polishData = await polishResp.json();
+      console.log("✅ STEP 2 Complete: Emails polished");
       
-      // Try extracting JSON from the first { to last }
-      const start = contentText.indexOf("{");
-      const end = contentText.lastIndexOf("}");
-      if (start !== -1 && end !== -1 && end > start) {
-        const possibleJson = contentText.slice(start, end + 1);
+      if (polishData.choices?.[0]?.message?.content) {
+        let polishedContent = polishData.choices[0].message.content.trim();
+        
+        // Extract JSON from polished response
+        const polishJsonMatch = polishedContent.match(/```json\s*([\s\S]*?)\s*```/);
+        if (polishJsonMatch) {
+          polishedContent = polishJsonMatch[1].trim();
+        } else {
+          const codeMatch = polishedContent.match(/```\s*([\s\S]*?)\s*```/);
+          if (codeMatch) {
+            polishedContent = codeMatch[1].trim();
+          }
+        }
+        
         try {
-          emailsData = JSON.parse(possibleJson);
-          console.log("Parsed via substring extraction");
-        } catch (e2) {
-          console.error("Substring parse failed:", e2);
-          return new Response(
-            JSON.stringify({ error: "AI returned invalid format. Please try again." }),
-            { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
+          emailsData = JSON.parse(polishedContent);
+          console.log("✅ Successfully parsed polished emails");
+        } catch (e) {
+          const start = polishedContent.indexOf("{");
+          const end = polishedContent.lastIndexOf("}");
+          if (start !== -1 && end !== -1) {
+            try {
+              emailsData = JSON.parse(polishedContent.slice(start, end + 1));
+              console.log("✅ Parsed polished emails via extraction");
+            } catch (e2) {
+              console.warn("⚠️ Polish parse failed, using drafts");
+              emailsData = draftEmails;
+            }
+          } else {
+            emailsData = draftEmails;
+          }
         }
       } else {
-        return new Response(
-          JSON.stringify({ error: "AI returned invalid format. Please try again." }),
-          { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        emailsData = draftEmails;
       }
     }
-    
+
     if (!emailsData.emails || !Array.isArray(emailsData.emails)) {
       console.error("Invalid emails structure:", emailsData);
       throw new Error("AI response missing emails array");
     }
     
-    console.log("Generated", emailsData.emails.length, "emails");
+    console.log("🚀 Two-step generation complete:", emailsData.emails.length, "emails ready");
 
     // Save emails using service client (bypasses RLS for bulk insert)
     for (let i = 0; i < emailsData.emails.length; i++) {
@@ -1370,7 +1544,7 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
       throw updateError;
     }
 
-    console.log("Campaign generation completed successfully");
+    console.log("✅ Campaign generation completed successfully (two-step workflow)");
 
     // Increment user credits ONLY for owned campaigns (not guest campaigns) - CHARGE PER EMAIL
     if (user && campaign.user_id) {
@@ -1385,7 +1559,6 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
 
         if (creditError) {
           console.error(`Error incrementing credit ${i + 1}/${emailCount}:`, creditError);
-          // Don't fail the request, but log the error
         }
       }
       
