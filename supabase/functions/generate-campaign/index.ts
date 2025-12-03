@@ -1227,67 +1227,193 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
 
     const fullPrompt = `${systemPrompt}\n\n${userPrompt}`;
     
-    // Use Lovable AI with Google Gemini 2.5 Pro - most powerful model for complex copywriting
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY not configured");
+    // ═══════════════════════════════════════════════════════════════════
+    // STEP 1: DRAFT GENERATION with Groq (Llama 3.3 70B)
+    // ═══════════════════════════════════════════════════════════════════
+    const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
+    const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
+    
+    if (!GROQ_API_KEY) {
+      console.error("GROQ_API_KEY not configured");
       return new Response(
         JSON.stringify({ error: "AI service not configured. Please contact support." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log(`Generating ${numEmails} emails with ${wordsPerEmail} words each using Lovable AI (google/gemini-2.5-pro)`);
+    console.log(`═══ STEP 1: DRAFT GENERATION ═══`);
+    console.log(`Generating ${numEmails} emails with ${wordsPerEmail} words each using Groq (Llama 3.3 70B)`);
     console.log(`Sequence type: ${sequenceType}`);
     
-    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const draftResp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "Authorization": `Bearer ${GROQ_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "llama-3.3-70b-versatile",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
-        temperature: 0.9,
+        temperature: 0.85,
+        max_tokens: 16000,
       }),
     });
 
-    if (!resp.ok) {
-      const errorText = await resp.text();
-      console.error("Lovable AI error:", resp.status, errorText);
+    if (!draftResp.ok) {
+      const errorText = await draftResp.text();
+      console.error("Groq draft generation error:", draftResp.status, errorText);
       
-      if (resp.status === 402) {
+      if (draftResp.status === 402) {
         return new Response(
           JSON.stringify({ 
             error: "AI credits depleted", 
-            details: "Please add credits to your Lovable workspace to continue generating campaigns. Visit Settings → Workspace → Usage to top up." 
+            details: "Groq API credits exhausted. Please add credits to your Groq account." 
           }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (resp.status === 429) {
+      if (draftResp.status === 429) {
         return new Response(
           JSON.stringify({ 
             error: "Rate limit exceeded", 
-            details: "Too many requests. Please wait a moment and try again. If this persists, contact support@lovable.dev to increase your rate limit." 
+            details: "Too many requests to Groq. Please wait a moment and try again." 
           }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       
       return new Response(
-        JSON.stringify({ error: "AI service temporarily unavailable. Please try again in a moment." }),
+        JSON.stringify({ error: "AI draft generation temporarily unavailable. Please try again." }),
         { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const aiData = await resp.json();
+    const draftData = await draftResp.json();
+    console.log("✅ Step 1 Complete: Draft generated with Groq");
 
-    console.log("✅ Successfully called Lovable AI");
+    if (!draftData.choices?.[0]?.message?.content) {
+      console.error("Invalid Groq response format:", draftData);
+      throw new Error("Invalid draft response format");
+    }
+
+    let draftContent = draftData.choices[0].message.content.trim();
+    console.log("Draft content length:", draftContent.length);
+
+    // ═══════════════════════════════════════════════════════════════════
+    // STEP 2: POLISH with Claude via OpenRouter
+    // ═══════════════════════════════════════════════════════════════════
+    let finalContent = draftContent;
+    
+    if (OPENROUTER_API_KEY) {
+      console.log(`═══ STEP 2: POLISH WITH CLAUDE ═══`);
+      
+      const polishPrompt = `You are an elite email copywriter and editor. Your task is to polish this email sequence to perfection.
+
+ORIGINAL DRAFT (JSON format):
+${draftContent}
+
+═══════════════════════════════════════════════════════════════════
+POLISHING INSTRUCTIONS:
+═══════════════════════════════════════════════════════════════════
+
+1. TONE & VOICE REFINEMENT:
+   • Ensure all emails sound like ONE human writer (consistent personality)
+   • Remove any remaining AI-sounding phrases or robotic language
+   • Add subtle conversational touches: "Here's the thing...", "Let me be real...", "Look,"
+   • Vary sentence rhythm: mix short punchy sentences with flowing ones
+   • Add natural imperfections: occasional fragments, casual grammar starts with "And", "But", "So"
+
+2. FLOW & READABILITY:
+   • Ensure smooth transitions between paragraphs
+   • Break up any walls of text
+   • Make sure emails build on each other (callbacks to previous emails)
+   • Check that the narrative arc feels natural across the sequence
+
+3. EMOTIONAL CONSISTENCY:
+   • Identify the primary emotion and ensure it threads through ALL emails
+   • Remove any jarring tone shifts
+   • Ensure urgency builds naturally (not forced)
+
+4. CTA OPTIMIZATION:
+   • Make CTAs feel like natural conclusions, not sales pitches
+   • Ensure CTA language matches the brand voice
+   • Vary CTA phrasing across emails (don't repeat same CTA)
+
+5. SUBJECT LINE POLISH:
+   • Ensure subject lines create genuine curiosity (40-50 chars)
+   • Remove clickbait that doesn't deliver in body
+   • Make each subject line feel human-written
+
+6. FINAL HUMAN TOUCH:
+   • Add 1-2 conversational asides per email "(I know, right?)", "(trust me on this)"
+   • Ensure sign-offs feel warm and personal
+   • Check that {{first_name}} placeholders feel natural, not forced
+   • Remove any remaining corporate speak or buzzwords
+
+═══════════════════════════════════════════════════════════════════
+OUTPUT REQUIREMENTS:
+═══════════════════════════════════════════════════════════════════
+
+Return ONLY the polished JSON with NO explanations, NO markdown code blocks, NO extra text.
+Keep the EXACT same structure as the input:
+{
+  "emails": [
+    {
+      "type": "...",
+      "subject": "polished subject",
+      "content": "polished plain text content",
+      "html": "polished HTML content"
+    }
+  ]
+}
+
+CRITICAL: Preserve word counts (each email should be approximately ${wordsPerEmail} words).
+CRITICAL: Return ONLY valid JSON, nothing else.`;
+
+      try {
+        const polishResp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://vayno.app",
+            "X-Title": "Vayno Email Polish"
+          },
+          body: JSON.stringify({
+            model: "anthropic/claude-sonnet-4-20250514",
+            messages: [
+              { role: "user", content: polishPrompt }
+            ],
+            temperature: 0.7,
+            max_tokens: 16000,
+          }),
+        });
+
+        if (polishResp.ok) {
+          const polishData = await polishResp.json();
+          if (polishData.choices?.[0]?.message?.content) {
+            finalContent = polishData.choices[0].message.content.trim();
+            console.log("✅ Step 2 Complete: Polished with Claude");
+            console.log("Polished content length:", finalContent.length);
+          } else {
+            console.warn("Claude response missing content, using draft");
+          }
+        } else {
+          const polishError = await polishResp.text();
+          console.warn("Claude polish failed, using draft:", polishResp.status, polishError);
+        }
+      } catch (polishError) {
+        console.warn("Claude polish error, using draft:", polishError);
+      }
+    } else {
+      console.log("OPENROUTER_API_KEY not configured, skipping Claude polish step");
+    }
+
+    const aiData = { choices: [{ message: { content: finalContent } }] };
+    console.log("✅ AI Pipeline Complete (Draft + Polish)");
 
     // Lovable AI returns OpenAI-compatible format
     if (!aiData.choices?.[0]?.message?.content) {
