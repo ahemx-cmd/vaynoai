@@ -1231,9 +1231,9 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
     // TWO-STEP AI WORKFLOW: Draft (GPT-5) → Polish (Gemini Pro)
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY not configured");
+    const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
+    if (!OPENROUTER_API_KEY) {
+      console.error("OPENROUTER_API_KEY not configured");
       return new Response(
         JSON.stringify({ error: "AI service not configured. Please contact support." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -1248,10 +1248,12 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
     console.log(`📝 STEP 1: Generating ${numEmails} email drafts with GPT-5...`);
     console.log(`Sequence type: ${sequenceType}, Words per email: ${wordsPerEmail}`);
     
-    const draftResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const draftResp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+        "HTTP-Referer": "https://vayno.app",
+        "X-Title": "Vayno Campaign Generator",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -1272,7 +1274,7 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
         return new Response(
           JSON.stringify({ 
             error: "AI credits depleted", 
-            details: "Please add credits to your Lovable workspace to continue generating campaigns. Visit Settings → Workspace → Usage to top up." 
+            details: "Please add credits to your OpenRouter account to continue generating campaigns." 
           }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
@@ -1451,10 +1453,12 @@ YOUR TASK:
 
 Return the polished sequence as JSON. Make it feel like a senior copywriter spent hours perfecting every word.`;
 
-    const polishResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const polishResp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+        "HTTP-Referer": "https://vayno.app",
+        "X-Title": "Vayno Campaign Generator",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
