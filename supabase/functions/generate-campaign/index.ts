@@ -1255,7 +1255,7 @@ NOW CREATE THIS SEQUENCE — Make it feel handcrafted by a human marketer! 🚀`
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "openai/gpt-5",
+        model: "openai/gpt-5-mini",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
