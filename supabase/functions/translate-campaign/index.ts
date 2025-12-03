@@ -74,30 +74,10 @@ serve(async (req) => {
 
     console.log(`Translating ${emails.length} emails to ${targetLanguage}`);
 
-    const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
-    const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
-    
-    if (!GROQ_API_KEY) {
-      console.error("GROQ_API_KEY not configured");
-      return new Response(
-        JSON.stringify({ error: "AI service not configured. Please contact support." }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Translate all emails using two-step AI pipeline
+    // Translate all emails using AI
     const translatedEmails = [];
     for (const email of emails) {
-      const translationPrompt = `You are an expert translator specializing in marketing and email copywriting. Translate the following email content to ${targetLanguage}.
-
-CRITICAL REQUIREMENTS:
-• Preserve the EXACT same tone, voice, and brand personality
-• Keep all formatting intact (paragraphs, line breaks, structure)
-• Maintain the persuasive power and emotional impact
-• Keep CTAs compelling in the target language
-• Preserve all personalization tags like {{first_name}}, {{company_name}} exactly as-is
-• Keep any URLs/links unchanged
-• Ensure the translation sounds native, not machine-translated
+      const prompt = `Translate the following email content to ${targetLanguage}. Preserve formatting, tone, and brand voice. Keep CTAs and links unchanged.
 
 Subject: ${email.subject}
 
@@ -114,11 +94,18 @@ Return ONLY valid JSON (no markdown, no code blocks):
   "html": "translated HTML content"
 }`;
 
-      // ═══════════════════════════════════════════════════════════════════
-      // STEP 1: DRAFT TRANSLATION with Groq (Llama 3.3 70B)
-      // ═══════════════════════════════════════════════════════════════════
-      console.log(`═══ Email ${email.sequence_number}: Step 1 - Draft Translation ═══`);
-      const draftResp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      // Use Groq AI
+      const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
+      if (!GROQ_API_KEY) {
+        console.error("GROQ_API_KEY not configured");
+        return new Response(
+          JSON.stringify({ error: "AI service not configured. Please contact support." }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      console.log(`Translating email ${email.sequence_number} with Groq AI (Llama 3.3 70B)`);
+      const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${GROQ_API_KEY}`,
@@ -127,25 +114,24 @@ Return ONLY valid JSON (no markdown, no code blocks):
         body: JSON.stringify({
           model: "llama-3.3-70b-versatile",
           messages: [
-            { role: "user", content: translationPrompt }
+            { role: "user", content: prompt }
           ],
-          temperature: 0.7,
         }),
       });
 
-      if (!draftResp.ok) {
-        const errorText = await draftResp.text();
-        console.error("Groq translation error:", draftResp.status, errorText);
+      if (!resp.ok) {
+        const errorText = await resp.text();
+        console.error("Groq AI error:", resp.status, errorText);
         
-        if (draftResp.status === 402) {
+        if (resp.status === 402) {
           return new Response(
             JSON.stringify({ error: "AI credits depleted. Please add credits to your Groq account." }),
             { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
-        if (draftResp.status === 429) {
+        if (resp.status === 429) {
           return new Response(
-            JSON.stringify({ error: "Rate limited. Please wait and retry." }),
+            JSON.stringify({ error: "Rate limited (500 free requests/day). Please wait and retry or upgrade your Groq plan." }),
             { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
@@ -156,76 +142,16 @@ Return ONLY valid JSON (no markdown, no code blocks):
         );
       }
 
-      const draftData = await draftResp.json();
-      if (!draftData.choices?.[0]?.message?.content) {
-        throw new Error("Invalid draft translation response");
+      const aiData = await resp.json();
+
+      // Groq returns OpenAI-compatible format
+      if (!aiData.choices?.[0]?.message?.content) {
+        throw new Error("Invalid AI response format");
       }
       
-      let draftContent = draftData.choices[0].message.content.trim();
-      console.log(`✅ Draft translation complete for email ${email.sequence_number}`);
-
-      // ═══════════════════════════════════════════════════════════════════
-      // STEP 2: POLISH with Claude via OpenRouter
-      // ═══════════════════════════════════════════════════════════════════
-      let finalContent = draftContent;
+      let contentText = aiData.choices[0].message.content.trim();
       
-      if (OPENROUTER_API_KEY) {
-        console.log(`═══ Email ${email.sequence_number}: Step 2 - Polish with Claude ═══`);
-        
-        const polishPrompt = `You are a native ${targetLanguage} copywriter. Review and polish this translated email for perfect fluency and natural phrasing.
-
-ORIGINAL TRANSLATION (JSON):
-${draftContent}
-
-POLISH REQUIREMENTS:
-• Ensure it reads like it was originally written in ${targetLanguage}, not translated
-• Fix any awkward phrasing or unnatural constructions
-• Maintain the persuasive marketing tone
-• Preserve all personalization tags ({{first_name}}, etc.) exactly
-• Keep URLs and links unchanged
-• Ensure emotional impact is preserved
-
-Return ONLY valid JSON (no markdown, no code blocks):
-{
-  "subject": "polished subject",
-  "content": "polished plain text content",
-  "html": "polished HTML content"
-}`;
-
-        try {
-          const polishResp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-              "Content-Type": "application/json",
-              "HTTP-Referer": "https://vayno.app",
-              "X-Title": "Vayno Translation Polish"
-            },
-            body: JSON.stringify({
-              model: "anthropic/claude-sonnet-4-20250514",
-              messages: [
-                { role: "user", content: polishPrompt }
-              ],
-              temperature: 0.5,
-            }),
-          });
-
-          if (polishResp.ok) {
-            const polishData = await polishResp.json();
-            if (polishData.choices?.[0]?.message?.content) {
-              finalContent = polishData.choices[0].message.content.trim();
-              console.log(`✅ Polish complete for email ${email.sequence_number}`);
-            }
-          } else {
-            console.warn(`Claude polish failed for email ${email.sequence_number}, using draft`);
-          }
-        } catch (polishError) {
-          console.warn(`Claude polish error for email ${email.sequence_number}:`, polishError);
-        }
-      }
-      
-      // Parse the final content
-      let contentText = finalContent;
+      // Extract JSON from markdown code blocks if present
       const jsonBlockMatch = contentText.match(/```json\s*([\s\S]*?)\s*```/);
       if (jsonBlockMatch) {
         contentText = jsonBlockMatch[1].trim();
@@ -245,8 +171,9 @@ Return ONLY valid JSON (no markdown, no code blocks):
         if (s !== -1 && e !== -1 && e > s) {
           try {
             translatedData = JSON.parse(contentText.slice(s, e + 1));
+            console.log("Parsed translation via substring extraction");
           } catch (e2) {
-            console.error("Translation parse failed:", e2);
+            console.error("Translate parse failed:", e2);
             return new Response(JSON.stringify({ error: "AI returned invalid translation format. Please retry." }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
           }
         } else {
@@ -274,7 +201,7 @@ Return ONLY valid JSON (no markdown, no code blocks):
         .eq("id", translatedEmail.id);
     }
 
-    console.log("✅ Campaign translation completed successfully (Draft + Polish pipeline)");
+    console.log("Campaign translation completed successfully");
 
     return new Response(
       JSON.stringify({ success: true, translatedCount: translatedEmails.length }),

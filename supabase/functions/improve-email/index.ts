@@ -66,9 +66,10 @@ serve(async (req) => {
     const { currentContent } = validationResult.data;
     console.log("Improving content of length:", currentContent.length);
 
-    const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
-    const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
+    const prompt = `Improve this email to be more compelling and high-converting while keeping the same length and structure: ${currentContent}`;
     
+    // Use Groq AI
+    const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
     if (!GROQ_API_KEY) {
       console.error("GROQ_API_KEY not configured");
       return new Response(
@@ -77,28 +78,8 @@ serve(async (req) => {
       );
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    // STEP 1: DRAFT IMPROVEMENT with Groq (Llama 3.3 70B)
-    // ═══════════════════════════════════════════════════════════════════
-    const draftPrompt = `You are a master email copywriter. Improve this email to be more compelling, persuasive, and high-converting.
-
-CURRENT EMAIL:
-${currentContent}
-
-IMPROVEMENT REQUIREMENTS:
-• Keep the SAME length and structure (±10% word count)
-• Make it more engaging and human-sounding
-• Strengthen the emotional appeal
-• Improve the flow and readability
-• Make CTAs more compelling
-• Remove any robotic or generic phrasing
-• Add conversational touches where appropriate
-• Ensure it sounds like a skilled human wrote it
-
-Return ONLY the improved email content (no explanations, no labels, no formatting instructions).`;
-
-    console.log("═══ STEP 1: Draft Improvement with Groq ═══");
-    const draftResp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    console.log("Calling Groq AI (Llama 3.3 70B) to improve email");
+    const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${GROQ_API_KEY}`,
@@ -107,25 +88,24 @@ Return ONLY the improved email content (no explanations, no labels, no formattin
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
         messages: [
-          { role: "user", content: draftPrompt }
+          { role: "user", content: prompt }
         ],
-        temperature: 0.8,
       }),
     });
 
-    if (!draftResp.ok) {
-      const errorText = await draftResp.text();
-      console.error("Groq improvement error:", draftResp.status, errorText);
+    if (!resp.ok) {
+      const errorText = await resp.text();
+      console.error("Groq AI error:", resp.status, errorText);
       
-      if (draftResp.status === 402) {
+      if (resp.status === 402) {
         return new Response(
           JSON.stringify({ error: "AI credits depleted. Please add credits to your Groq account." }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (draftResp.status === 429) {
+      if (resp.status === 429) {
         return new Response(
-          JSON.stringify({ error: "Rate limited. Please wait and retry." }),
+          JSON.stringify({ error: "Rate limited (500 free requests/day). Please wait and retry or upgrade your Groq plan." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -136,75 +116,16 @@ Return ONLY the improved email content (no explanations, no labels, no formattin
       );
     }
 
-    const draftData = await draftResp.json();
-    if (!draftData.choices?.[0]?.message?.content) {
-      console.error("Invalid Groq response format:", draftData);
+    const aiData = await resp.json();
+
+    // Groq returns OpenAI-compatible format
+    if (!aiData.choices?.[0]?.message?.content) {
+      console.error("Invalid AI response format:", aiData);
       throw new Error("Invalid AI response format");
     }
 
-    let improvedContent = draftData.choices[0].message.content.trim();
-    console.log("✅ Step 1 Complete: Draft improved");
-
-    // ═══════════════════════════════════════════════════════════════════
-    // STEP 2: POLISH with Claude via OpenRouter
-    // ═══════════════════════════════════════════════════════════════════
-    if (OPENROUTER_API_KEY) {
-      console.log("═══ STEP 2: Polish with Claude ═══");
-      
-      const polishPrompt = `You are an elite email editor. Polish this email to perfection.
-
-IMPROVED EMAIL:
-${improvedContent}
-
-POLISH REQUIREMENTS:
-• Ensure it sounds completely human (no AI tells)
-• Fix any awkward phrasing or unnatural constructions  
-• Maintain the same length and structure
-• Add subtle conversational touches if missing
-• Ensure smooth flow between paragraphs
-• Make sure personality is consistent throughout
-• Keep any personalization tags like {{first_name}} intact
-
-Return ONLY the polished email content (no explanations, no labels).`;
-
-      try {
-        const polishResp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://vayno.app",
-            "X-Title": "Vayno Email Polish"
-          },
-          body: JSON.stringify({
-            model: "anthropic/claude-sonnet-4-20250514",
-            messages: [
-              { role: "user", content: polishPrompt }
-            ],
-            temperature: 0.6,
-          }),
-        });
-
-        if (polishResp.ok) {
-          const polishData = await polishResp.json();
-          if (polishData.choices?.[0]?.message?.content) {
-            improvedContent = polishData.choices[0].message.content.trim();
-            console.log("✅ Step 2 Complete: Polished with Claude");
-          } else {
-            console.warn("Claude response missing content, using draft");
-          }
-        } else {
-          const polishError = await polishResp.text();
-          console.warn("Claude polish failed, using draft:", polishResp.status, polishError);
-        }
-      } catch (polishError) {
-        console.warn("Claude polish error, using draft:", polishError);
-      }
-    } else {
-      console.log("OPENROUTER_API_KEY not configured, skipping polish step");
-    }
-
-    console.log("✅ Email improvement complete (Draft + Polish pipeline)");
+    const improvedContent = aiData.choices[0].message.content.trim();
+    console.log("Content improved successfully");
 
     return new Response(JSON.stringify({ improvedContent }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
