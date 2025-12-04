@@ -165,16 +165,23 @@ Deno.serve(async (req) => {
 
     console.log(`📤 Starting Klaviyo export for campaign ${campaign_id}, type: ${export_type}`);
 
-    // Get Klaviyo API key from environment
-    const klaviyoApiKey = Deno.env.get("KLAVIYO_API_KEY");
+    // Get user's Klaviyo API key from klaviyo_connections table
+    const { data: klaviyoConnection, error: connectionError } = await supabase
+      .from("klaviyo_connections")
+      .select("api_key_encrypted")
+      .eq("user_id", user.id)
+      .eq("is_connected", true)
+      .single();
     
-    if (!klaviyoApiKey) {
-      console.error("KLAVIYO_API_KEY not configured");
+    if (connectionError || !klaviyoConnection) {
+      console.error("No Klaviyo connection found for user:", connectionError);
       return new Response(
-        JSON.stringify({ error: "Klaviyo integration is not configured. Please contact support." }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: "Please connect your Klaviyo account first", requiresConnection: true }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    const klaviyoApiKey = klaviyoConnection.api_key_encrypted;
 
     // Fetch campaign data
     const { data: campaign, error: campError } = await supabase
