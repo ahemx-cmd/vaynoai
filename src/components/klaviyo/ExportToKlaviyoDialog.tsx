@@ -100,19 +100,10 @@ const ExportToKlaviyoDialog = ({
             <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-500" />
             <h3 className="text-lg font-semibold mb-2">Export Successful!</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Your email sequence has been exported to Klaviyo. 
-              {exportType === "draft" 
-                ? " Review and tweak your templates in Klaviyo."
-                : " The templates are ready—create a flow in Klaviyo to use them."}
+              Your {emailCount} emails have been exported to Klaviyo as templates. 
+              Open your Klaviyo account to find them in the Templates section.
             </p>
-            <div className="flex gap-3 justify-center">
-              <Button variant="outline" onClick={handleClose}>Done</Button>
-              <Button 
-                onClick={() => window.open("https://www.klaviyo.com/templates", "_blank")}
-              >
-                View in Klaviyo
-              </Button>
-            </div>
+            <Button onClick={handleClose}>Done</Button>
           </div>
         ) : (
           <div className="space-y-6 pt-4">
