@@ -3,11 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { Loader2, Store, Rocket, CheckCircle, ExternalLink } from "lucide-react";
+import { Loader2, Store, Rocket } from "lucide-react";
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -24,14 +22,7 @@ const Onboarding = () => {
   // Step 3: Email marketing experience
   const [experience, setExperience] = useState("");
 
-  // Step 4 (Sellers only): Klaviyo connection
-  const [klaviyoApiKey, setKlaviyoApiKey] = useState("");
-  const [testingKlaviyo, setTestingKlaviyo] = useState(false);
-  const [klaviyoTestSuccess, setKlaviyoTestSuccess] = useState(false);
-  const [savingKlaviyo, setSavingKlaviyo] = useState(false);
-
-  // Calculate total steps based on platform
-  const totalSteps = userPlatform === "seller" ? 4 : 3;
+  const totalSteps = 3;
 
   useEffect(() => {
     checkAuth();
@@ -57,72 +48,6 @@ const Onboarding = () => {
     }
   };
 
-  const handleTestKlaviyo = async () => {
-    if (!klaviyoApiKey.trim()) {
-      toast.error("Please enter your Klaviyo API key");
-      return;
-    }
-
-    setTestingKlaviyo(true);
-    setKlaviyoTestSuccess(false);
-
-    try {
-      const response = await supabase.functions.invoke("test-klaviyo-connection", {
-        body: { api_key: klaviyoApiKey },
-      });
-
-      if (response.error) {
-        console.error("Test connection error:", response.error);
-        toast.error("Failed to test connection. Please try again.");
-        return;
-      }
-
-      const data = response.data;
-      
-      if (data.success) {
-        setKlaviyoTestSuccess(true);
-        toast.success("Connection successful! Your API key is valid.");
-      } else {
-        toast.error(data.error || "Invalid API key. Please check and try again.");
-      }
-    } catch (error) {
-      console.error("Connection test error:", error);
-      toast.error("Failed to test connection. Please try again.");
-    } finally {
-      setTestingKlaviyo(false);
-    }
-  };
-
-  const saveKlaviyoConnection = async () => {
-    if (!userId || !klaviyoApiKey.trim() || !klaviyoTestSuccess) return false;
-
-    setSavingKlaviyo(true);
-    try {
-      const { error } = await supabase
-        .from("klaviyo_connections")
-        .upsert({
-          user_id: userId,
-          api_key_encrypted: klaviyoApiKey,
-          is_connected: true,
-        }, {
-          onConflict: "user_id",
-        });
-
-      if (error) {
-        console.error("Save Klaviyo error:", error);
-        toast.error("Failed to save Klaviyo connection");
-        return false;
-      }
-      return true;
-    } catch (error) {
-      console.error("Save Klaviyo connection error:", error);
-      toast.error("Failed to save Klaviyo connection");
-      return false;
-    } finally {
-      setSavingKlaviyo(false);
-    }
-  };
-
   const handleNext = () => {
     if (step === 1 && !userPlatform) {
       toast.error("Please select a platform");
@@ -140,23 +65,6 @@ const Onboarding = () => {
     if (step < totalSteps) {
       setStep(step + 1);
     } else {
-      completeOnboarding();
-    }
-  };
-
-  const handleSkipKlaviyo = () => {
-    completeOnboarding();
-  };
-
-  const handleConnectKlaviyo = async () => {
-    if (!klaviyoTestSuccess) {
-      toast.error("Please test your connection first");
-      return;
-    }
-    
-    const saved = await saveKlaviyoConnection();
-    if (saved) {
-      toast.success("Klaviyo connected!");
       completeOnboarding();
     }
   };
@@ -349,92 +257,6 @@ const Onboarding = () => {
             </motion.div>
           )}
 
-          {/* Step 4: Klaviyo Connection (Sellers only) */}
-          {step === 4 && userPlatform === "seller" && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-6"
-            >
-              <div>
-                <h2 className="text-3xl font-bold mb-2">Connect Klaviyo</h2>
-                <p className="text-muted-foreground">
-                  Export your AI-generated sequences directly to Klaviyo
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  (Optional — you can always connect later)
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="klaviyoKey">Klaviyo Private API Key</Label>
-                  <Input
-                    id="klaviyoKey"
-                    type="password"
-                    placeholder="pk_xxxxxxxxxxxxxxxxxxxxxxxx"
-                    value={klaviyoApiKey}
-                    onChange={(e) => {
-                      setKlaviyoApiKey(e.target.value);
-                      setKlaviyoTestSuccess(false);
-                    }}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Find your API key in Klaviyo → Account → Settings → API Keys
-                  </p>
-                </div>
-
-                <a
-                  href="https://www.klaviyo.com/account#api-keys-tab"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
-                >
-                  Get your API key from Klaviyo
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={handleTestKlaviyo}
-                    disabled={testingKlaviyo || !klaviyoApiKey.trim()}
-                    className="flex-1"
-                  >
-                    {testingKlaviyo ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Testing...
-                      </>
-                    ) : klaviyoTestSuccess ? (
-                      <>
-                        <CheckCircle className="w-4 h-4 mr-2 text-green-500" />
-                        Connected
-                      </>
-                    ) : (
-                      "Test Connection"
-                    )}
-                  </Button>
-
-                  <Button
-                    onClick={handleConnectKlaviyo}
-                    disabled={savingKlaviyo || !klaviyoTestSuccess}
-                    className="flex-1"
-                  >
-                    {savingKlaviyo ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Saving...
-                      </>
-                    ) : (
-                      "Save & Continue"
-                    )}
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
           {/* Navigation buttons */}
           <div className="flex justify-between pt-6">
             <Button
@@ -445,32 +267,18 @@ const Onboarding = () => {
               Back
             </Button>
             
-            {step === 4 && userPlatform === "seller" ? (
-              <Button
-                variant="ghost"
-                onClick={handleSkipKlaviyo}
-                disabled={loading || savingKlaviyo}
-              >
-                Skip for now
-              </Button>
-            ) : (
-              <Button onClick={handleNext} disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : step === totalSteps && userPlatform !== "seller" ? (
-                  "Finish"
-                ) : step === 3 && userPlatform === "seller" ? (
-                  "Continue"
-                ) : step === totalSteps ? (
-                  "Finish"
-                ) : (
-                  "Continue"
-                )}
-              </Button>
-            )}
+            <Button onClick={handleNext} disabled={loading}>
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : step === totalSteps ? (
+                "Finish"
+              ) : (
+                "Continue"
+              )}
+            </Button>
           </div>
         </Card>
       </motion.div>
