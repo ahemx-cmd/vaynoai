@@ -102,10 +102,17 @@ const ExportToKlaviyoDialog = ({
             <p className="text-sm text-muted-foreground mb-4">
               Your email sequence has been exported to Klaviyo. 
               {exportType === "draft" 
-                ? " Check your Klaviyo templates to review them."
+                ? " Review and tweak your templates in Klaviyo."
                 : " The templates are ready—create a flow in Klaviyo to use them."}
             </p>
-            <Button onClick={handleClose}>Done</Button>
+            <div className="flex gap-3 justify-center">
+              <Button variant="outline" onClick={handleClose}>Done</Button>
+              <Button 
+                onClick={() => window.open("https://www.klaviyo.com/email-templates", "_blank")}
+              >
+                View in Klaviyo
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="space-y-6 pt-4">
