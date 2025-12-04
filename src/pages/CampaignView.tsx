@@ -13,9 +13,7 @@ import AutoTranslate from "@/components/campaign/AutoTranslate";
 import JSZip from "jszip";
 import { generateESPReadyHTML } from "@/lib/emailUtils";
 import { trackExport, trackFunnelStep, trackCampaignGeneration } from "@/lib/analytics";
-import KlaviyoConnectionDialog from "@/components/klaviyo/KlaviyoConnectionDialog";
 import ExportToKlaviyoDialog from "@/components/klaviyo/ExportToKlaviyoDialog";
-import { useKlaviyoConnection } from "@/hooks/useKlaviyoConnection";
 
 const CampaignView = () => {
   const { id } = useParams();
@@ -26,10 +24,8 @@ const CampaignView = () => {
   const [isGuest, setIsGuest] = useState(false);
   const [copiedAll, setCopiedAll] = useState(false);
   const [userPlatform, setUserPlatform] = useState<string | null>(null);
-  const [showKlaviyoConnect, setShowKlaviyoConnect] = useState(false);
   const [showKlaviyoExport, setShowKlaviyoExport] = useState(false);
   const { isTrial } = useUserPlan();
-  const { isConnected: isKlaviyoConnected, refresh: refreshKlaviyo } = useKlaviyoConnection();
 
   useEffect(() => {
     const fetchCampaign = async () => {
@@ -100,15 +96,6 @@ const CampaignView = () => {
   }, [id, navigate]);
 
   const handleKlaviyoExport = () => {
-    if (isKlaviyoConnected) {
-      setShowKlaviyoExport(true);
-    } else {
-      setShowKlaviyoConnect(true);
-    }
-  };
-
-  const handleKlaviyoConnected = () => {
-    refreshKlaviyo();
     setShowKlaviyoExport(true);
   };
 
@@ -344,13 +331,7 @@ const CampaignView = () => {
         </div>
       </div>
 
-      {/* Klaviyo Dialogs */}
-      <KlaviyoConnectionDialog
-        open={showKlaviyoConnect}
-        onOpenChange={setShowKlaviyoConnect}
-        onConnected={handleKlaviyoConnected}
-      />
-      
+      {/* Klaviyo Export Dialog */}
       {campaign && (
         <ExportToKlaviyoDialog
           open={showKlaviyoExport}
