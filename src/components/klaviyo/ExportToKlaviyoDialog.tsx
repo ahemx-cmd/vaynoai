@@ -108,7 +108,7 @@ const ExportToKlaviyoDialog = ({
             <div className="flex gap-3 justify-center">
               <Button variant="outline" onClick={handleClose}>Done</Button>
               <Button 
-                onClick={() => window.open("https://www.klaviyo.com/email-templates", "_blank")}
+                onClick={() => window.open("https://www.klaviyo.com/email-editor/templates", "_blank")}
               >
                 View in Klaviyo
               </Button>
