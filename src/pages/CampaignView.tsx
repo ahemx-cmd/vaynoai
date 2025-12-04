@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { ArrowLeft, Download, Sparkles, ExternalLink, Copy, Check } from "lucide-react";
+import { ArrowLeft, Download, Sparkles, ExternalLink, Copy, Check, Send } from "lucide-react";
 import EmailCard from "@/components/campaign/EmailCard";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import URLSummary from "@/components/campaign/URLSummary";
@@ -13,6 +13,9 @@ import AutoTranslate from "@/components/campaign/AutoTranslate";
 import JSZip from "jszip";
 import { generateESPReadyHTML } from "@/lib/emailUtils";
 import { trackExport, trackFunnelStep, trackCampaignGeneration } from "@/lib/analytics";
+import KlaviyoConnectionDialog from "@/components/klaviyo/KlaviyoConnectionDialog";
+import ExportToKlaviyoDialog from "@/components/klaviyo/ExportToKlaviyoDialog";
+import { useKlaviyoConnection } from "@/hooks/useKlaviyoConnection";
 
 const CampaignView = () => {
   const { id } = useParams();
@@ -22,14 +25,31 @@ const CampaignView = () => {
   const [loading, setLoading] = useState(true);
   const [isGuest, setIsGuest] = useState(false);
   const [copiedAll, setCopiedAll] = useState(false);
+  const [userPlatform, setUserPlatform] = useState<string | null>(null);
+  const [showKlaviyoConnect, setShowKlaviyoConnect] = useState(false);
+  const [showKlaviyoExport, setShowKlaviyoExport] = useState(false);
   const { isTrial } = useUserPlan();
+  const { isConnected: isKlaviyoConnected, refresh: refreshKlaviyo } = useKlaviyoConnection();
 
   useEffect(() => {
     const fetchCampaign = async () => {
       if (!id) return;
 
-      // Check if user is authenticated
+      // Check if user is authenticated and get profile
       const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        // Fetch user's platform preference
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("user_platform")
+          .eq("id", session.user.id)
+          .single();
+        
+        if (profile?.user_platform) {
+          setUserPlatform(profile.user_platform);
+        }
+      }
 
       const { data: campaignData, error: campaignError } = await supabase
         .from("campaigns")
@@ -78,6 +98,19 @@ const CampaignView = () => {
 
     fetchCampaign();
   }, [id, navigate]);
+
+  const handleKlaviyoExport = () => {
+    if (isKlaviyoConnected) {
+      setShowKlaviyoExport(true);
+    } else {
+      setShowKlaviyoConnect(true);
+    }
+  };
+
+  const handleKlaviyoConnected = () => {
+    refreshKlaviyo();
+    setShowKlaviyoExport(true);
+  };
 
   const handleCopyAllEmails = async () => {
     if (emails.length === 0) {
@@ -209,6 +242,16 @@ const CampaignView = () => {
                   )}
                   {copiedAll ? "Copied!" : "Copy All"}
                 </Button>
+                {/* Klaviyo Export - Seller platform only */}
+                {userPlatform === "seller" && (
+                  <Button 
+                    variant="outline" 
+                    onClick={handleKlaviyoExport}
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    Export to Klaviyo
+                  </Button>
+                )}
               </>
             )}
             <Button onClick={handleExportHTML} className="glow">
@@ -300,6 +343,23 @@ const CampaignView = () => {
           </div>
         </div>
       </div>
+
+      {/* Klaviyo Dialogs */}
+      <KlaviyoConnectionDialog
+        open={showKlaviyoConnect}
+        onOpenChange={setShowKlaviyoConnect}
+        onConnected={handleKlaviyoConnected}
+      />
+      
+      {campaign && (
+        <ExportToKlaviyoDialog
+          open={showKlaviyoExport}
+          onOpenChange={setShowKlaviyoExport}
+          campaignId={campaign.id}
+          campaignName={campaign.name}
+          emailCount={emails.length}
+        />
+      )}
     </div>
   );
 };
