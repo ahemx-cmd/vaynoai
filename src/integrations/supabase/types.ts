@@ -141,6 +141,77 @@ export type Database = {
           },
         ]
       }
+      klaviyo_connections: {
+        Row: {
+          api_key_encrypted: string
+          created_at: string | null
+          id: string
+          is_connected: boolean | null
+          last_sync_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          api_key_encrypted: string
+          created_at?: string | null
+          id?: string
+          is_connected?: boolean | null
+          last_sync_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          api_key_encrypted?: string
+          created_at?: string | null
+          id?: string
+          is_connected?: boolean | null
+          last_sync_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      klaviyo_exports: {
+        Row: {
+          campaign_id: string | null
+          created_at: string | null
+          error_message: string | null
+          export_type: string
+          id: string
+          klaviyo_template_ids: Json | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          campaign_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          export_type: string
+          id?: string
+          klaviyo_template_ids?: Json | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          export_type?: string
+          id?: string
+          klaviyo_template_ids?: Json | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "klaviyo_exports_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

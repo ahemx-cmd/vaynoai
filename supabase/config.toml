@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.reset-monthly-credits]
 verify_jwt = false
+
+[functions.export-to-klaviyo]
+verify_jwt = false
