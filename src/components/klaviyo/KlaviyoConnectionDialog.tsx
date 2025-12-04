@@ -39,22 +39,24 @@ const KlaviyoConnectionDialog = ({
     setTestSuccess(false);
 
     try {
-      // Test the API key by making a simple request to Klaviyo
-      const response = await fetch("https://a.klaviyo.com/api/accounts/", {
-        method: "GET",
-        headers: {
-          "Authorization": `Klaviyo-API-Key ${apiKey}`,
-          "Accept": "application/json",
-          "revision": "2024-02-15",
-        },
+      // Test the API key via edge function (avoids CORS)
+      const response = await supabase.functions.invoke("test-klaviyo-connection", {
+        body: { api_key: apiKey },
       });
 
-      if (response.ok) {
+      if (response.error) {
+        console.error("Test connection error:", response.error);
+        toast.error("Failed to test connection. Please try again.");
+        return;
+      }
+
+      const data = response.data;
+      
+      if (data.success) {
         setTestSuccess(true);
         toast.success("Connection successful! Your API key is valid.");
       } else {
-        const errorData = await response.json();
-        toast.error(errorData.errors?.[0]?.detail || "Invalid API key. Please check and try again.");
+        toast.error(data.error || "Invalid API key. Please check and try again.");
       }
     } catch (error) {
       console.error("Connection test error:", error);

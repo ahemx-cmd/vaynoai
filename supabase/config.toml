@@ -1,5 +1,8 @@
 project_id = "dwliuzujgjglbkezqsls"
 
+[functions.test-klaviyo-connection]
+verify_jwt = false
+
 [functions.generate-campaign]
 verify_jwt = false
 
