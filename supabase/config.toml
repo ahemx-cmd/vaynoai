@@ -1,8 +1,5 @@
 project_id = "dwliuzujgjglbkezqsls"
 
-[functions.test-klaviyo-connection]
-verify_jwt = false
-
 [functions.generate-campaign]
 verify_jwt = false
 
@@ -16,7 +13,4 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.reset-monthly-credits]
-verify_jwt = false
-
-[functions.export-to-klaviyo]
 verify_jwt = false
