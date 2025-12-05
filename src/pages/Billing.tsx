@@ -55,7 +55,7 @@ const Billing = () => {
     },
     {
       name: "Starter",
-      price: isLifetimeToggle ? 59 : 19,
+      price: isLifetimeToggle ? 59 : 11,
       period: isLifetimeToggle ? "one-time" : "month",
       icon: CreditCard,
       color: "from-primary to-accent",
@@ -112,7 +112,7 @@ const Billing = () => {
 
     const checkoutUrl = checkoutUrls[planName];
     if (checkoutUrl) {
-      const price = planName === 'Starter' ? (isLifetimeToggle ? 59 : 19) : 29;
+      const price = planName === 'Starter' ? (isLifetimeToggle ? 59 : 11) : 29;
       trackPlanUpgrade(planName, price);
       handleCheckout(checkoutUrl);
     }
