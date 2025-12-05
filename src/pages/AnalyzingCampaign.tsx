@@ -49,6 +49,7 @@ const AnalyzingCampaign = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [campaignUrl, setCampaignUrl] = useState<string>("");
+  const [tipIndex, setTipIndex] = useState(0);
 
   const steps = [
     "Fetching your landing page...",
@@ -56,8 +57,27 @@ const AnalyzingCampaign = () => {
     "Understanding your brand voice...",
     "Generating email sequence...",
     "Polishing the copy...",
-    "Almost done! 🚀",
+    "Final touches... hang tight!",
   ];
+
+  const engagingTips = [
+    "This usually takes 30-60 seconds",
+    "Good emails take time to craft",
+    "AI is studying your brand voice",
+    "Writing copy that converts",
+    "Almost there, worth the wait!",
+    "Perfecting every word",
+    "Quality takes a moment",
+    "Your emails are being polished",
+  ];
+
+  // Rotate tips every 4 seconds
+  useEffect(() => {
+    const tipInterval = setInterval(() => {
+      setTipIndex((prev) => (prev + 1) % engagingTips.length);
+    }, 4000);
+    return () => clearInterval(tipInterval);
+  }, []);
 
   useEffect(() => {
     const analyzeAndGenerate = async () => {
@@ -269,6 +289,53 @@ if (!data || !data.success) {
             <Progress value={progress} className="h-3" />
             <p className="text-sm text-muted-foreground">{progress}% complete</p>
           </div>
+
+          {/* Engaging tip message */}
+          {progress < 100 && (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={tipIndex}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="mb-6 px-4 py-3 rounded-xl bg-primary/5 border border-primary/10"
+              >
+                <p className="text-sm text-muted-foreground">
+                  💡 {engagingTips[tipIndex]}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+          )}
+
+          {/* Special pulsing animation when at 95%+ and waiting */}
+          {progress >= 95 && progress < 100 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="mb-6"
+            >
+              <div className="flex items-center justify-center gap-3">
+                <motion.div
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                  className="w-3 h-3 rounded-full bg-primary"
+                />
+                <motion.div
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
+                  className="w-3 h-3 rounded-full bg-primary"
+                />
+                <motion.div
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
+                  className="w-3 h-3 rounded-full bg-primary"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">
+                Finalizing your emails...
+              </p>
+            </motion.div>
+          )}
 
           {progress === 100 ? (
             <motion.div
