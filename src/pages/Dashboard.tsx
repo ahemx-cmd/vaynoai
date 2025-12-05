@@ -22,57 +22,72 @@ const Dashboard = () => {
   const { isTrial } = useUserPlan();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (!session) {
-        navigate("/auth");
+    let currentUserId: string | null = null;
+    
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      currentUserId = session?.user?.id ?? null;
+      
+      if (!session) {
+        navigate("/auth", { replace: true });
       } else {
         fetchCredits(session.user.id);
       }
-    }
-  );
+      setLoading(false);
+    });
 
-  supabase.auth.getSession().then(({ data: { session } }) => {
-    setSession(session);
-    setUser(session?.user ?? null);
-    
-    if (!session) {
-      navigate("/auth");
-    } else {
-      fetchCredits(session.user.id);
-    }
-    setLoading(false);
-  });
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        // Only update state if the user actually changed
+        if (session?.user?.id !== currentUserId) {
+          setSession(session);
+          setUser(session?.user ?? null);
+          currentUserId = session?.user?.id ?? null;
+          
+          if (!session) {
+            navigate("/auth", { replace: true });
+          } else {
+            fetchCredits(session.user.id);
+          }
+        }
+      }
+    );
 
-    // Set up realtime subscription for credit updates
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
+
+  // Separate effect for realtime credits - only set up when we have a user
+  useEffect(() => {
+    if (!user?.id) return;
+
     const channel = supabase
-      .channel("credits_updates")
+      .channel(`credits_updates_${user.id}`)
       .on(
         "postgres_changes",
         {
           event: "*",
           schema: "public",
           table: "user_usage",
+          filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
           if (payload.new && typeof payload.new === "object") {
             const newData = payload.new as any;
-            if (user && newData.user_id === user.id) {
-              setCreditsRemaining(newData.generations_limit - newData.generations_used);
-            }
+            setCreditsRemaining(newData.generations_limit - newData.generations_used);
           }
         }
       )
       .subscribe();
 
     return () => {
-      subscription.unsubscribe();
-      channel.unsubscribe();
+      supabase.removeChannel(channel);
     };
-  }, [navigate, user]);
+  }, [user?.id]);
 
   const fetchCredits = async (userId: string) => {
     const { data, error } = await supabase
