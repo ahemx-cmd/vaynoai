@@ -73,11 +73,12 @@ const AnalyzingCampaign = () => {
 
   // Rotate tips every 4 seconds
   useEffect(() => {
+    const tipsLength = engagingTips.length;
     const tipInterval = setInterval(() => {
-      setTipIndex((prev) => (prev + 1) % engagingTips.length);
+      setTipIndex((prev) => (prev + 1) % tipsLength);
     }, 4000);
     return () => clearInterval(tipInterval);
-  }, []);
+  }, [engagingTips.length]);
 
   useEffect(() => {
     const analyzeAndGenerate = async () => {
