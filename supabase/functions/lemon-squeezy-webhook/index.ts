@@ -6,6 +6,49 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+/**
+ * HMAC-SHA256 signature verification for LemonSqueezy webhooks
+ */
+async function verifySignature(
+  payload: string,
+  signature: string,
+  secret: string
+): Promise<boolean> {
+  try {
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      "raw",
+      encoder.encode(secret),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"]
+    );
+
+    const signatureBuffer = await crypto.subtle.sign(
+      "HMAC",
+      key,
+      encoder.encode(payload)
+    );
+
+    const expectedSignature = Array.from(new Uint8Array(signatureBuffer))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+
+    // Constant-time comparison to prevent timing attacks
+    if (signature.length !== expectedSignature.length) {
+      return false;
+    }
+    let result = 0;
+    for (let i = 0; i < signature.length; i++) {
+      result |= signature.charCodeAt(i) ^ expectedSignature.charCodeAt(i);
+    }
+    return result === 0;
+  } catch (error) {
+    console.error("Signature verification error:", error);
+    return false;
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -18,7 +61,9 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Verify webhook signature if secret is set
+    // SECURITY FIX: Properly verify webhook signature using HMAC-SHA256
+    const rawBody = await req.text();
+    
     if (webhookSecret) {
       const signature = req.headers.get('x-signature');
       if (!signature) {
@@ -28,18 +73,33 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
+
+      // Actually verify the signature cryptographically
+      const isValid = await verifySignature(rawBody, signature, webhookSecret);
+      if (!isValid) {
+        console.error('Invalid webhook signature - possible attack attempt');
+        return new Response(JSON.stringify({ error: 'Invalid signature' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      console.log('Webhook signature verified successfully');
+    } else {
+      console.warn('LEMON_SQUEEZY_WEBHOOK_SECRET not set - signature verification skipped');
     }
 
-    const payload = await req.json();
+    const payload = JSON.parse(rawBody);
     console.log('Received webhook event:', payload.meta?.event_name);
     console.log('Custom data:', payload.meta?.custom_data);
 
     const eventName = payload.meta?.event_name;
     const userId = payload.meta?.custom_data?.user_id;
 
-    if (!userId) {
-      console.error('No user_id in webhook payload');
-      return new Response(JSON.stringify({ error: 'Missing user_id' }), {
+    // Validate user_id format (must be a valid UUID)
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!userId || !uuidRegex.test(userId)) {
+      console.error('Invalid or missing user_id in webhook payload:', userId);
+      return new Response(JSON.stringify({ error: 'Invalid user_id format' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });

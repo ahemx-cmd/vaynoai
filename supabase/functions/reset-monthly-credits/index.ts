@@ -12,6 +12,67 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // SECURITY: Verify this is a legitimate cron job or admin call
+    const cronSecret = Deno.env.get('CRON_SECRET');
+    const authHeader = req.headers.get('Authorization');
+    
+    // Check for cron secret in header (for scheduled jobs)
+    const providedSecret = req.headers.get('x-cron-secret');
+    
+    if (cronSecret && providedSecret !== cronSecret) {
+      // If cron secret is set but not provided/matched, check for admin auth
+      if (!authHeader) {
+        console.error('Unauthorized access attempt - no credentials provided');
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized - This endpoint requires authentication' }),
+          { 
+            status: 401, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+      
+      // Verify admin role if using auth header
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+      const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+      
+      const authClient = createClient(supabaseUrl, supabaseAnonKey, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      
+      const { data: { user }, error: authError } = await authClient.auth.getUser();
+      if (authError || !user) {
+        console.error('Invalid auth token');
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized - Invalid token' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      // Check if user has admin role
+      const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+      const serviceClient = createClient(supabaseUrl, supabaseServiceKey);
+      
+      const { data: hasAdmin } = await serviceClient.rpc('has_role', {
+        _user_id: user.id,
+        _role: 'admin'
+      });
+      
+      if (!hasAdmin) {
+        console.error('User is not admin:', user.id);
+        return new Response(
+          JSON.stringify({ error: 'Forbidden - Admin access required' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      console.log('Admin access verified for user:', user.id);
+    } else if (cronSecret && providedSecret === cronSecret) {
+      console.log('Cron job access verified via secret');
+    } else if (!cronSecret) {
+      console.warn('CRON_SECRET not set - endpoint is unprotected. Set CRON_SECRET for production.');
+    }
+
     console.log('Starting monthly credit reset job...');
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
