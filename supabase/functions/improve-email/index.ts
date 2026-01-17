@@ -7,6 +7,26 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Rate limiting - in-memory store (per instance)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
+function checkRateLimit(userId: string, maxRequests: number, windowMs: number): { allowed: boolean; resetIn: number } {
+  const now = Date.now();
+  const entry = rateLimitStore.get(userId);
+
+  if (!entry || now > entry.resetTime) {
+    rateLimitStore.set(userId, { count: 1, resetTime: now + windowMs });
+    return { allowed: true, resetIn: Math.ceil(windowMs / 1000) };
+  }
+
+  if (entry.count >= maxRequests) {
+    return { allowed: false, resetIn: Math.ceil((entry.resetTime - now) / 1000) };
+  }
+
+  entry.count++;
+  return { allowed: true, resetIn: Math.ceil((entry.resetTime - now) / 1000) };
+}
+
 // Input validation schema
 const requestSchema = z.object({
   currentContent: z.string().min(1, "Content cannot be empty").max(5000, "Content too long"),
@@ -18,7 +38,7 @@ serve(async (req) => {
   }
 
   try {
-    // SECURITY FIX 1: Validate authentication
+    // SECURITY: Validate authentication
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       console.error("Missing Authorization header");
@@ -48,7 +68,28 @@ serve(async (req) => {
 
     console.log("Authenticated user:", user.id);
 
-    // SECURITY FIX 2: Validate input data
+    // SECURITY: Rate limiting - 30 requests per hour per user
+    const rateLimit = checkRateLimit(user.id, 30, 60 * 60 * 1000);
+    if (!rateLimit.allowed) {
+      console.warn(`Rate limit exceeded for user ${user.id}`);
+      return new Response(
+        JSON.stringify({ 
+          error: "Too many requests", 
+          message: `Rate limit exceeded. Please try again in ${rateLimit.resetIn} seconds.`,
+          retryAfter: rateLimit.resetIn 
+        }),
+        { 
+          status: 429, 
+          headers: { 
+            ...corsHeaders, 
+            "Content-Type": "application/json",
+            "Retry-After": rateLimit.resetIn.toString()
+          } 
+        }
+      );
+    }
+
+    // Validate input data
     const body = await req.json();
     const validationResult = requestSchema.safeParse(body);
     

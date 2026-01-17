@@ -7,11 +7,52 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Rate limiting - in-memory store (per instance)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
+interface RateLimitConfig {
+  maxRequests: number;
+  windowMs: number;
+}
+
+function checkRateLimit(identifier: string, config: RateLimitConfig): { allowed: boolean; remaining: number; resetIn: number } {
+  const now = Date.now();
+  const entry = rateLimitStore.get(identifier);
+
+  // Clean up expired entries periodically
+  if (rateLimitStore.size > 5000) {
+    for (const [key, val] of rateLimitStore.entries()) {
+      if (now > val.resetTime) rateLimitStore.delete(key);
+    }
+  }
+
+  if (!entry || now > entry.resetTime) {
+    rateLimitStore.set(identifier, { count: 1, resetTime: now + config.windowMs });
+    return { allowed: true, remaining: config.maxRequests - 1, resetIn: Math.ceil(config.windowMs / 1000) };
+  }
+
+  if (entry.count >= config.maxRequests) {
+    return { allowed: false, remaining: 0, resetIn: Math.ceil((entry.resetTime - now) / 1000) };
+  }
+
+  entry.count++;
+  return { allowed: true, remaining: config.maxRequests - entry.count, resetIn: Math.ceil((entry.resetTime - now) / 1000) };
+}
+
+function getClientIP(req: Request): string {
+  return (
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    req.headers.get("cf-connecting-ip") ||
+    "unknown"
+  );
+}
+
 // Input validation schema
 const requestSchema = z.object({
   campaignId: z.string().uuid("Invalid campaign ID format"),
   url: z.string().url("Invalid URL format").max(2000, "URL too long"),
-  brandGuidelines: z.string().optional().nullable(),
+  brandGuidelines: z.string().max(10000, "Brand guidelines too long").optional().nullable(),
 });
 
 serve(async (req) => {
@@ -20,9 +61,39 @@ serve(async (req) => {
   }
 
   try {
-    // Check for authentication (optional for guest campaigns)
+    // SECURITY: Rate limiting
+    const clientIP = getClientIP(req);
     const authHeader = req.headers.get("Authorization");
     let user = null;
+    
+    // Apply rate limiting based on auth status
+    // Guest users: 5 requests per hour per IP
+    // Authenticated users: 20 requests per hour per user
+    const rateLimitIdentifier = authHeader ? null : `ip:${clientIP}`; // Will be updated after auth
+    
+    if (!authHeader) {
+      // Guest rate limiting by IP
+      const rateLimit = checkRateLimit(`guest:${clientIP}`, { maxRequests: 5, windowMs: 60 * 60 * 1000 });
+      if (!rateLimit.allowed) {
+        console.warn(`Rate limit exceeded for guest IP: ${clientIP}`);
+        return new Response(
+          JSON.stringify({ 
+            error: "Too many requests", 
+            message: `Rate limit exceeded. Please try again in ${rateLimit.resetIn} seconds or sign in for higher limits.`,
+            retryAfter: rateLimit.resetIn 
+          }),
+          { 
+            status: 429, 
+            headers: { 
+              ...corsHeaders, 
+              "Content-Type": "application/json",
+              "Retry-After": rateLimit.resetIn.toString()
+            } 
+          }
+        );
+      }
+      console.log(`Guest request from IP ${clientIP} - ${rateLimit.remaining} requests remaining`);
+    }
     
     console.log("Request received, auth header present:", !!authHeader);
     
@@ -40,6 +111,28 @@ serve(async (req) => {
       if (!authError && authUser) {
         user = authUser;
         console.log("Authenticated user:", user.id);
+        
+        // Rate limiting for authenticated users: 20 per hour
+        const rateLimit = checkRateLimit(`user:${user.id}`, { maxRequests: 20, windowMs: 60 * 60 * 1000 });
+        if (!rateLimit.allowed) {
+          console.warn(`Rate limit exceeded for user: ${user.id}`);
+          return new Response(
+            JSON.stringify({ 
+              error: "Too many requests", 
+              message: `Rate limit exceeded. Please try again in ${rateLimit.resetIn} seconds.`,
+              retryAfter: rateLimit.resetIn 
+            }),
+            { 
+              status: 429, 
+              headers: { 
+                ...corsHeaders, 
+                "Content-Type": "application/json",
+                "Retry-After": rateLimit.resetIn.toString()
+              } 
+            }
+          );
+        }
+        console.log(`Authenticated request - ${rateLimit.remaining} requests remaining this hour`);
       } else {
         console.log("Auth header present but user verification failed:", authError?.message);
       }

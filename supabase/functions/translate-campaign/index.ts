@@ -1,10 +1,54 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Rate limiting - in-memory store (per instance)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
+function checkRateLimit(userId: string, maxRequests: number, windowMs: number): { allowed: boolean; resetIn: number } {
+  const now = Date.now();
+  const entry = rateLimitStore.get(userId);
+
+  if (!entry || now > entry.resetTime) {
+    rateLimitStore.set(userId, { count: 1, resetTime: now + windowMs });
+    return { allowed: true, resetIn: Math.ceil(windowMs / 1000) };
+  }
+
+  if (entry.count >= maxRequests) {
+    return { allowed: false, resetIn: Math.ceil((entry.resetTime - now) / 1000) };
+  }
+
+  entry.count++;
+  return { allowed: true, resetIn: Math.ceil((entry.resetTime - now) / 1000) };
+}
+
+// ISO 639-1 language codes (common subset)
+const validLanguageCodes = [
+  "en", "es", "fr", "de", "it", "pt", "nl", "ru", "zh", "ja", "ko", "ar", "hi", "bn", "pa",
+  "tr", "vi", "th", "pl", "uk", "cs", "el", "he", "sv", "da", "no", "fi", "hu", "ro", "sk",
+  "bg", "hr", "sl", "et", "lv", "lt", "id", "ms", "tl", "sw", "af", "zu", "am", "fa", "ur"
+];
+
+// Input validation schema with strict types
+const requestSchema = z.object({
+  campaignId: z.string().uuid("Invalid campaign ID format"),
+  targetLanguage: z.string()
+    .min(2, "Language code too short")
+    .max(50, "Language specification too long")
+    .refine(
+      (val) => {
+        // Allow either ISO code or full language name (up to 50 chars)
+        const lowerVal = val.toLowerCase().trim();
+        return validLanguageCodes.includes(lowerVal) || /^[a-zA-Z\s-]+$/.test(val);
+      },
+      { message: "Invalid language format" }
+    ),
+});
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -12,10 +56,12 @@ serve(async (req) => {
   }
 
   try {
+    // SECURITY: Validate authentication
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
+      console.error("Missing Authorization header");
       return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
+        JSON.stringify({ error: "Unauthorized - Missing authentication" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -29,20 +75,63 @@ serve(async (req) => {
 
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
     if (authError || !user) {
+      console.error("Authentication failed:", authError?.message);
       return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
+        JSON.stringify({ error: "Unauthorized - Invalid token" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const { campaignId, targetLanguage } = await req.json();
+    console.log("Authenticated user:", user.id);
 
-    if (!campaignId || !targetLanguage) {
+    // SECURITY: Rate limiting - 10 requests per hour per user
+    const rateLimit = checkRateLimit(user.id, 10, 60 * 60 * 1000);
+    if (!rateLimit.allowed) {
+      console.warn(`Rate limit exceeded for user ${user.id}`);
       return new Response(
-        JSON.stringify({ error: "Missing campaignId or targetLanguage" }),
+        JSON.stringify({ 
+          error: "Too many requests", 
+          message: `Rate limit exceeded. Please try again in ${rateLimit.resetIn} seconds.`,
+          retryAfter: rateLimit.resetIn 
+        }),
+        { 
+          status: 429, 
+          headers: { 
+            ...corsHeaders, 
+            "Content-Type": "application/json",
+            "Retry-After": rateLimit.resetIn.toString()
+          } 
+        }
+      );
+    }
+
+    // SECURITY: Validate and sanitize input
+    let body;
+    try {
+      body = await req.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON body" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    const validationResult = requestSchema.safeParse(body);
+    if (!validationResult.success) {
+      console.error("Input validation failed:", validationResult.error.errors);
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid input", 
+          details: validationResult.error.errors[0].message 
+        }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { campaignId, targetLanguage } = validationResult.data;
+    
+    // Sanitize targetLanguage to prevent injection
+    const sanitizedLanguage = targetLanguage.trim().slice(0, 50);
 
     // Verify campaign ownership
     const { data: campaign, error: campaignError } = await supabaseClient
@@ -52,6 +141,7 @@ serve(async (req) => {
       .single();
 
     if (campaignError || !campaign || campaign.user_id !== user.id) {
+      console.error("Campaign not found or unauthorized:", campaignError?.message);
       return new Response(
         JSON.stringify({ error: "Campaign not found or unauthorized" }),
         { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -72,12 +162,12 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Translating ${emails.length} emails to ${targetLanguage}`);
+    console.log(`Translating ${emails.length} emails to ${sanitizedLanguage}`);
 
     // Translate all emails using AI
     const translatedEmails = [];
     for (const email of emails) {
-      const prompt = `Translate the following email content to ${targetLanguage}. Preserve formatting, tone, and brand voice. Keep CTAs and links unchanged.
+      const prompt = `Translate the following email content to ${sanitizedLanguage}. Preserve formatting, tone, and brand voice. Keep CTAs and links unchanged.
 
 Subject: ${email.subject}
 
